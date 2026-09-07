@@ -33,6 +33,7 @@ STANDOFF_H = 6.0           # PCB underside above the floor (SD slot body + GPIO 
 STANDOFF_WALL = 1.2        # boss OD 6.4: stays inside the ~6 mm component keep-out around the Pi holes
 PCB_BOTTOM_Z = FLOOR_T + STANDOFF_H
 PCB_TOP_Z = PCB_BOTTOM_Z + BOARD.pcb_t         # 9.2
+PCB_ENVELOPE_H = 16.0      # tallest component above the PCB top (USB-A double stack) for fit checks
 HEADROOM = 20.0            # PCB top to lid underside: USB-A stacks 16 tall, 10 mm fan under the lid clears the SoC by ~7.5
 OUTER_H = PCB_TOP_Z + HEADROOM                 # 29.2 body height (31.2 with lid)
 

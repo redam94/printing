@@ -48,13 +48,13 @@ Assumptions (user unavailable):
 """
 from build123d import Align, Box, Part, Plane, Polygon, Pos, Rectangle, Rot, Sketch, extrude
 
-from lib.component import locations_of, on_bed
+from lib.component import flip_to_assembly, locations_of, on_bed
 from lib.fasteners.clearance_hole import clearance_hole
 from lib.fasteners.heat_set_boss import heat_set_boss
 from lib.mechanisms.cantilever_latch import cantilever_latch, latch_window
 from lib.patterns.corners import corner_holes
 from lib.patterns.fan import fan_mount
-from lib.patterns.pi import pi5_mount, pi5_port_cutouts
+from lib.patterns.pi import pi5_mount, pi5_port_cutouts, pi_board_outline
 from lib.primitives.feet import rubber_foot_recess
 from lib.primitives.rounded_box import box_lid, rounded_box
 from lib.primitives.vented_panel import vent_slots
@@ -172,6 +172,25 @@ def build() -> dict[str, Part]:
     lid = on_bed(Rot(180, 0, 0) * lid)             # print orientation: top face on the bed
     lid_snap = on_bed(Rot(180, 0, 0) * lid_snap)
     return {"body": body, "lid": lid, "lid_snap": lid_snap}
+
+
+def fit_checks(parts: dict[str, Part]) -> dict[str, tuple[Part, Part]]:
+    """Assembled-state interference checks run by scripts/build.py.
+
+    Both lids are put back on the rim (plate underside at OUTER_H); the Pi is a box envelope:
+    PCB outline at its standoff height, PCB_ENVELOPE_H tall (USB-A stacks are the tallest part).
+    """
+    body = parts["body"]
+    lid = flip_to_assembly(parts["lid"], P.OUTER_H + P.LID_T)
+    lid_snap = flip_to_assembly(parts["lid_snap"], P.OUTER_H + P.LID_T)
+    pcb = Pos(P.PI_X, P.PI_Y, P.PCB_BOTTOM_Z) * extrude(pi_board_outline("pi5"), amount=P.BOARD.pcb_t + P.PCB_ENVELOPE_H)
+    return {
+        "lid_vs_body": (lid, body),
+        "lid_snap_vs_body": (lid_snap, body),
+        "pcb_vs_body": (pcb, body),
+        "pcb_vs_lid": (pcb, lid),
+        "pcb_vs_lid_snap": (pcb, lid_snap),
+    }
 
 
 if __name__ == "__main__":

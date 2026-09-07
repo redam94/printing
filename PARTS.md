@@ -189,6 +189,7 @@ Raspberry Pi PCB outline (rounded rectangle) positioned to line up with the matc
 - **tags:** footprint, keep-out, outline, pcb, pi zero, pi4, pi5, raspberry pi  
 - **validated in:** PLA, PETG  
 - **orientation:** any (2D pattern)  
+- **used by:** models/pi5_fan_case/model.py  
 
 | param | type | units | default | description |
 |---|---|---|---|---|
@@ -770,4 +771,4 @@ side = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)
 |---|---|---|
 | `esp32_devkit_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `patterns.esp32_footprint`, `primitives.box_lid`, `primitives.cable_grommet`, `primitives.pcb_slot_cradle`, `primitives.rounded_box`, `primitives.vent_slots` | yes |
 | `l_bracket_40` | `primitives.l_bracket` | yes |
-| `pi5_fan_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `mechanisms.cantilever_latch`, `mechanisms.latch_window`, `patterns.corner_holes`, `patterns.fan_mount`, `patterns.pi5_mount`, `patterns.pi5_port_cutouts`, `primitives.box_lid`, `primitives.rounded_box`, `primitives.rubber_foot_recess`, `primitives.vent_slots` | yes |
+| `pi5_fan_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `mechanisms.cantilever_latch`, `mechanisms.latch_window`, `patterns.corner_holes`, `patterns.fan_mount`, `patterns.pi5_mount`, `patterns.pi5_port_cutouts`, `patterns.pi_board_outline`, `primitives.box_lid`, `primitives.rounded_box`, `primitives.rubber_foot_recess`, `primitives.vent_slots` | yes |

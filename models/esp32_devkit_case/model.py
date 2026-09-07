@@ -9,7 +9,7 @@ Both parts are returned in print orientation (bed at z=0): body floor down, lid 
 """
 from build123d import Align, Box, Part, Plane, Pos, Rot, extrude
 
-from lib.component import on_bed
+from lib.component import flip_to_assembly, on_bed
 from lib.fasteners.clearance_hole import clearance_hole
 from lib.fasteners.heat_set_boss import heat_set_boss
 from lib.primitives.cable_grommet import cable_grommet
@@ -65,7 +65,7 @@ def fit_checks(parts: dict[str, Part]) -> dict[str, tuple[Part, Part]]:
     """Assembled-state interference checks run by scripts/build.py."""
     body, lid = parts["body"], parts["lid"]
     # lid back in assembled orientation: plate on the rim, lip hanging inside
-    lid_assembled = Pos(0, 0, P.OUTER_H + P.LID_T) * Rot(180, 0, 0) * Pos(0, 0, -lid.bounding_box().max.Z) * lid
+    lid_assembled = flip_to_assembly(lid, P.OUTER_H + P.LID_T)
     # PCB envelope (board + components) sitting in the cradle
     pcb = Pos(0, 0, P.FLOOR_T + P.BOARD_Z) * extrude(esp32_footprint("devkitc_v4"), amount=P.BOARD.pcb_t + P.BOARD.module_h)
     return {"lid_vs_body": (lid_assembled, body), "pcb_vs_body": (pcb, body)}

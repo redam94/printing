@@ -230,3 +230,17 @@ def on_bed(shape):
     from build123d import Pos
 
     return Pos(0, 0, -shape.bounding_box().min.Z) * shape
+
+
+def flip_to_assembly(shape, top_z: float):
+    """Undo a print flip: rotate a face-down part (lid, cover) 180 deg about X and translate it
+    so its highest point sits at ``top_z``.  For a lid printed top-face-down, pass
+    ``top_z = body_height + lid_thickness`` and the plate lands on the rim with the lip inside::
+
+        lid_assembled = flip_to_assembly(parts["lid"], OUTER_H + LID_T)
+        return {"lid_vs_body": (lid_assembled, parts["body"])}
+    """
+    from build123d import Pos, Rot
+
+    flipped = Rot(180, 0, 0) * shape
+    return Pos(0, 0, top_z - flipped.bounding_box().max.Z) * flipped

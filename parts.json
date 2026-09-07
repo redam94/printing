@@ -1417,7 +1417,9 @@
       "returns": "Sketch",
       "docstring": "Board outline sketch sharing the mount pattern's origin, so\n``pi_board_outline() - pi5_mount()`` is the drilled PCB footprint.\n\nExample:\n    pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
       "example": "pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.patterns.pi import pi_board_outline"
     },
     "patterns.pi_zero_mount": {
@@ -2286,6 +2288,7 @@
         "patterns.fan_mount",
         "patterns.pi5_mount",
         "patterns.pi5_port_cutouts",
+        "patterns.pi_board_outline",
         "primitives.box_lid",
         "primitives.rounded_box",
         "primitives.rubber_foot_recess",
