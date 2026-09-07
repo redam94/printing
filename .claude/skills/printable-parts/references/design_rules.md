@@ -1,6 +1,6 @@
 # FDM design rules baked into the library
 
-Numbers assume a 0.4 mm nozzle, 0.2 mm layers, PLA/PETG. Components already apply these; use
+Numbers assume the Snapmaker U1 defaults: 0.4 mm nozzle, 0.2 mm layers, PLA/PETG, 270 mm cube bed. Components already apply these; use
 this when writing geometry the library does not cover.
 
 ## Holes and fits

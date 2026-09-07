@@ -66,7 +66,10 @@ Do not guess or pad with things that are not there.
    - See `references/build123d_cheatsheet.md` for the 0.11 idioms that work here (algebra API,
      `is_valid` is a property, `Plane.XZ` mapping, selecting edges).
 4. **Build it:** `uv run python scripts/build.py <project>`. This runs the model, prints bbox and
-   volume per part, runs the printability check, exports STL + STEP to `models/<project>/exports/`,
+   volume per part, runs the printability check, exports STL + STEP + 3MF per part to
+   `models/<project>/exports/` plus `<project>.3mf`, a plate with every part arranged 10 mm apart
+   (the file to open in Snapmaker Orca for the U1; it fails the build if the plate exceeds the
+   270 x 270 x 270 mm bed),
    renders `exports/renders/<part>.png` (isometric + top + front), writes `exports/build_report.json`
    and the review page `exports/view.html` (interactive 3D with a Z section plane, a Report tab and a
    Notes tab), and writes or diffs the golden metrics in `tests/regression/<project>.json`. **Open
@@ -178,7 +181,7 @@ side, not a golden update.
 
 | task | command |
 |---|---|
-| build, check, export, render, golden | `uv run python scripts/build.py <project> [--update-golden]` |
+| build, check, export STL/STEP/3MF, render, review page, golden | `uv run python scripts/build.py <project> [--update-golden]` |
 | render only | `uv run python scripts/render.py <project>` |
 | review page only (3D + report + notes) | `uv run python scripts/export_viewer.py <project>` |
 | printability only | `uv run python scripts/check_printable.py <project>` or `--stl file.stl` |
@@ -186,6 +189,14 @@ side, not a golden update.
 | impact of a component change | `uv run python scripts/impact.py <component-id> [--accept]` |
 | lint models for magic numbers / inlined patterns | `uv run python scripts/lint_models.py` |
 | full test suite | `uv run python -m pytest -q` |
+
+## Target printer
+
+Default target is the **Snapmaker U1** (270 x 270 x 270 mm, four 0.4 mm toolheads, Snapmaker Orca
+slicer), encoded in `scripts/_common.py` as `PRINTER`. Wall multiples, hole oversize and the plate
+fit check assume it. Multi-material is available: a model may return separate parts intended for
+different filaments (e.g. a TPU foot on a PETG body) and say so in its docstring; they still export
+as separate objects in the plate 3MF and get assigned to extruders in the slicer.
 
 ## References (read when relevant)
 

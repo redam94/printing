@@ -49,7 +49,7 @@ def scan_model_imports() -> dict[str, list[str]]:
     for py in sorted(MODELS_DIR.glob("*/*.py")):
         rel = str(py.relative_to(ROOT))
         try:
-            tree = ast.parse(py.read_text())
+            tree = ast.parse(py.read_text(encoding="utf-8"))
         except SyntaxError:
             continue
         module_aliases: dict[str, str] = {}   # local name -> lib module path
@@ -154,17 +154,17 @@ def main() -> int:
     js = json.dumps(index, indent=2, default=str) + "\n"
     if args.check:
         stale = []
-        if not PARTS_MD.exists() or PARTS_MD.read_text() != md:
+        if not PARTS_MD.exists() or PARTS_MD.read_text(encoding="utf-8") != md:
             stale.append("PARTS.md")
-        if not PARTS_JSON.exists() or PARTS_JSON.read_text() != js:
+        if not PARTS_JSON.exists() or PARTS_JSON.read_text(encoding="utf-8") != js:
             stale.append("parts.json")
         if stale:
             print(f"STALE INDEX: {', '.join(stale)} — run `uv run python scripts/reindex.py`")
             return 1
         print("index is fresh")
         return 0
-    PARTS_MD.write_text(md)
-    PARTS_JSON.write_text(js)
+    PARTS_MD.write_text(md, encoding="utf-8")
+    PARTS_JSON.write_text(js, encoding="utf-8")
     n_used = sum(1 for c in index["components"].values() if c["used_by"])
     print(f"wrote PARTS.md and parts.json: {len(index['components'])} components ({n_used} used by models), {len(index['models'])} models")
     return 0

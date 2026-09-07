@@ -303,7 +303,8 @@ function renderReport(run){
     <h3>Library components reused</h3>${comps.length?`<ul>${comps.map(c=>`<li><span class="mono">${esc(c.id)}</span> <span class="chip">v${esc(c.version)}</span> <span class="dim">${esc(c.summary)}</span></li>`).join('')}</ul>`:'<p class="dim">None — everything in this model is new geometry.</p>'}
     <h3>Parameters</h3><div class="tw"><table><thead><tr><th>name</th><th>value</th><th>note</th></tr></thead><tbody>${params.map(p=>`<tr class="${p.derived?'dim':''}"><td class="mono">${esc(p.name)}</td><td class="mono">${esc(p.value)}</td><td>${esc(p.comment)}${p.derived?' <span class="chip">derived</span>':''}</td></tr>`).join('')}</tbody></table></div>
     <h3>Changes vs golden</h3>${changes.length?`<ul>${changes.map(c=>`<li><span class="mono">${esc(c.part)} ${esc(c.field)}</span>: ${esc(c.old)} → ${esc(c.new)} ${c.delta?`<span class="dim">(${esc(c.delta)})</span>`:''}</li>`).join('')}</ul>`:'<p class="dim">Matches the committed golden metrics.</p>'}
-    <h3>Exports</h3><ul>${parts.map(([n,p])=>`<li class="mono">${esc(p.stl)} · ${esc(p.step)}</li>`).join('')}</ul>
+    ${r.plate&&r.plate.threemf?`<h3>Plate for ${esc(r.plate.printer)}</h3><p><span class="mono">${esc(r.plate.threemf)}</span> — ${r.plate.extent.map(v=>fmt(v)).join(' × ')} mm on a ${r.plate.bed.map(v=>fmt(v,0)).join(' × ')} bed ${r.plate.fits_bed?'<span class="flag ok">fits</span>':'<span class="flag bad">does not fit</span>'}</p>`:''}
+    <h3>Exports</h3><ul>${parts.map(([n,p])=>`<li class="mono">${esc(p.stl)} · ${esc(p.step)}${p.threemf?' · '+esc(p.threemf):''}</li>`).join('')}</ul>
     ${r.review&&r.review.artifact_url?`<h3>Review page</h3><p class="mono">${esc(r.review.artifact_url)}</p>`:''}
   </div>`;
 }

@@ -142,7 +142,7 @@ def golden_path(project: str) -> Path:
 
 def load_golden(project: str) -> dict | None:
     p = golden_path(project)
-    return json.loads(p.read_text()) if p.exists() else None
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
 def write_golden(project: str, part_metrics: dict[str, Metrics]) -> Path:
@@ -154,7 +154,7 @@ def write_golden(project: str, part_metrics: dict[str, Metrics]) -> Path:
         "parts": {n: m.to_dict() for n, m in part_metrics.items()},
     }
     p = golden_path(project)
-    p.write_text(json.dumps(data, indent=2) + "\n")
+    p.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return p
 
 
@@ -232,7 +232,7 @@ def params_snapshot(project: str) -> list[dict]:
     src_path = MODELS_DIR / project / "params.py"
     if not src_path.exists():
         return []
-    src = src_path.read_text()
+    src = src_path.read_text(encoding="utf-8")
     lines = src.splitlines()
     mod = importlib.import_module(f"models.{project}.params")
     out = []
@@ -257,7 +257,7 @@ def components_used(project: str) -> list[dict]:
     pj = ROOT / "parts.json"
     if not pj.exists():
         return []
-    idx = json.loads(pj.read_text())
+    idx = json.loads(pj.read_text(encoding="utf-8"))
     prefix = f"models/{project}/"
     return [{"id": cid, "version": c["version"], "summary": c["summary"]}
             for cid, c in idx["components"].items() if any(f.startswith(prefix) for f in c["used_by"])]
@@ -265,10 +265,10 @@ def components_used(project: str) -> list[dict]:
 
 def review_info(project: str) -> dict:
     p = MODELS_DIR / project / "review.json"
-    return json.loads(p.read_text()) if p.exists() else {}
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
-def write_build_report(project: str, parts: dict, part_metrics: dict, checks: dict, fits: dict, golden_changes: list) -> Path:
+def write_build_report(project: str, parts: dict, part_metrics: dict, checks: dict, fits: dict, golden_changes: list, threemf: dict | None = None) -> Path:
     import inspect
 
     mod = load_model(project)
@@ -282,13 +282,83 @@ def write_build_report(project: str, parts: dict, part_metrics: dict, checks: di
         "components": components_used(project),
         "params": params_snapshot(project),
         "parts": {name: {"metrics": part_metrics[name].to_dict(), "printability": checks.get(name, {}),
-                         "stl": f"models/{project}/exports/{name}.stl", "step": f"models/{project}/exports/{name}.step"}
+                         "stl": f"models/{project}/exports/{name}.stl", "step": f"models/{project}/exports/{name}.step",
+                         "threemf": f"models/{project}/exports/{name}.3mf"}
                   for name in parts},
+        "plate": ({"threemf": f"models/{project}/exports/{project}.3mf", "extent": list(threemf["plate_extent"]),
+                   "fits_bed": threemf["fits_bed"], "printer": threemf["printer"], "bed": list(threemf["bed"])} if threemf else {}),
         "fit_checks": fits,
         "golden_changes": golden_changes,
         "review": review_info(project),
     }
     out = MODELS_DIR / project / "exports" / "build_report.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2, default=str) + "\n")
+    out.write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
     return out
+
+
+# ---------------------------------------------------------------------------
+# Printer profile and 3MF export
+# ---------------------------------------------------------------------------
+
+PRINTER = {
+    "name": "Snapmaker U1",
+    "bed": (270.0, 270.0, 270.0),   # X, Y, Z build volume in mm (Snapmaker U1 spec sheet, ver. 2025.09)
+    "nozzle": 0.4,                   # stock hotends; 0.2/0.6/0.8 available
+    "toolheads": 4,
+    "slicer": "Snapmaker Orca",
+}
+PLATE_GAP = 10.0  # mm between parts on the plate
+
+
+def plate_layout(parts: dict) -> dict[str, tuple[float, float, float]]:
+    """Side-by-side layout along X with PLATE_GAP, centred on the origin, every part on z=0.
+    Returns {name: (dx, dy, dz)} translations."""
+    boxes = {n: s.bounding_box() for n, s in parts.items()}
+    total_x = sum(b.size.X for b in boxes.values()) + PLATE_GAP * (len(boxes) - 1)
+    x = -total_x / 2
+    out = {}
+    for n, b in boxes.items():
+        out[n] = (x - b.min.X, -(b.min.Y + b.max.Y) / 2, -b.min.Z)
+        x += b.size.X + PLATE_GAP
+    return out
+
+
+def export_3mf(project: str, parts: dict, build_id: str = "") -> dict:
+    """Write <part>.3mf for each part and <project>.3mf with all parts arranged on the plate.
+    Returns {"files": [...], "plate_extent": (x, y, z), "fits_bed": bool}."""
+    from build123d import Mesher, Pos
+
+    out_dir = MODELS_DIR / project / "exports"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    files = []
+
+    def meta(m: Mesher, title: str):
+        m.add_meta_data("", "Title", title, "xs:string", True)
+        m.add_meta_data("", "Designer", f"printing/{project} (build123d)", "xs:string", False)
+        m.add_meta_data("", "Description", f"build {build_id}; target {PRINTER['name']}", "xs:string", False)
+
+    for name, shape in parts.items():
+        m = Mesher()
+        m.add_shape(shape, linear_deflection=STL_TOLERANCE, angular_deflection=STL_ANGULAR_TOLERANCE, part_number=name)
+        meta(m, f"{project} / {name}")
+        p = out_dir / f"{name}.3mf"
+        m.write(str(p))
+        files.append(p)
+
+    layout = plate_layout(parts)
+    placed = {n: Pos(*layout[n]) * s for n, s in parts.items()}
+    m = Mesher()
+    for name, shape in placed.items():
+        m.add_shape(shape, linear_deflection=STL_TOLERANCE, angular_deflection=STL_ANGULAR_TOLERANCE, part_number=name)
+    meta(m, f"{project} plate ({len(parts)} parts)")
+    plate = out_dir / f"{project}.3mf"
+    m.write(str(plate))
+    files.append(plate)
+
+    xs = [b for s in placed.values() for b in (s.bounding_box().min.X, s.bounding_box().max.X)]
+    ys = [b for s in placed.values() for b in (s.bounding_box().min.Y, s.bounding_box().max.Y)]
+    zmax = max(s.bounding_box().max.Z for s in placed.values())
+    extent = (round(max(xs) - min(xs), 1), round(max(ys) - min(ys), 1), round(zmax, 1))
+    fits = all(e <= b for e, b in zip(extent, PRINTER["bed"]))
+    return {"files": files, "plate_extent": extent, "fits_bed": fits, "printer": PRINTER["name"], "bed": PRINTER["bed"]}

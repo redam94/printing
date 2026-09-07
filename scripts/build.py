@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, write_build_report, review_info, FIT_TOL_MM3  # noqa: E402
+from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, write_build_report, review_info, export_3mf, FIT_TOL_MM3  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.render import render_project  # noqa: E402
 from scripts._common import to_trimesh  # noqa: E402
@@ -83,8 +83,16 @@ def main() -> int:
         rc = 0
     print()
 
+    threemf = {}
     if not a.no_export:
-        rep_path = write_build_report(a.project, parts, current, checks, fits, changes)
+        threemf = export_3mf(a.project, parts)
+        for f in threemf["files"]:
+            print(f"exported {f.relative_to(ROOT)}")
+        ex, bed = threemf["plate_extent"], threemf["bed"]
+        verdict = "fits" if threemf["fits_bed"] else "DOES NOT FIT"
+        print(f"plate {ex[0]} x {ex[1]} x {ex[2]} mm -> {verdict} the {threemf['printer']} bed ({bed[0]:.0f} x {bed[1]:.0f} x {bed[2]:.0f})")
+        ok &= threemf["fits_bed"]
+        rep_path = write_build_report(a.project, parts, current, checks, fits, changes, threemf)
         print(f"build report {rep_path.relative_to(ROOT)}")
     if not a.no_render:
         for png in render_project(a.project, parts=parts):

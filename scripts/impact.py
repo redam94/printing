@@ -28,7 +28,7 @@ def affected_models(component_id: str) -> list[str]:
     pj = ROOT / "parts.json"
     if not pj.exists():
         raise SystemExit("parts.json missing — run scripts/reindex.py")
-    idx = json.loads(pj.read_text())
+    idx = json.loads(pj.read_text(encoding="utf-8"))
     comp = idx["components"].get(component_id)
     if comp is None:
         raise SystemExit(f"unknown component {component_id!r}; known: {', '.join(sorted(idx['components']))}")

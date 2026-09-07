@@ -27,7 +27,7 @@ HARDWARE_DIAMETERS = {1.6, 1.7, 2.0, 2.2, 2.4, 2.5, 2.7, 2.9, 3.0, 3.2, 3.4, 3.6
 
 
 def lint_file(path: Path) -> list[str]:
-    src = path.read_text()
+    src = path.read_text(encoding="utf-8")
     tree = ast.parse(src)
     issues: list[str] = []
     rel = path.relative_to(ROOT)

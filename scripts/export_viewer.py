@@ -37,12 +37,12 @@ def write_viewer(runs: list[dict], out: Path, title: str, heading: str | None = 
             parts.append({"name": p["name"], "stl": base64.b64encode(stl.read_bytes()).decode("ascii"), "metrics": p.get("metrics") or {}})
         payload["runs"].append({k: v for k, v in r.items() if k != "parts"} | {"parts": parts})
     data = json.dumps(payload).replace("</", "<\\/")
-    page = (TEMPLATE.read_text()
+    page = (TEMPLATE.read_text(encoding="utf-8")
             .replace("__TITLE__", html.escape(title))
             .replace("__HEADING__", html.escape(heading or title))
             .replace("__DATA__", data))
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(page)
+    out.write_text(page, encoding="utf-8")
     return out
 
 
@@ -54,7 +54,7 @@ def project_run(project: str) -> dict:
     if not stls:
         raise SystemExit(f"no STLs in {exports} — run scripts/build.py {project} first")
     report_path = exports / "build_report.json"
-    report = json.loads(report_path.read_text()) if report_path.exists() else ""
+    report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else ""
     parts = []
     for s in stls:
         m = dict(gparts.get(s.stem, {}))
