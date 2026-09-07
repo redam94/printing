@@ -15,7 +15,7 @@ _LATCH_NOTES = MaterialNotes(
 
 
 @component(
-    id="mechanisms.cantilever_latch", version="1.0.0",
+    id="mechanisms.cantilever_latch", version="1.0.1",
     summary="Cantilever snap-fit hook: flexing beam along +Z from z=0 with a ramped hook on the +X face at the tip.",
     tags=["latch", "snap", "snap-fit", "cantilever", "hook", "clip", "lid", "compliant"],
     units={"length": "mm", "width": "mm", "thickness": "mm", "hook_depth": "mm", "hook_height": "mm",
@@ -36,12 +36,19 @@ def cantilever_latch(length: float = 12.0, width: float = 6.0, thickness: float 
                      hook_height: float = 2.5, entry_angle: float = 30.0, retention_angle: float = 90.0,
                      root_fillet: float = 0.5) -> Part:
     """The beam's back face is at x=0 (attach it there), hook faces +X.
-    Total height = length + hook_height.
+    Total height = length + hook_height.  As returned, the beam stands along
+    Z — that is the *assembled* pose for a latch embedded in a vertical wall,
+    and it must be rotated so the beam lies in the bed plane before printing
+    (see material_notes).  The usual layer-safe layout is to make the beam a
+    strip of the box wall: cut a U-slot in the wall, place the latch in it
+    with its length along the wall and its thickness = wall thickness, hook
+    pointing outward; the lid carries a skirt tab with a ``latch_window``.
 
     Example:
-        latch = cantilever_latch(length=10, thickness=1.6)
-        lid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward
-        body = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)
+        # beam runs along X inside the +Y wall (wall thickness = latch thickness), hook points +Y
+        latch = Rot(0, 90, 90) * cantilever_latch(length=12, thickness=wall_t)
+        body = body - wall_slot + Pos(x_root, y_wall, z_hook) * latch
+        lid_tab = lid_tab - Pos(x_hook, y_wall, z_hook) * Rot(0, 0, 90) * latch_window(width=6, hook_depth=1.2)
     """
     import math
     beam = Box(thickness, width, length, align=(Align.MIN, Align.CENTER, Align.MIN))

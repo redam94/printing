@@ -399,7 +399,7 @@
     },
     "mechanisms.cantilever_latch": {
       "id": "mechanisms.cantilever_latch",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "summary": "Cantilever snap-fit hook: flexing beam along +Z from z=0 with a ramped hook on the +X face at the tip.",
       "params": [
         {
@@ -482,8 +482,8 @@
       "file": "lib/mechanisms/cantilever_latch.py",
       "line": 17,
       "returns": "Part",
-      "docstring": "The beam's back face is at x=0 (attach it there), hook faces +X.\nTotal height = length + hook_height.\n\nExample:\n    latch = cantilever_latch(length=10, thickness=1.6)\n    lid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\n    body = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
-      "example": "latch = cantilever_latch(length=10, thickness=1.6)\nlid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\nbody = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
+      "docstring": "The beam's back face is at x=0 (attach it there), hook faces +X.\nTotal height = length + hook_height.  As returned, the beam stands along\nZ \u2014 that is the *assembled* pose for a latch embedded in a vertical wall,\nand it must be rotated so the beam lies in the bed plane before printing\n(see material_notes).  The usual layer-safe layout is to make the beam a\nstrip of the box wall: cut a U-slot in the wall, place the latch in it\nwith its length along the wall and its thickness = wall thickness, hook\npointing outward; the lid carries a skirt tab with a ``latch_window``.\n\nExample:\n    # beam runs along X inside the +Y wall (wall thickness = latch thickness), hook points +Y\n    latch = Rot(0, 90, 90) * cantilever_latch(length=12, thickness=wall_t)\n    body = body - wall_slot + Pos(x_root, y_wall, z_hook) * latch\n    lid_tab = lid_tab - Pos(x_hook, y_wall, z_hook) * Rot(0, 0, 90) * latch_window(width=6, hook_depth=1.2)",
+      "example": "# beam runs along X inside the +Y wall (wall thickness = latch thickness), hook points +Y\nlatch = Rot(0, 90, 90) * cantilever_latch(length=12, thickness=wall_t)\nbody = body - wall_slot + Pos(x_root, y_wall, z_hook) * latch\nlid_tab = lid_tab - Pos(x_hook, y_wall, z_hook) * Rot(0, 0, 90) * latch_window(width=6, hook_depth=1.2)",
       "used_by": [],
       "import": "from lib.mechanisms.cantilever_latch import cantilever_latch"
     },
@@ -547,7 +547,7 @@
       "module": "lib.mechanisms.cantilever_latch",
       "qualname": "latch_window",
       "file": "lib/mechanisms/cantilever_latch.py",
-      "line": 64,
+      "line": 71,
       "returns": "Part",
       "docstring": "Window centred on the origin in Y and Z, cutting through X in both directions.\n\nExample:\n    body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",
       "example": "body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",

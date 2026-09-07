@@ -190,7 +190,7 @@ plate = RectangleRounded(120, 120, 5) - vesa_mount("100")
 
 ## mechanisms
 
-### `mechanisms.cantilever_latch` v1.0.0
+### `mechanisms.cantilever_latch` v1.0.1
 
 Cantilever snap-fit hook: flexing beam along +Z from z=0 with a ramped hook on the +X face at the tip.
 
@@ -213,9 +213,10 @@ Cantilever snap-fit hook: flexing beam along +Z from z=0 with a ramped hook on t
 | `root_fillet` | float | mm | `0.5` | fillet at the beam root to spread stress |
 
 ```python
-latch = cantilever_latch(length=10, thickness=1.6)
-lid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward
-body = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)
+# beam runs along X inside the +Y wall (wall thickness = latch thickness), hook points +Y
+latch = Rot(0, 90, 90) * cantilever_latch(length=12, thickness=wall_t)
+body = body - wall_slot + Pos(x_root, y_wall, z_hook) * latch
+lid_tab = lid_tab - Pos(x_hook, y_wall, z_hook) * Rot(0, 0, 90) * latch_window(width=6, hook_depth=1.2)
 ```
 
 ### `mechanisms.latch_window` v1.0.0
