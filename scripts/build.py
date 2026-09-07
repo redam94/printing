@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, FIT_TOL_MM3  # noqa: E402
+from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, write_build_report, review_info, FIT_TOL_MM3  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.render import render_project  # noqa: E402
 from scripts._common import to_trimesh  # noqa: E402
@@ -36,7 +36,7 @@ def main() -> int:
     parts = build_parts(a.project)
     print(f"built {a.project}: {len(parts)} part(s) in {time.time()-t0:.1f}s\n")
 
-    current, ok = {}, True
+    current, checks, ok = {}, {}, True
     for name, shape in parts.items():
         m = metrics(shape)
         current[name] = m
@@ -44,6 +44,7 @@ def main() -> int:
               f"(min {m.bbox_min}, max {m.bbox_max})  volume {m.volume:.1f} mm³ = {m.volume/1000:.2f} cm³  "
               f"solids={m.solids} valid={m.valid}")
         rep = check_mesh(to_trimesh(shape), a.nozzle)
+        checks[name] = rep
         print(format_report(name, rep))
         ok &= rep["ok"] and m.valid
         if not a.no_export:
@@ -60,15 +61,6 @@ def main() -> int:
         print()
     else:
         print("(no fit_checks() defined in the model — add one if the parts must mate or enclose hardware)\n")
-
-    if not a.no_render:
-        for png in render_project(a.project, parts=parts):
-            print(f"rendered {png.relative_to(ROOT)}   <- open this with Read to inspect")
-        if not a.no_export:
-            from scripts.export_viewer import project_run, write_viewer
-            html_out = write_viewer([project_run(a.project)], MODELS_DIR / a.project / "exports" / "view.html", f"{a.project} viewer", a.project)
-            print(f"interactive viewer {html_out.relative_to(ROOT)}   <- open in a browser (orbit, section plane, translucent)")
-        print()
 
     golden = load_golden(a.project)
     changes = diff_golden(golden, current)
@@ -89,6 +81,24 @@ def main() -> int:
     else:
         print("matches golden")
         rc = 0
+    print()
+
+    if not a.no_export:
+        rep_path = write_build_report(a.project, parts, current, checks, fits, changes)
+        print(f"build report {rep_path.relative_to(ROOT)}")
+    if not a.no_render:
+        for png in render_project(a.project, parts=parts):
+            print(f"rendered {png.relative_to(ROOT)}   <- open this with Read to inspect")
+        if not a.no_export:
+            from scripts.export_viewer import project_run, write_viewer
+            html_out = write_viewer([project_run(a.project)], MODELS_DIR / a.project / "exports" / "view.html", f"{a.project} review", a.project)
+            print(f"review page {html_out.relative_to(ROOT)}   <- interactive 3D + report + notes")
+            rv = review_info(a.project)
+            if rv.get("artifact_url"):
+                print(f"published review: {rv['artifact_url']}  (republish with the Artifact tool, url=<that>, same file path)")
+            else:
+                print("not yet published: publish exports/view.html with the Artifact tool (capabilities db) and record the URL in models/{}/review.json".format(a.project))
+    print()
     return rc if ok else 1
 
 

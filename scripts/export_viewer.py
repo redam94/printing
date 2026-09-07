@@ -4,8 +4,11 @@
     uv run python scripts/export_viewer.py <project>          # -> models/<project>/exports/view.html
 
 Open the file in a browser: orbit, section plane along Z, wireframe, translucent,
-parts laid out on a 10 mm bed grid, bbox/volume per part.  Uses three.js from
-cdnjs (needs internet); the meshes are embedded, nothing else is fetched.
+parts laid out on a 10 mm bed grid, bbox/volume per part, a Report tab (from
+exports/build_report.json) and a Notes tab for critiques.  Notes persist in the
+artifact database when the page is published with the Artifact tool
+(capabilities {"db": {}}) and in localStorage when opened as a local file.
+Uses three.js from cdnjs (needs internet); the meshes are embedded.
 
 ``write_viewer(runs, out, ...)`` is the reusable API: each run is
 ``{"id","label","title","eval","config","parts":[{"name","stl":<path>,"metrics":{}}],"report":str}``.
@@ -50,8 +53,15 @@ def project_run(project: str) -> dict:
     stls = sorted(exports.glob("*.stl"))
     if not stls:
         raise SystemExit(f"no STLs in {exports} — run scripts/build.py {project} first")
-    return {"id": project, "label": project, "title": project, "eval": "", "config": "",
-            "parts": [{"name": s.stem, "stl": str(s), "metrics": gparts.get(s.stem, {})} for s in stls], "report": ""}
+    report_path = exports / "build_report.json"
+    report = json.loads(report_path.read_text()) if report_path.exists() else ""
+    parts = []
+    for s in stls:
+        m = dict(gparts.get(s.stem, {}))
+        if report and s.stem in report.get("parts", {}):
+            m["wall_min_mm"] = report["parts"][s.stem].get("printability", {}).get("wall_min_mm")
+        parts.append({"name": s.stem, "stl": str(s), "metrics": m})
+    return {"id": project, "label": project, "title": project, "eval": "", "config": "", "parts": parts, "report": report}
 
 
 def main() -> int:

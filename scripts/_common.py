@@ -218,3 +218,77 @@ def run_fit_checks(project: str, parts: dict) -> dict[str, float]:
             vol = 0.0
         out[name] = round(vol, 3)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Build report (feeds exports/build_report.json and the interactive viewer)
+# ---------------------------------------------------------------------------
+
+def params_snapshot(project: str) -> list[dict]:
+    """UPPER_CASE constants from models/<project>/params.py with their values and trailing comments."""
+    import ast
+    import importlib
+
+    src_path = MODELS_DIR / project / "params.py"
+    if not src_path.exists():
+        return []
+    src = src_path.read_text()
+    lines = src.splitlines()
+    mod = importlib.import_module(f"models.{project}.params")
+    out = []
+    for node in ast.parse(src).body:
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            name = node.targets[0].id
+            if not name.isupper():
+                continue
+            line = lines[node.lineno - 1]
+            comment = line.split("#", 1)[1].strip() if "#" in line else ""
+            val = getattr(mod, name, None)
+            if hasattr(val, "__dataclass_fields__"):
+                val = f"{type(val).__name__}({getattr(val, 'name', '')})"
+            elif not isinstance(val, (int, float, str, bool, type(None))):
+                val = repr(val)
+            out.append({"name": name, "value": val, "comment": comment,
+                        "derived": not isinstance(node.value, ast.Constant)})
+    return out
+
+
+def components_used(project: str) -> list[dict]:
+    pj = ROOT / "parts.json"
+    if not pj.exists():
+        return []
+    idx = json.loads(pj.read_text())
+    prefix = f"models/{project}/"
+    return [{"id": cid, "version": c["version"], "summary": c["summary"]}
+            for cid, c in idx["components"].items() if any(f.startswith(prefix) for f in c["used_by"])]
+
+
+def review_info(project: str) -> dict:
+    p = MODELS_DIR / project / "review.json"
+    return json.loads(p.read_text()) if p.exists() else {}
+
+
+def write_build_report(project: str, parts: dict, part_metrics: dict, checks: dict, fits: dict, golden_changes: list) -> Path:
+    import inspect
+
+    mod = load_model(project)
+    doc = inspect.getdoc(mod) or ""
+    build_id = time.strftime("%Y%m%d-%H%M%S")
+    report = {
+        "project": project,
+        "build_id": build_id,
+        "built_at": time.strftime("%Y-%m-%d %H:%M"),
+        "docstring": doc,
+        "components": components_used(project),
+        "params": params_snapshot(project),
+        "parts": {name: {"metrics": part_metrics[name].to_dict(), "printability": checks.get(name, {}),
+                         "stl": f"models/{project}/exports/{name}.stl", "step": f"models/{project}/exports/{name}.step"}
+                  for name in parts},
+        "fit_checks": fits,
+        "golden_changes": golden_changes,
+        "review": review_info(project),
+    }
+    out = MODELS_DIR / project / "exports" / "build_report.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(report, indent=2, default=str) + "\n")
+    return out
