@@ -1,0 +1,350 @@
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8; --line-2:#E8EBE6;
+  --accent:#E8791D; --accent-ink:#FFFFFF; --accent-soft:#FBE9DA; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F; --focus:#2F6FE8;
+  --c-patterns:#2F6FE8; --c-mechanisms:#2E9E5B; --c-fasteners:#8A4FD3; --c-primitives:#5E6771;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35; --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --c-primitives:#9AA3AD;
+}}
+:root[data-theme="dark"]{ --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35; --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --c-primitives:#9AA3AD; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.45;min-height:100vh}
+a{color:var(--focus)} a:hover{text-decoration-thickness:2px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+header.top{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+.top .row1{display:flex;align-items:baseline;gap:16px;padding:12px 20px 6px;flex-wrap:wrap}
+.top h1{font-size:16px;font-weight:600;margin:0;letter-spacing:.01em}
+.top .git{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.top .git b{color:var(--ink);font-weight:500}
+.stats{display:flex;gap:0;padding:0 20px 8px;flex-wrap:wrap}
+.stat{padding:4px 16px 4px 0;margin-right:16px;border-right:1px solid var(--line-2)}
+.stat:last-child{border-right:0}
+.stat .n{font-family:var(--mono);font-size:20px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat .sub{font-size:11px;color:var(--muted)}
+nav.tabs{display:flex;gap:2px;padding:0 20px;border-top:1px solid var(--line-2)}
+nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font:inherit;font-weight:500;padding:9px 12px;cursor:pointer}
+nav.tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:hover{color:var(--ink)}
+main{padding:18px 20px 60px;max-width:1500px}
+section.tab[hidden]{display:none}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:600}
+h3{font-size:14px;margin:0;font-weight:600}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);background:var(--panel-2);white-space:nowrap;vertical-align:middle}
+.chip.cat{border-color:transparent;color:#fff}
+.chip.patterns{background:var(--c-patterns)} .chip.mechanisms{background:var(--c-mechanisms)} .chip.fasteners{background:var(--c-fasteners)} .chip.primitives{background:var(--c-primitives)}
+.chip.gap{border-style:dashed;border-color:var(--bad);color:var(--bad);background:transparent}
+.chip.ok{color:var(--ok);border-color:var(--ok)} .chip.bad{color:var(--bad);border-color:var(--bad)} .chip.warn{color:var(--warn);border-color:var(--warn)}
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:5px 10px;font:inherit;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:2px 8px;font-size:12px}
+input[type=text],input[type=search],select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 8px}
+textarea{width:100%;min-height:70px;resize:vertical}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;font-weight:600;padding:5px 8px;border-bottom:1px solid var(--line)}
+td{padding:5px 8px;border-bottom:1px solid var(--line-2);vertical-align:top}
+td.num{text-align:right;font-family:var(--mono);font-size:12.5px}
+.scroll{overflow-x:auto}
+/* overview */
+.ov{display:grid;grid-template-columns:minmax(320px,1fr) minmax(360px,1.4fr);gap:24px;align-items:start}
+@media (max-width:980px){.ov{grid-template-columns:1fr}}
+.att{display:flex;flex-direction:column;gap:6px}
+.att .it{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:8px 10px;border-left:3px solid var(--warn);background:var(--panel);border-radius:0 5px 5px 0}
+.att .it[data-kind="idea"]{border-left-color:var(--accent)} .att .it[data-kind="part"]{border-left-color:var(--bad)} .att .it[data-kind="component"]{border-left-color:var(--c-fasteners)}
+.att .fix{grid-column:2;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.matrix{border-collapse:separate;border-spacing:0}
+.matrix th.rot{height:120px;white-space:nowrap;vertical-align:bottom;padding:0 0 6px;text-align:left}
+.matrix th.rot>div{transform:rotate(-60deg);transform-origin:left bottom;width:24px;font-family:var(--mono);font-size:11.5px;text-transform:none;letter-spacing:0}
+.matrix td{padding:2px 6px;border-bottom:1px solid var(--line-2)}
+.matrix td.cell{width:24px;text-align:center}
+.matrix td.cell span{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--line-2)}
+.matrix td.cell span.on{background:var(--accent)} .matrix td.cell span.want{background:transparent;border:1.5px dashed var(--accent)}
+.matrix tr.cat td{padding-top:10px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:0}
+.matrix td.id{font-family:var(--mono);font-size:12px;white-space:nowrap}
+.matrix td.id.unused{color:var(--muted)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;align-items:center}
+.legend span.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}
+/* library */
+.libtools{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.libtools input{min-width:280px}
+.comp{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:6px}
+.comp summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;padding:8px 12px;align-items:center}
+.comp summary::-webkit-details-marker{display:none}
+.comp summary .id{font-family:var(--mono);font-size:13px;font-weight:500}
+.comp summary .v{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:6px}
+.comp summary .sum{grid-column:1/-1;color:var(--muted)}
+.comp summary .right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.comp .det{padding:4px 12px 12px;border-top:1px solid var(--line-2);display:grid;gap:10px}
+.comp .det pre{margin:0;background:var(--panel-2);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:12px;overflow-x:auto}
+.comp .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:12.5px}
+.comp .kv b{font-weight:500;color:var(--muted)}
+.comp[hidden]{display:none}
+.catgroup{margin-bottom:18px}
+.catgroup h3{margin-bottom:8px;display:flex;align-items:center;gap:8px}
+/* models */
+.model{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:16px;padding:14px 16px;display:grid;gap:12px}
+.model .head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.model .head h3{font-family:var(--mono);font-size:15px}
+.model .head .meta{color:var(--muted);font-size:12.5px}
+.model .head .spacer{flex:1}
+.model .doc{color:var(--muted);max-width:80ch}
+.model .doc.full{white-space:pre-wrap;color:var(--ink);font-size:12.5px}
+.renders{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:10px}
+.renders figure{margin:0;border:1px solid var(--line-2);border-radius:5px;overflow:hidden;background:#fff}
+.renders img{display:block;width:100%;height:auto}
+.renders figcaption{font-family:var(--mono);font-size:11.5px;padding:4px 8px;color:var(--muted);border-top:1px solid var(--line-2);background:var(--panel-2)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+/* ideas */
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;align-items:start}
+.col{background:var(--panel-2);border-radius:6px;padding:10px;min-height:120px;border:1px solid var(--line-2)}
+.col h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between}
+.col.inbox{border-color:var(--accent);background:var(--accent-soft)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-bottom:8px;display:grid;gap:6px}
+.card .t{font-weight:600}
+.card .k{font-size:11px;color:var(--muted)}
+.card .txt{color:var(--muted);font-size:12.5px;white-space:pre-wrap}
+.card img{width:100%;border-radius:4px;border:1px solid var(--line-2);background:#fff}
+.card .acts{display:flex;gap:6px;justify-content:flex-end}
+.card .prob{color:var(--bad);font-size:12px}
+.card details summary{cursor:pointer;color:var(--muted);font-size:12px}
+.card .sec{font-size:12.5px;white-space:pre-wrap;margin-top:4px}
+.card .sec b{font-weight:600}
+.newidea{display:grid;gap:8px;margin-bottom:10px}
+.newidea .row{display:flex;gap:8px;flex-wrap:wrap}
+.store{font-size:11.5px;color:var(--muted)}
+.empty{color:var(--muted);font-size:12.5px;padding:8px 2px}
+.howto{border:1px dashed var(--line);border-radius:6px;padding:10px 12px;color:var(--muted);font-size:12.5px;max-width:80ch;margin-top:14px}
+.howto code{font-family:var(--mono);font-size:12px;background:var(--panel-2);padding:0 4px;border-radius:3px}
+@media (prefers-reduced-motion:no-preference){.comp summary,.btn{transition:border-color .12s}}
+</style>
+
+<header class="top">
+  <div class="row1">
+    <h1 id="title"></h1>
+    <span class="git" id="git"></span>
+    <span class="git" id="published"></span>
+  </div>
+  <div class="stats" id="stats"></div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="overview" aria-pressed="true">Overview</button>
+    <button data-tab="library" aria-pressed="false">Library</button>
+    <button data-tab="models" aria-pressed="false">Models</button>
+    <button data-tab="ideas" aria-pressed="false">Ideas</button>
+  </nav>
+</header>
+<main>
+  <section class="tab" id="tab-overview">
+    <div class="ov">
+      <div>
+        <h2>Needs attention</h2>
+        <div class="att" id="attention"></div>
+        <div id="gaps"></div>
+      </div>
+      <div>
+        <h2>Who uses what</h2>
+        <div class="scroll"><table class="matrix" id="matrix"></table></div>
+        <div class="legend"><span><span class="sw" style="background:var(--accent)"></span>used by the model</span><span><span class="sw" style="border:1.5px dashed var(--accent)"></span>wanted by an idea</span><span><span class="sw" style="background:var(--line-2)"></span>not used</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-library" hidden>
+    <div class="libtools">
+      <input type="search" id="libFilter" placeholder="filter by id, tag, summary, hardware…" aria-label="filter components">
+      <label><input type="checkbox" id="libUnused"> unused only</label>
+      <label><input type="checkbox" id="libUnvalidated"> unvalidated only</label>
+      <span class="muted" id="libCount"></span>
+    </div>
+    <div id="library"></div>
+  </section>
+
+  <section class="tab" id="tab-models" hidden>
+    <div id="models"></div>
+  </section>
+
+  <section class="tab" id="tab-ideas" hidden>
+    <div class="board" id="board"></div>
+    <div class="howto">
+      Ideas written here land in the <b>inbox</b>. Claude files each one into <code>ideas/&lt;slug&gt;/IDEA.md</code> (problem, concept,
+      reuse map against the library, gaps), sketches it with <code>scripts/sketch.py</code>, and moves it across the board as it matures.
+      The columns after the inbox come from those files at the time this page was generated (<span id="gen"></span>).
+    </div>
+  </section>
+</main>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+const D=JSON.parse(document.getElementById('data').textContent);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt1=v=>v==null?'?':Number(v).toFixed(1);
+const cm3=v=>v==null?'?':(v/1000).toFixed(1)+' cm³';
+const bbox=b=>b?b.map(fmt1).join(' × '):'?';
+const catChip=id=>{const c=id.split('.')[0];return `<span class="chip cat ${esc(c)}">${esc(c)}</span>`;};
+const compChip=(id,extra)=>{const c=D.components.find(x=>x.id===id);const cls=c?'':'gap';const v=extra&&extra[id]?` <span class="muted">v${esc(extra[id])}</span>`:'';return `<span class="chip ${cls}" title="${esc(c?c.summary:'not in the library yet')}"><a href="#" data-comp="${esc(id)}" style="color:inherit;text-decoration:none">${esc(id)}</a>${v}</span>`;};
+
+// ---------- header ----------
+document.getElementById('title').textContent=D.repo+' studio';
+document.title=D.repo+' Studio';
+const g=D.git||{};
+document.getElementById('git').innerHTML=g.hash?`<b>${esc(g.hash)}</b> ${esc(g.date)}${g.dirty?' · uncommitted changes':''} · ${esc(g.subject)}`:'';
+if(D.studio&&D.studio.published) document.getElementById('published').textContent='page generated '+D.generated;
+document.getElementById('gen').textContent=D.generated;
+const S=D.stats;
+const cats=Object.entries(S.categories||{}).map(([k,v])=>`${v} ${k}`).join(' · ');
+const ideasSub=D.statuses.filter(s=>S.ideas_by_status[s]).map(s=>`${S.ideas_by_status[s]} ${s}`).join(' · ')||'none yet';
+document.getElementById('stats').innerHTML=[
+  ['components',S.components,cats],['models',S.models,S.parts+' printable parts'],['ideas',S.ideas,ideasSub],
+  ['unused',S.unused_components,'components no model uses'],['unvalidated',S.unvalidated,'never test-printed'],['gaps',S.gaps,'components ideas are waiting for']
+].map(([l,n,s])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div><div class="sub">${esc(s)}</div></div>`).join('');
+
+// ---------- tabs ----------
+const tabs=document.getElementById('tabs');
+function showTab(name){tabs.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tab===name)));document.querySelectorAll('section.tab').forEach(s=>s.hidden=s.id!=='tab-'+name);try{localStorage.setItem('studio:tab',name);}catch(e){}}
+tabs.addEventListener('click',e=>{const b=e.target.closest('button');if(b)showTab(b.dataset.tab);});
+document.body.addEventListener('click',e=>{const a=e.target.closest('[data-comp]');if(!a)return;e.preventDefault();showTab('library');const el=document.getElementById('comp-'+a.dataset.comp.replace('.','-'));if(el){el.hidden=false;el.open=true;el.scrollIntoView({block:'center'});}});
+
+// ---------- overview ----------
+const att=document.getElementById('attention');
+att.innerHTML=D.attention.length?D.attention.map(a=>`<div class="it" data-kind="${esc(a.kind)}"><span class="chip">${esc(a.kind)}</span><span><span class="mono">${esc(a.ref)}</span> — ${esc(a.text)}</span>${a.fix?`<span class="fix">${esc(a.fix)}</span>`:''}</div>`).join('')
+  :'<div class="empty">Nothing flagged: every model is built and published, every component validated, every idea well-formed.</div>';
+if(D.gaps.length){document.getElementById('gaps').innerHTML=`<h2 style="margin-top:18px">Library gaps</h2><div class="chips">${D.gaps.map(gp=>`<span class="chip gap" title="wanted by ${esc(gp.wanted_by.join(', '))}">${esc(gp.id)}</span> <span class="muted" style="margin-right:8px">← ${esc(gp.wanted_by.join(', '))}</span>`).join('')}</div>`;}
+const mnames=D.models.map(m=>m.project);
+let mx=`<thead><tr><th></th>${mnames.map(n=>`<th class="rot"><div>${esc(n)}</div></th>`).join('')}<th class="rot"><div>ideas</div></th></tr></thead><tbody>`;
+let cur=null;
+for(const c of D.components){
+  if(c.category!==cur){cur=c.category;mx+=`<tr class="cat"><td colspan="${mnames.length+2}">${esc(cur)}</td></tr>`;}
+  mx+=`<tr><td class="id ${c.used_by.length?'':'unused'}"><a href="#" data-comp="${esc(c.id)}" style="color:inherit;text-decoration:none">${esc(c.name)}</a></td>${mnames.map(n=>`<td class="cell"><span class="${c.used_by.includes(n)?'on':''}" title="${esc(c.id)}${c.used_by.includes(n)?' used by '+esc(n):''}"></span></td>`).join('')}<td class="cell"><span class="${c.wanted_by.length?'want':''}" title="${esc(c.wanted_by.join(', '))}"></span></td></tr>`;
+}
+mx+='</tbody>';document.getElementById('matrix').innerHTML=mx;
+
+// ---------- library ----------
+const lib=document.getElementById('library');
+const byCat={};D.components.forEach(c=>(byCat[c.category]=byCat[c.category]||[]).push(c));
+lib.innerHTML=Object.entries(byCat).map(([cat,cs])=>`<div class="catgroup" data-cat="${esc(cat)}"><h3><span class="chip cat ${esc(cat)}">${esc(cat)}</span><span class="muted" style="font-weight:400">${cs.length}</span></h3>${cs.map(c=>{
+  const val=c.unvalidated?'<span class="chip warn">UNVALIDATED</span>':c.validated.map(v=>`<span class="chip ok">${esc(v)}</span>`).join(' ');
+  const used=c.used_by.length?`<span class="pill">${c.used_by.length} model${c.used_by.length>1?'s':''}</span>`:'<span class="pill">unused</span>';
+  const want=c.wanted_by.length?`<span class="pill" style="border-color:var(--accent);color:var(--accent)">wanted by ${c.wanted_by.length} idea${c.wanted_by.length>1?'s':''}</span>`:'';
+  const params=c.params&&c.params.length?`<div class="scroll"><table><thead><tr><th>param</th><th>type</th><th>units</th><th>default</th><th>description</th></tr></thead><tbody>${c.params.map(p=>`<tr><td class="mono">${esc(p.name)}</td><td class="mono">${esc(p.type)}</td><td>${esc(p.units)}</td><td class="mono">${esc(JSON.stringify(p.default))}</td><td>${esc(p.description)}</td></tr>`).join('')}</tbody></table></div>`:'';
+  return `<details class="comp" id="comp-${esc(c.id.replace('.','-'))}" data-search="${esc((c.id+' '+c.summary+' '+c.tags.join(' ')+' '+c.notes).toLowerCase())}" data-unused="${c.used_by.length?0:1}" data-unval="${c.unvalidated?1:0}">
+    <summary><span><span class="id">${esc(c.name)}</span><span class="v">v${esc(c.version)}</span></span><span></span><span class="right">${val}${used}${want}</span><span class="sum">${esc(c.summary)}</span></summary>
+    <div class="det">
+      <div class="kv"><b>import</b><span class="mono">${esc(c.import)}</span><b>returns</b><span class="mono">${esc(c.returns)}</span><b>where</b><span class="mono">${esc(c.file)}${c.line?':'+c.line:''}</span>
+        ${c.orientation?`<b>orientation</b><span>${esc(c.orientation)}</span>`:''}${c.notes?`<b>notes</b><span>${esc(c.notes)}</span>`:''}
+        ${c.used_by.length?`<b>used by</b><span>${c.used_by.map(esc).join(', ')}</span>`:''}${c.wanted_by.length?`<b>wanted by</b><span>${c.wanted_by.map(esc).join(', ')}</span>`:''}</div>
+      <div class="chips">${c.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>
+      ${params}${c.example?`<pre>${esc(c.example)}</pre>`:''}
+    </div></details>`;}).join('')}</div>`).join('');
+function filterLib(){
+  const q=document.getElementById('libFilter').value.trim().toLowerCase();const un=document.getElementById('libUnused').checked;const uv=document.getElementById('libUnvalidated').checked;
+  let n=0;lib.querySelectorAll('.comp').forEach(el=>{const show=(!q||el.dataset.search.includes(q))&&(!un||el.dataset.unused==='1')&&(!uv||el.dataset.unval==='1');el.hidden=!show;if(show)n++;});
+  lib.querySelectorAll('.catgroup').forEach(gp=>gp.hidden=![...gp.querySelectorAll('.comp')].some(el=>!el.hidden));
+  document.getElementById('libCount').textContent=`${n} of ${D.components.length}`;
+}
+['libFilter','libUnused','libUnvalidated'].forEach(id=>document.getElementById(id).addEventListener('input',filterLib));filterLib();
+
+// ---------- models ----------
+document.getElementById('models').innerHTML=D.models.length?D.models.map(m=>{
+  const status=!m.built?'<span class="chip bad">not built</span>':m.stale?'<span class="chip warn">stale build</span>':'<span class="chip ok">built</span>';
+  const plate=m.plate&&m.plate.extent?`<span class="chip ${m.plate.fits_bed?'ok':'bad'}">plate ${m.plate.extent.map(fmt1).join('×')} mm ${m.plate.fits_bed?'fits':'DOES NOT FIT'} ${esc(m.plate.printer)}</span>`:'';
+  const fits=Object.entries(m.fit_checks||{}).map(([k,v])=>`<span class="chip ${v>0.05?'bad':'ok'}">fit ${esc(k)}: ${v>0.05?v+' mm³ overlap':'clear'}</span>`).join('');
+  const golden=m.golden_changes.filter(c=>c.kind!=='mesh').length?'<span class="chip warn">differs from golden</span>':m.golden?'<span class="chip">golden ok</span>':'<span class="chip warn">no golden</span>';
+  const parts=m.parts.length?`<div class="scroll"><table><thead><tr><th>part</th><th style="text-align:right">bbox mm</th><th style="text-align:right">volume</th><th style="text-align:right">min wall</th><th>printability</th></tr></thead><tbody>${m.parts.map(p=>`<tr><td class="mono">${esc(p.name)}</td><td class="num">${bbox(p.bbox)}</td><td class="num">${cm3(p.volume)}</td><td class="num">${p.wall_min_mm==null?'?':fmt1(p.wall_min_mm)}</td><td>${p.ok==null?'<span class="muted">not checked</span>':p.ok?`<span class="chip ok">ok</span>${p.warnings?` <span class="muted">${p.warnings} warning${p.warnings>1?'s':''}</span>`:''}`:`<span class="chip bad">${p.problems||''} problem${p.problems===1?'':'s'}</span>`}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No parts recorded. Build it to see metrics and renders.</div>';
+  const renders=m.parts.filter(p=>p.render).map(p=>`<figure><img src="${p.render}" alt="render of ${esc(m.project)} ${esc(p.name)}: isometric, top and front views"><figcaption>${esc(p.name)}</figcaption></figure>`).join('');
+  return `<article class="model"><div class="head"><h3>${esc(m.project)}</h3><span class="meta">${m.parts.length} part${m.parts.length===1?'':'s'}${m.built_at?' · built '+esc(m.built_at):''}${m.params?' · '+m.params+' parameters':''}</span><span class="spacer"></span>${status}${golden}${plate}${fits}${m.review_url?`<a href="${esc(m.review_url)}" target="_blank" rel="noopener">review page ↗</a>`:'<span class="chip warn">unpublished</span>'}</div>
+    ${m.summary?`<div class="doc">${esc(m.summary)}</div>`:''}
+    ${renders?`<div class="renders">${renders}</div>`:''}
+    ${parts}
+    <div class="chips"><span class="muted" style="margin-right:4px">uses</span>${m.components.length?m.components.map(c=>compChip(c,m.components_versions)).join(''):'<span class="muted">no library components</span>'}</div>
+    ${m.docstring&&m.docstring.length>m.summary.length+20?`<details><summary class="muted" style="cursor:pointer">full model notes</summary><div class="doc full">${esc(m.docstring)}</div></details>`:''}
+  </article>`;}).join(''):'<div class="empty">No models yet.</div>';
+
+// ---------- ideas board ----------
+let inbox=[]; let dbRef=null; let storeKind='local';
+const LS_KEY='studio:inbox';
+function localLoad(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){return [];}}
+function localSave(){try{localStorage.setItem(LS_KEY,JSON.stringify(inbox));}catch(e){}}
+function setStore(kind,msg){storeKind=kind;const el=document.getElementById('store');if(el)el.textContent=msg;}
+async function initStore(){
+  inbox=localLoad(); renderBoard();
+  setStore('local','inbox saved in this browser only');
+  if(typeof window.claude?.use!=='function') return;
+  try{
+    const db=await window.claude.use('db');
+    if(!db) return;
+    dbRef=db.collection('ideas');
+    dbRef.orderBy('created','asc').onSnapshot(snap=>{inbox=snap.docs.map(d=>Object.assign({id:d.id},d.data()));renderBoard();},err=>setStore('local','shared inbox unavailable ('+(err&&err.code||'error')+'), using this browser'));
+    setStore('db','inbox shared with everyone who opens this page · Claude files it into ideas/');
+  }catch(e){}
+}
+async function addIdea(n){
+  n=Object.assign({status:'inbox',created:new Date().toISOString(),source:'studio page'},n);
+  if(dbRef){try{await dbRef.add(n);return;}catch(e){setStore('local','write failed ('+(e&&e.code||'error')+'), saved in this browser');}}
+  n.id='l'+Date.now(); inbox.push(n); localSave(); renderBoard();
+}
+async function patchIdea(id,patch){
+  if(dbRef&&!id.startsWith('l')){try{await dbRef.doc(id).update(patch);return;}catch(e){}}
+  const n=inbox.find(x=>x.id===id); if(n){Object.assign(n,patch);localSave();renderBoard();}
+}
+async function deleteIdea(id){
+  if(dbRef&&!id.startsWith('l')){try{await dbRef.doc(id).delete();return;}catch(e){}}
+  inbox=inbox.filter(x=>x.id!==id); localSave(); renderBoard();
+}
+function ideaCard(i){
+  const chips=[...i.reuse.map(r=>compChip(r)),...i.gaps.map(g=>`<span class="chip gap" title="not in the library yet">${esc(g)}</span>`)].join('');
+  const secs=['Problem','Concept','Constraints','Gaps','Open questions'].filter(s=>i.sections[s]).map(s=>`<div class="sec"><b>${esc(s)}</b>\n${esc(i.sections[s])}</div>`).join('');
+  return `<div class="card"><div class="t">${esc(i.title)}</div><div class="k">${esc(i.kind)} · <span class="mono">${esc(i.slug)}</span>${i.updated?' · '+esc(i.updated):''}${i.model?' · models/'+esc(i.model):''}${i.has_sketch?' · has sketch':''}</div>
+    ${i.render?`<img src="${i.render}" alt="sketch render for ${esc(i.title)}">`:''}
+    ${i.hardware.length?`<div class="k">fits: ${esc(i.hardware.join(', '))}</div>`:''}
+    ${chips?`<div class="chips">${chips}</div>`:''}
+    ${i.sections.Problem?`<div class="txt">${esc(i.sections.Problem.slice(0,240))}${i.sections.Problem.length>240?'…':''}</div>`:''}
+    ${i.problems.length?i.problems.map(p=>`<div class="prob">! ${esc(p)}</div>`).join(''):''}
+    ${secs?`<details><summary>full write-up</summary>${secs}</details>`:''}
+  </div>`;
+}
+function inboxCard(n){
+  const filed=n.status==='filed';
+  return `<div class="card" style="${filed?'opacity:.7':''}"><div class="t">${esc(n.title||'(untitled)')}</div><div class="k">${esc(n.kind||'part')} · ${esc((n.created||'').slice(0,10))}${filed?' · filed as <span class="mono">'+esc(n.path||'')+'</span>':''}</div>
+    ${n.hardware?`<div class="k">fits: ${esc(n.hardware)}</div>`:''}${n.text?`<div class="txt">${esc(n.text)}</div>`:''}
+    <div class="acts">${filed?`<button class="btn small" data-unfile="${esc(n.id)}">back to inbox</button>`:`<button class="btn small" data-file="${esc(n.id)}">mark filed</button>`}<button class="btn small" data-del="${esc(n.id)}" aria-label="delete">×</button></div></div>`;
+}
+function renderBoard(){
+  const b=document.getElementById('board');
+  const showFiled=b.querySelector('#showFiled')?.checked||false;
+  const draft={title:b.querySelector('#nTitle')?.value||'',text:b.querySelector('#nText')?.value||'',kind:b.querySelector('#nKind')?.value||'part',hardware:b.querySelector('#nHw')?.value||''};
+  const items=inbox.filter(n=>showFiled||n.status!=='filed').sort((a,c)=>(c.created||'').localeCompare(a.created||''));
+  const open=inbox.filter(n=>n.status!=='filed').length;
+  let h=`<div class="col inbox"><h3><span>Inbox ${open?`(${open})`:''}</span><span class="store" id="store"></span></h3>
+    <form class="newidea" id="newIdea"><input type="text" id="nTitle" placeholder="title, e.g. 'wall mount for the label printer'" required value="${esc(draft.title)}">
+      <textarea id="nText" placeholder="what is it for, what must it fit, what is wrong with the current thing">${esc(draft.text)}</textarea>
+      <div class="row"><select id="nKind"><option value="part"${draft.kind==='part'?' selected':''}>new part</option><option value="library"${draft.kind==='library'?' selected':''}>library component</option><option value="modification"${draft.kind==='modification'?' selected':''}>change to an existing part</option></select>
+      <input type="text" id="nHw" placeholder="hardware (optional)" value="${esc(draft.hardware)}" style="flex:1;min-width:120px"></div>
+      <div class="row"><button class="btn primary" type="submit">Add to inbox</button><label style="margin-left:auto;display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="showFiled"${showFiled?' checked':''}> show filed</label></div></form>
+    ${items.length?items.map(inboxCard).join(''):'<div class="empty">Empty. Anything you type here, Claude reads back and files into ideas/.</div>'}</div>`;
+  for(const s of D.statuses){
+    if(s==='inbox') continue;
+    const mine=D.ideas.filter(i=>i.status===s);
+    if(!mine.length&&(s==='parked'||s==='promoted')&&!D.ideas.length) continue;
+    h+=`<div class="col"><h3><span>${esc(s)}</span><span>${mine.length||''}</span></h3>${mine.length?mine.map(ideaCard).join(''):`<div class="empty">${{idea:'Nothing written up yet.',sketching:'No sketches in progress.',prototyping:'Nothing being test-printed.',promoted:'Nothing shipped from an idea yet.',parked:'Nothing parked.'}[s]||''}</div>`}</div>`;
+  }
+  b.innerHTML=h;
+  setStore(storeKind,document.getElementById('store')&&storeKind==='db'?'inbox shared with everyone who opens this page · Claude files it into ideas/':'inbox saved in this browser only');
+  b.querySelector('#newIdea').addEventListener('submit',e=>{e.preventDefault();const t=b.querySelector('#nTitle').value.trim();if(!t)return;addIdea({title:t,text:b.querySelector('#nText').value.trim(),kind:b.querySelector('#nKind').value,hardware:b.querySelector('#nHw').value.trim()});b.querySelector('#nTitle').value='';b.querySelector('#nText').value='';b.querySelector('#nHw').value='';});
+  b.querySelector('#showFiled').addEventListener('change',renderBoard);
+  b.querySelectorAll('[data-file]').forEach(x=>x.addEventListener('click',()=>patchIdea(x.dataset.file,{status:'filed'})));
+  b.querySelectorAll('[data-unfile]').forEach(x=>x.addEventListener('click',()=>patchIdea(x.dataset.unfile,{status:'inbox'})));
+  b.querySelectorAll('[data-del]').forEach(x=>x.addEventListener('click',()=>deleteIdea(x.dataset.del)));
+}
+renderBoard(); initStore();
+let t='overview';try{t=localStorage.getItem('studio:tab')||'overview';}catch(e){}
+if(!document.querySelector(`#tabs [data-tab="${t}"]`))t='overview';showTab(t);
+})();
+</script>

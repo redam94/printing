@@ -1,0 +1,23 @@
+{
+  "skill_name": "design-studio",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "give me a rundown of where this repo is at — what's in the library, what models are actually built, and what needs attention. i haven't looked at it in a while",
+      "expected_output": "Runs scripts/studio.py and answers from its output: components grouped by category with versions and validation, three models with part counts / bbox / review links, the one idea, and the ATTENTION items (three UNVALIDATED components, 15 unused). Does not invent components or models. Mentions or regenerates/republishes the Studio page.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I've got a Raspberry Pi Zero 2 W and a 40mm fan lying around and a spare DIN rail in the cabinet. what could I build? not looking for a spec yet, just want a few options and how much new work each one is",
+      "expected_output": "Reads the overview first, proposes 3-5 candidates each with problem, one-sentence concept, a reuse map of real component ids (patterns.pi_zero_mount, patterns.fan_mount, patterns.din_rail_ts35_profile, primitives.rounded_box, primitives.box_lid...) and gaps with proposed ids, ranked with an honest cost. Files the candidates under ideas/<slug>/IDEA.md (status inbox when the user is not there to pick) and does not start building a model.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "idea: a little clip that holds a pen to the side of my monitor. wall of the monitor bezel is about 12mm thick. can you rough out the shape so I can see if it looks right before we do it properly?",
+      "expected_output": "Creates ideas/<slug>/IDEA.md with the problem and constraints (12 mm bezel), writes ideas/<slug>/sketch.py, runs scripts/sketch.py <slug>, opens the render PNG and comments on it, iterates at least once if something is wrong, sets status: sketching with a log line, and stops short of creating models/<project> — instead says what the handoff to printable-parts would replace with library components.",
+      "files": []
+    }
+  ]
+}

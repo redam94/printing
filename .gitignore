@@ -7,3 +7,5 @@ models/*/exports/
 .remember/
 .claude/skills/*-workspace/
 .claude/worktrees/
+/exports/
+ideas/*/exports/
