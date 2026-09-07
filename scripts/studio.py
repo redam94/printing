@@ -26,7 +26,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import GOLDEN_DIR, MODELS_DIR, ROOT, Metrics, diff_golden, list_projects, load_golden, review_info  # noqa: E402
+from scripts._common import GOLDEN_DIR, MODELS_DIR, ROOT, Metrics, diff_golden, list_projects, load_golden, prints_info, review_info  # noqa: E402
 from scripts.ideas import STATUSES, list_ideas, validate  # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "studio_template.html"
@@ -89,7 +89,14 @@ def collect(with_images: bool = False) -> dict:
             except TypeError:
                 golden_diff = []
         rv = review_info(p)
+        notes_path = MODELS_DIR / p / "notes.json"
+        mirrored = json.loads(notes_path.read_text(encoding="utf-8")) if notes_path.exists() else {}
+        open_critiques = [n for n in mirrored.get("notes", []) if n.get("status") != "resolved" and n.get("kind") != "print"]
+        prints = prints_info(p).get("prints", [])
         models.append({
+            "open_critiques": [{"part": n.get("part", ""), "text": n.get("text", ""), "created": str(n.get("created", ""))[:10]} for n in open_critiques],
+            "notes_synced": mirrored.get("synced", ""),
+            "prints": [{k: pr.get(k) for k in ("date", "parts", "material", "outcome", "text", "inferred")} for pr in prints],
             "project": p, "summary": doc.strip().split("\n\n")[0].replace("\n", " ") if doc else "", "docstring": doc,
             "components": idx.get("models", {}).get(p, {}).get("components", []),
             "components_versions": {c["id"]: c["version"] for c in report.get("components", [])},
@@ -120,7 +127,9 @@ def collect(with_images: bool = False) -> dict:
             "id": cid, "category": cid.split(".", 1)[0], "name": cid.split(".", 1)[1], "version": c.get("version", ""),
             "summary": c.get("summary", ""), "tags": c.get("tags", []), "returns": c.get("returns", ""),
             "validated": validated, "orientation": mn.get("orientation", ""), "notes": mn.get("notes", ""),
-            "unvalidated": any("UNVALIDATED" in str(v) for v in list(validated) + [mn.get("notes", "")]),
+            "field_validated": mn.get("field_validated", []), "field_failed": mn.get("field_failed", []),
+            "evidence": [{k: e.get(k) for k in ("material", "outcome", "model", "date", "parts")} for e in mn.get("evidence", [])],
+            "unvalidated": not validated and not mn.get("field_validated"),
             "used_by": sorted({u.split("/")[1] for u in c.get("used_by", []) if u.startswith("models/")}),
             "params": c.get("params", []), "example": c.get("example", ""), "import": c.get("import", ""),
             "file": c.get("file", ""), "line": c.get("line"),
@@ -139,6 +148,15 @@ def collect(with_images: bool = False) -> dict:
             attention.append({"kind": "model", "ref": m["project"], "text": "review page not published", "fix": "publish exports/view.html with the Artifact tool, record models/<p>/review.json"})
         if any(c["kind"] != "mesh" for c in m["golden_changes"]):
             attention.append({"kind": "model", "ref": m["project"], "text": "last build differed from its golden", "fix": "review the diff; --update-golden only if intended"})
+        if m["open_critiques"]:
+            n = len(m["open_critiques"])
+            attention.append({"kind": "model", "ref": m["project"], "text": f"{n} open critique{'s' if n > 1 else ''} on the review page (as of {m['notes_synced']})", "fix": "read them with Artifact read_db before modifying; resolve after the rebuild"})
+        for pr in m["prints"]:
+            if pr.get("outcome") == "fail":
+                attention.append({"kind": "model", "ref": m["project"], "text": f"print FAILED {pr.get('date')} in {pr.get('material') or '?'}: {(pr.get('text') or '')[:80]}", "fix": ""})
+        for c in comp_rows:
+            if c["field_failed"]:
+                attention.append({"kind": "component", "ref": c["id"], "text": f"print failures recorded in {', '.join(c['field_failed'])}", "fix": "check lib/validation.json; fix the geometry or note the material to avoid"})
         for p in m["parts"]:
             if p.get("ok") is False:
                 attention.append({"kind": "part", "ref": f"{m['project']}/{p['name']}", "text": "printability check failed at last build", "fix": ""})
@@ -184,6 +202,10 @@ def format_text(d: dict) -> str:
             lines.append(f"  [{cur}]")
         used = f"used by {', '.join(c['used_by'])}" if c["used_by"] else "unused"
         val = "UNVALIDATED" if c["unvalidated"] else ", ".join(c["validated"]) or "-"
+        if c["field_validated"]:
+            val += f" +printed:{','.join(c['field_validated'])}"
+        if c["field_failed"]:
+            val += f" FAILED:{','.join(c['field_failed'])}"
         want = f"  wanted by ideas: {', '.join(c['wanted_by'])}" if c["wanted_by"] else ""
         lines.append(f"    {c['id']:<36s} v{c['version']:<7s} {val:<14s} {used}{want}")
         lines.append(f"      {c['summary']}")
@@ -205,6 +227,10 @@ def format_text(d: dict) -> str:
             verdict = "ok" if p.get("ok") else ("FAIL" if p.get("ok") is False else "?")
             lines.append(f"      {p['name']:<20s} {bb:<24s} {vol:>10s}  print {verdict}  wall_min {p.get('wall_min_mm')}")
         lines.append(f"    uses: {', '.join(m['components']) or '-'}")
+        for pr in m["prints"]:
+            lines.append(f"    printed {pr.get('date')} {', '.join(pr.get('parts') or []) or 'whole model'} in {pr.get('material') or '?'}: {pr.get('outcome')}{' (inferred)' if pr.get('inferred') else ''}  {(pr.get('text') or '')[:100]}")
+        for n in m["open_critiques"]:
+            lines.append(f"    open critique [{n['part'] or 'whole model'}] {n['created']}: {n['text'][:120]}")
     lines += ["", "IDEAS"]
     if not d["ideas"]:
         lines.append("  (none yet — ideas/README.md explains the format; the Studio page inbox captures new ones)")

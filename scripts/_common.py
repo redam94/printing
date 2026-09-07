@@ -259,12 +259,25 @@ def components_used(project: str) -> list[dict]:
         return []
     idx = json.loads(pj.read_text(encoding="utf-8"))
     prefix = f"models/{project}/"
-    return [{"id": cid, "version": c["version"], "summary": c["summary"]}
-            for cid, c in idx["components"].items() if any(f.startswith(prefix) for f in c["used_by"])]
+    out = []
+    for cid, c in idx["components"].items():
+        if not any(f.startswith(prefix) for f in c["used_by"]):
+            continue
+        mn = c.get("material_notes") or {}
+        out.append({"id": cid, "version": c["version"], "summary": c["summary"], "validated": mn.get("validated", []),
+                    "field_validated": mn.get("field_validated", []), "field_failed": mn.get("field_failed", []),
+                    "evidence": [{k: e.get(k) for k in ("material", "outcome", "model", "date")} for e in mn.get("evidence", [])]})
+    return out
 
 
 def review_info(project: str) -> dict:
     p = MODELS_DIR / project / "review.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
+def prints_info(project: str) -> dict:
+    """models/<project>/prints.json: print log written by scripts/sync_notes.py from review-page print reports."""
+    p = MODELS_DIR / project / "prints.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
@@ -290,6 +303,7 @@ def write_build_report(project: str, parts: dict, part_metrics: dict, checks: di
         "fit_checks": fits,
         "golden_changes": golden_changes,
         "review": review_info(project),
+        "prints": prints_info(project).get("prints", []),
     }
     out = MODELS_DIR / project / "exports" / "build_report.json"
     out.parent.mkdir(parents=True, exist_ok=True)

@@ -72,7 +72,10 @@
           "PLA"
         ],
         "orientation": "nut axis vertical; if the slot roof is a horizontal bridge keep slot_length short or add a sacrificial layer",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "fasteners",
       "module": "lib.fasteners.captive_nut",
@@ -158,7 +161,10 @@
           "PETG"
         ],
         "orientation": "any; for horizontal holes use primitives.teardrop instead",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "fasteners",
       "module": "lib.fasteners.clearance_hole",
@@ -246,7 +252,10 @@
           "PLA"
         ],
         "orientation": "boss axis vertical (insert pressed in along Z); pocket walls are then continuous perimeters",
-        "notes": "Insert pocket is sized per the insert spec, never per the screw. In PLA keep iron at ~200 C."
+        "notes": "Insert pocket is sized per the insert spec, never per the screw. In PLA keep iron at ~200 C.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "fasteners",
       "module": "lib.fasteners.heat_set_boss",
@@ -302,7 +311,10 @@
           "PLA"
         ],
         "orientation": "pocket axis vertical preferred",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "fasteners",
       "module": "lib.fasteners.heat_set_boss",
@@ -386,7 +398,10 @@
           "PETG"
         ],
         "orientation": "boss axis vertical so the screw threads cut across layers, not between them",
-        "notes": "Good for ~5 insert/remove cycles. Use heat_set_boss for anything serviced often. PLA cracks under over-torque."
+        "notes": "Good for ~5 insert/remove cycles. Use heat_set_boss for anything serviced often. PLA cracks under over-torque.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "fasteners",
       "module": "lib.fasteners.screw_boss",
@@ -476,7 +491,10 @@
           "PETG"
         ],
         "orientation": "beam lying flat in the bed plane (beam length along X or Y, thickness along Z). Never print the beam standing up: bending then peels layers apart and the root cracks.",
-        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%."
+        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.cantilever_latch",
@@ -545,7 +563,10 @@
           "PETG"
         ],
         "orientation": "beam lying flat in the bed plane (beam length along X or Y, thickness along Z). Never print the beam standing up: bending then peels layers apart and the root cracks.",
-        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%."
+        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.cantilever_latch",
@@ -623,7 +644,10 @@
           "PETG"
         ],
         "orientation": "flat on the bed; slot walls vertical. Works even in PLA because links twist rather than bend across layers.",
-        "notes": "Bend radius ~ length / total bend angle; more columns = gentler bend."
+        "notes": "Bend radius ~ length / total bend angle; more columns = gentler bend.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.living_hinge",
@@ -699,7 +723,10 @@
           "TPU"
         ],
         "orientation": "flat on the bed, hinge axis in the bed plane; the web is then 1-2 continuous layers with extrusion lines along the axis",
-        "notes": "PLA fatigue-cracks within tens of cycles; PP and TPU are best. Fold immediately after printing while warm for PETG."
+        "notes": "PLA fatigue-cracks within tens of cycles; PP and TPU are best. Fold immediately after printing while warm for PETG.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.living_hinge",
@@ -774,7 +801,10 @@
           "PETG"
         ],
         "orientation": "flat on the bed with beams in the XY plane so bending stress runs along the extrusion lines, not across layers",
-        "notes": "Stiffness ~ N*E*depth*t^3/L^3. Halve thickness for 8x softer. PLA works for tiny strokes only."
+        "notes": "Stiffness ~ N*E*depth*t^3/L^3. Halve thickness for 8x softer. PLA works for tiny strokes only.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.flexure",
@@ -828,7 +858,10 @@
           "PLA"
         ],
         "orientation": "ridge running horizontally along a vertical wall prints fine (the half-round is a shallow overhang)",
-        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4."
+        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.snap_fit",
@@ -883,7 +916,10 @@
           "PLA"
         ],
         "orientation": "ridge running horizontally along a vertical wall prints fine (the half-round is a shallow overhang)",
-        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4."
+        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "mechanisms",
       "module": "lib.mechanisms.snap_fit",
@@ -953,7 +989,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.corners",
@@ -1007,7 +1046,10 @@
       "material_notes": {
         "validated": [],
         "orientation": "clip printed with rail axis vertical (Z) so the lips are solid perimeters",
-        "notes": "UNVALIDATED: geometry from standard, no test print yet"
+        "notes": "UNVALIDATED: geometry from standard, no test print yet",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.din_rail",
@@ -1057,7 +1099,10 @@
           "PLA"
         ],
         "orientation": "any (2D pattern)",
-        "notes": "Boards have no holes: hold by edge slots (pcb_slot_cradle) or header sockets."
+        "notes": "Boards have no holes: hold by edge slots (pcb_slot_cradle) or header sockets.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.esp32",
@@ -1112,7 +1157,10 @@
           "PLA"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.esp32",
@@ -1183,7 +1231,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.fan",
@@ -1234,7 +1285,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.pi",
@@ -1290,7 +1344,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.pi",
@@ -1356,7 +1413,10 @@
       "material_notes": {
         "validated": [],
         "orientation": "windows cut through a vertical wall; the wall above each window is a short bridge (<= 18 mm)",
-        "notes": "UNVALIDATED: positions from the official drawing, connector/plug envelopes from Pi 4 data and typical cables \u2014 test-fit before printing many."
+        "notes": "UNVALIDATED: positions from the official drawing, connector/plug envelopes from Pi 4 data and typical cables \u2014 test-fit before printing many.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.pi",
@@ -1407,7 +1467,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.pi",
@@ -1457,7 +1520,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.pi",
@@ -1511,7 +1577,10 @@
           "PETG"
         ],
         "orientation": "any (2D pattern); print the bracket so screw load is in-plane",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "patterns",
       "module": "lib.patterns.vesa",
@@ -1613,7 +1682,10 @@
           "PETG"
         ],
         "orientation": "top face down on the bed, lip pointing up",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.rounded_box",
@@ -1676,7 +1748,10 @@
           "PETG"
         ],
         "orientation": "hole axis horizontal, slit pointing up",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.cable_grommet",
@@ -1732,7 +1807,10 @@
           "TPU"
         ],
         "orientation": "printed as part of the body, bed side down",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.feet",
@@ -1856,7 +1934,10 @@
       "material_notes": {
         "validated": [],
         "orientation": "on its side: L profile in the bed plane, width along Z, so the corner is loaded along the layers; holes are horizontal (teardrop point up)",
-        "notes": "UNVALIDATED: no test print yet. Printing one arm flat on the bed puts the corner's bending load across layers."
+        "notes": "UNVALIDATED: no test print yet. Printing one arm flat on the bed puts the corner's bending load across layers.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.l_bracket",
@@ -1954,7 +2035,10 @@
           "PLA"
         ],
         "orientation": "rails vertical; slot faces are then vertical walls, no bridging",
-        "notes": "With top_lip the board slides in from the +X end; leave that end open or make one rail cantilevered. Dev boards with header bodies flush to the edge (ESP32 DevKitC) need top_lip=False and lid retention."
+        "notes": "With top_lip the board slides in from the +X end; leave that end open or make one rail cantilevered. Dev boards with header bodies flush to the edge (ESP32 DevKitC) need top_lip=False and lid retention.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.pcb_cradle",
@@ -2045,7 +2129,10 @@
           "PETG"
         ],
         "orientation": "floor on the bed, open top up",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.rounded_box",
@@ -2100,7 +2187,10 @@
           "PLA"
         ],
         "orientation": "any",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.feet",
@@ -2156,7 +2246,10 @@
           "PETG"
         ],
         "orientation": "hole axis horizontal, point up (+Y in the sketch)",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.cable_grommet",
@@ -2238,7 +2331,10 @@
           "PETG"
         ],
         "orientation": "on a vertical wall run slots vertically so they need no bridging",
-        "notes": ""
+        "notes": "",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
       },
       "category": "primitives",
       "module": "lib.primitives.vented_panel",

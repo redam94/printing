@@ -150,6 +150,15 @@ Publish it once with the Artifact tool:
 The page opened as a local file still works (inbox in that browser's localStorage); the published
 page is the one that closes the loop with Claude.
 
+## Print reports and the sync loop
+
+The overview's MODELS section lists prints (`models/<p>/prints.json`) and open critiques
+(`models/<p>/notes.json`), and components show `+printed:PETG` once field evidence exists in
+`lib/validation.json`. All three files are written by the `sync-notes` skill, which dumps the
+review-page notes and the Studio inbox with `read_db`, ingests them with
+`scripts/sync_notes.py`, reindexes and republishes. A routine runs it on a schedule; run it by
+hand when the user says they printed something or asks what is on the pages.
+
 ## Repo questions
 
 "What do I have?", "what's built?", "what's unused?", "what's waiting on a test print?" are

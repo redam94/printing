@@ -1,0 +1,114 @@
+---
+name: sync-notes
+description: >-
+  Pull the notes people leave on the published review pages (critiques and print reports) and the
+  Studio page inbox (ideas) into the repo, and turn print reports into state: models/<p>/notes.json,
+  models/<p>/prints.json, lib/validation.json field evidence per component, ideas/<slug>/IDEA.md;
+  then reindex, rebuild and republish so every other page shows what has been printed and in what.
+  Use this skill whenever the user says "sync the notes", "pull the notes in", "I printed X and it
+  worked / failed", "record the print", "update the validation", "check the review pages", "what did
+  I leave on the review page", "file the inbox", or when a scheduled routine is asked to sync artifact
+  notes. Also run it at the start of any session that will modify a model whose review.json exists.
+---
+
+# Sync notes: artifact pages → repo state → artifact pages
+
+Every model has a review page (`models/<project>/review.json` holds its URL) with a `notes`
+collection, and the Studio page (`studio.json`) has an `ideas` inbox. People write there from a
+browser or a phone, often right after a print. The repo is the record; this skill is the loop
+that copies what they wrote into the repo, extracts state from it, and pushes the state back out
+to every page. Run everything from the repo root with `uv run python ...`.
+
+## 1. Dump every collection
+
+The artifact databases are reachable only through the Artifact tool, so dump them to `.sync/`
+(gitignored), one call per page, with `out_dir` so each document lands as a file:
+
+```
+for each models/<p>/review.json:
+  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "notes",
+                   out_dir: ".sync/<p>"
+if studio.json exists:
+  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "ideas",
+                   out_dir: ".sync/studio"
+```
+
+A page with no documents writes nothing; that is fine. If a `read_db` fails (page deleted,
+no access) say so in the report and continue with the others.
+
+## 2. Ingest
+
+```
+uv run python scripts/sync_notes.py ingest --dry-run    # preview
+uv run python scripts/sync_notes.py ingest              # write
+```
+
+What it writes, and what the writes mean:
+
+- `models/<p>/notes.json` — every note, verbatim, with status. This is the critique log the
+  Studio page counts ("2 open critiques") and the printable-parts skill reads before modifying.
+- `models/<p>/prints.json` — one record per print report: date, parts, material, outcome
+  (`ok` / `partial` / `fail`), the text, the build it was printed from.
+- `lib/validation.json` — field evidence per component id. A print that worked in a material
+  is evidence that every component the model uses works in that material; a failed print is
+  recorded as a failure. `reindex.py` merges this into PARTS.md / parts.json as
+  `field_validated` / `field_failed`, next to the designer's own `validated` claim, and the
+  Studio page stops flagging a component as UNVALIDATED once it has an ok print.
+- `ideas/<slug>/IDEA.md` for each inbox idea that does not exist yet (`status: inbox`).
+- `.sync/actions.json` — the db updates you apply in step 4.
+
+**Use judgment on two things the script cannot decide:**
+
+- *Inferred reports.* A free-text note that reads like a print outcome ("printed the lid in PLA,
+  fits") is recorded with `inferred: true` and listed in the summary. Read each one. If it is
+  not really a print report, delete its record from `prints.json` and its entries from
+  `lib/validation.json` before committing (or leave the print record and remove only the
+  evidence). Structured reports (kind = print on the page form) are taken as written.
+- *Which components a partial print validates.* If the note names a part (e.g. `lid_snap`),
+  the parts that were printed do not exercise every component the model uses: a lid print says
+  nothing about `patterns.pi5_mount`. Open `models/<p>/model.py`, see which components the
+  printed parts actually call, and re-run with
+  `--components <note_id>=<id1>,<id2>` so only those get evidence. A print of the whole model
+  validates everything it uses.
+
+## 3. Reindex, test, rebuild
+
+```
+uv run python scripts/reindex.py
+uv run python -m pytest -q
+```
+
+Then rebuild every model whose components gained evidence or whose notes changed, so its review
+page report shows the print log and the validation chips:
+`uv run python scripts/build.py <project>` (geometry is unchanged, so the golden must still
+match; if it does not, stop and report rather than updating it). Regenerate the Studio page:
+`uv run python scripts/studio.py --html`.
+
+## 4. Push state back to the pages
+
+- Republish each rebuilt model's `models/<p>/exports/view.html` with `url` = its review.json
+  URL, and `exports/studio.html` with `url` = the studio.json URL. Never publish without `url`.
+- Apply `.sync/actions.json`: for each action,
+  `Artifact action: "write_db", url: <artifact_url>, db_op: "update", collection: <collection>,
+  doc_id: <doc_id>, data: <data>`. These stamp notes as `synced` and mark inbox ideas `filed`
+  with their path. Never delete documents; never change a note's text.
+- For a print report that resolved an open critique (the user says "fixed, printed, works"),
+  mark that critique resolved with `resolution` text; otherwise leave critiques open — they
+  are for the next design pass, not for this sync.
+
+## 5. Commit
+
+Commit everything the sync produced in one commit: `notes.json`, `prints.json`,
+`lib/validation.json`, `PARTS.md`, `parts.json`, new idea files. Message:
+`sync notes: <n> print report(s), <n> idea(s) filed, <components> validated in <materials>`.
+The pre-commit hook checks the index is fresh. If running as a routine with push access, push
+to the branch you were given (main unless told otherwise); if tests failed, commit nothing and
+report what failed.
+
+## Report
+
+Say per model how many notes were mirrored, how many critiques are open, and which print
+reports were recorded. List every component that gained field validation, by material, and any
+failures. List inferred reports you kept or dropped and why. List ideas filed. Give the review
+page and Studio page links that were republished. If nothing was on any page, say so in one
+line; do not invent activity.

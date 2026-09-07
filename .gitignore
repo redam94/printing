@@ -9,3 +9,4 @@ models/*/exports/
 .claude/worktrees/
 /exports/
 ideas/*/exports/
+/.sync/

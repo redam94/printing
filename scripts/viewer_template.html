@@ -147,7 +147,15 @@ h2.k,.k{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.0
             <select id="notePart"></select>
             <label style="display:flex;gap:6px;align-items:center;margin-left:auto"><input type="checkbox" id="noteCtx" checked> attach current section &amp; view</label>
           </div>
-          <textarea id="noteText" placeholder="What should change? e.g. 'boss at the USB end is too close to the wall — 0.2 mm gap', 'lid lip binds, add 0.1 clearance'"></textarea>
+          <div class="row">
+            <label class="k" style="margin:0" for="noteKind">Kind</label>
+            <select id="noteKind"><option value="critique">critique (something should change)</option><option value="print">print report (I printed this)</option></select>
+            <span id="printFields" hidden style="display:contents">
+              <select id="noteMaterial" aria-label="material"><option value="">material…</option><option>PLA</option><option>PETG</option><option>TPU</option><option>ASA</option><option>ABS</option><option>PLA-CF</option><option>PETG-CF</option><option>NYLON</option></select>
+              <select id="noteOutcome" aria-label="outcome"><option value="ok">worked / fits</option><option value="partial">partly (see text)</option><option value="fail">failed</option></select>
+            </span>
+          </div>
+          <textarea id="noteText" placeholder="Critique: what should change, e.g. 'boss at the USB end is too close to the wall — 0.2 mm gap'. Print report: what you printed and how it went, e.g. 'body + lid_snap in PETG, latches click and hold'."></textarea>
           <div class="row"><button class="btn primary" type="submit">Add note</button><button class="btn" type="button" id="copyNotes">Copy as markdown</button><label style="margin-left:auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="showResolved"> show resolved</label></div>
         </form>
         <div class="list" id="noteList"></div>
@@ -300,7 +308,8 @@ function renderReport(run){
     <h3>Parts</h3><div class="tw"><table><thead><tr><th>part</th><th>bbox mm</th><th>cm³</th><th>watertight</th><th>bodies</th><th>min wall</th><th>overhang</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     ${issues.length?`<h3>Printability findings</h3><ul>${issues.join('')}</ul>`:'<h3>Printability findings</h3><p class="dim">No problems or warnings.</p>'}
     <h3>Fit checks</h3>${fits.length?`<ul>${fits.map(([n,v])=>`<li>${esc(n)}: <span class="mono">${fmt(v,3)} mm³</span> ${v>0.05?'<span class="flag bad">collide</span>':'<span class="flag ok">clear</span>'}</li>`).join('')}</ul>`:'<p class="dim">None declared — add fit_checks() to the model if parts must mate or enclose hardware.</p>'}
-    <h3>Library components reused</h3>${comps.length?`<ul>${comps.map(c=>`<li><span class="mono">${esc(c.id)}</span> <span class="chip">v${esc(c.version)}</span> <span class="dim">${esc(c.summary)}</span></li>`).join('')}</ul>`:'<p class="dim">None — everything in this model is new geometry.</p>'}
+    <h3>Library components reused</h3>${comps.length?`<ul>${comps.map(c=>{const val=(c.validated||[]).length?`<span class="flag ok">${esc(c.validated.join(', '))}</span>`:'<span class="flag bad">UNVALIDATED</span>';const fv=(c.field_validated||[]).length?` <span class="flag ok" title="from print reports">printed ok: ${esc(c.field_validated.join(', '))}</span>`:'';const ff=(c.field_failed||[]).length?` <span class="flag bad" title="from print reports">failed: ${esc(c.field_failed.join(', '))}</span>`:'';return `<li><span class="mono">${esc(c.id)}</span> <span class="chip">v${esc(c.version)}</span> ${val}${fv}${ff} <span class="dim">${esc(c.summary)}</span></li>`;}).join('')}</ul>`:'<p class="dim">None — everything in this model is new geometry.</p>'}
+    ${(r.prints||[]).length?`<h3>Print log</h3><ul>${r.prints.map(p=>`<li>${esc(p.date)} · <span class="mono">${esc((p.parts||[]).join(', ')||'whole model')}</span> · ${esc(p.material||'?')} · ${p.outcome==='ok'?'<span class="flag ok">worked</span>':p.outcome==='fail'?'<span class="flag bad">failed</span>':'<span class="flag">partial</span>'} <span class="dim">${esc(p.text)}</span></li>`).join('')}</ul>`:''}
     <h3>Parameters</h3><div class="tw"><table><thead><tr><th>name</th><th>value</th><th>note</th></tr></thead><tbody>${params.map(p=>`<tr class="${p.derived?'dim':''}"><td class="mono">${esc(p.name)}</td><td class="mono">${esc(p.value)}</td><td>${esc(p.comment)}${p.derived?' <span class="chip">derived</span>':''}</td></tr>`).join('')}</tbody></table></div>
     <h3>Changes vs golden</h3>${changes.length?`<ul>${changes.map(c=>`<li><span class="mono">${esc(c.part)} ${esc(c.field)}</span>: ${esc(c.old)} → ${esc(c.new)} ${c.delta?`<span class="dim">(${esc(c.delta)})</span>`:''}</li>`).join('')}</ul>`:'<p class="dim">Matches the committed golden metrics.</p>'}
     ${r.plate&&r.plate.threemf?`<h3>Plate for ${esc(r.plate.printer)}</h3><p><span class="mono">${esc(r.plate.threemf)}</span> — ${r.plate.extent.map(v=>fmt(v)).join(' × ')} mm on a ${r.plate.bed.map(v=>fmt(v,0)).join(' × ')} bed ${r.plate.fits_bed?'<span class="flag ok">fits</span>':'<span class="flag bad">does not fit</span>'}</p>`:''}
@@ -329,7 +338,9 @@ async function initStore(){
 }
 function noteCtx(){const c=parseFloat(cut.value)>=parseFloat(cut.max)?null:parseFloat(cut.value);return {z:c,view:currentView,visible:meshes.filter(m=>m.visible).map(m=>m.part.name)};}
 async function addNote(text,part,withCtx){
-  const n={run:current.id,part:part||'',text,status:'open',created:new Date().toISOString(),build_id:(current.report&&current.report.build_id)||'',...(withCtx?noteCtx():{})};
+  const kind=document.getElementById('noteKind').value;
+  const extra=kind==='print'?{kind,material:document.getElementById('noteMaterial').value,outcome:document.getElementById('noteOutcome').value}:{kind};
+  const n={run:current.id,part:part||'',text,status:kind==='print'?'resolved':'open',created:new Date().toISOString(),build_id:(current.report&&current.report.build_id)||'',...extra,...(withCtx?noteCtx():{})};
   if(dbRef){try{await dbRef.add(n);return;}catch(e){setStore('local','write failed ('+(e&&e.code||'error')+'), saved in this browser');}}
   n.id='l'+Date.now(); notes.push(n); localSave(); renderNotes();
 }
@@ -344,14 +355,15 @@ async function deleteNote(id){
 function renderNotes(){
   if(!current) return;
   const showResolved=document.getElementById('showResolved').checked;
-  const mine=notes.filter(n=>n.run===current.id&&(showResolved||n.status!=='resolved')).sort((a,b)=>(b.created||'').localeCompare(a.created||''));
+  const mine=notes.filter(n=>n.run===current.id&&(showResolved||n.status!=='resolved'||n.kind==='print')).sort((a,b)=>(b.created||'').localeCompare(a.created||''));
   const open=notes.filter(n=>n.run===current.id&&n.status!=='resolved').length;
   document.getElementById('tabNotes').textContent=open?`Notes (${open} open)`:'Notes';
   const list=document.getElementById('noteList');
   if(!mine.length){list.innerHTML=`<p class="sub">No ${showResolved?'':'open '}notes on this ${current.eval?'run':'model'} yet. Use the section plane to find the spot, then describe what should change.</p>`;return;}
   list.innerHTML=mine.map(n=>{const part=current.parts.find(p=>p.name===n.part);const chip=n.part?`<span class="chip part" style="background:${part?hex(part._color):'#777'}">${esc(n.part)}</span>`:'<span class="chip">whole model</span>';
     const ctx=[n.z!=null?`Z ${Number(n.z).toFixed(1)} mm`:'',n.view&&n.view!=='custom'?n.view+' view':'',n.build_id?'build '+n.build_id:''].filter(Boolean).join(' · ');
-    return `<div class="note" data-status="${esc(n.status)}"><div class="who">${chip}<span class="meta">${esc((n.created||'').slice(0,16).replace('T',' '))}${ctx?' · '+esc(ctx):''}</span>${n.z!=null||n.view&&n.view!=='custom'?`<button class="btn small" data-go="${esc(n.id)}">go</button>`:''}</div>
+    const kindChip=n.kind==='print'?`<span class="chip" style="border-color:${n.outcome==='fail'?'var(--bad)':n.outcome==='partial'?'var(--warn)':'var(--ok)'};color:${n.outcome==='fail'?'var(--bad)':n.outcome==='partial'?'var(--warn)':'var(--ok)'}">print · ${esc(n.material||'?')} · ${esc(n.outcome||'ok')}${n.synced?' · synced '+esc(String(n.synced).slice(0,10)):''}</span>`:'';
+    return `<div class="note" data-status="${esc(n.status)}"><div class="who">${chip}${kindChip}<span class="meta">${esc((n.created||'').slice(0,16).replace('T',' '))}${ctx?' · '+esc(ctx):''}</span>${n.z!=null||n.view&&n.view!=='custom'?`<button class="btn small" data-go="${esc(n.id)}">go</button>`:''}</div>
       <div class="acts"><button class="btn small" data-toggle="${esc(n.id)}">${n.status==='resolved'?'reopen':'resolve'}</button><button class="btn small" data-del="${esc(n.id)}" aria-label="delete note">×</button></div>
       <div class="text" style="grid-column:1/-1">${esc(n.text)}</div>${n.resolution?`<div class="res">${esc(n.resolution)}</div>`:''}</div>`;}).join('');
   list.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{const n=notes.find(x=>x.id===b.dataset.toggle);patchNote(n.id,{status:n.status==='resolved'?'open':'resolved'});}));
@@ -360,9 +372,10 @@ function renderNotes(){
 }
 document.getElementById('noteForm').addEventListener('submit',e=>{e.preventDefault();const t=document.getElementById('noteText').value.trim();if(!t)return;addNote(t,document.getElementById('notePart').value,document.getElementById('noteCtx').checked);document.getElementById('noteText').value='';});
 document.getElementById('showResolved').addEventListener('change',renderNotes);
+document.getElementById('noteKind').addEventListener('change',e=>{document.getElementById('printFields').hidden=e.target.value!=='print';});
 document.getElementById('copyNotes').addEventListener('click',async()=>{
   const mine=notes.filter(n=>n.run===current.id).sort((a,b)=>(a.created||'').localeCompare(b.created||''));
-  const md=`## Notes on ${current.title||current.id}\n\n`+(mine.length?mine.map(n=>`- [${n.status==='resolved'?'x':' '}] **${n.part||'whole model'}**${n.z!=null?` (Z ${Number(n.z).toFixed(1)} mm)`:''}: ${n.text}${n.resolution?`\n  - resolved: ${n.resolution}`:''}`).join('\n'):'_none_');
+  const md=`## Notes on ${current.title||current.id}\n\n`+(mine.length?mine.map(n=>`- [${n.status==='resolved'?'x':' '}] **${n.part||'whole model'}**${n.kind==='print'?` (print · ${n.material||'?'} · ${n.outcome||'ok'})`:''}${n.z!=null?` (Z ${Number(n.z).toFixed(1)} mm)`:''}: ${n.text}${n.resolution?`\n  - resolved: ${n.resolution}`:''}`).join('\n'):'_none_');
   try{await navigator.clipboard.writeText(md);setStore(storeKind,'copied '+mine.length+' note(s) as markdown');}catch(e){setStore(storeKind,'clipboard blocked — select and copy from the list');}
 });
 

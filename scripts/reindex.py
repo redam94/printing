@@ -81,9 +81,20 @@ def scan_model_imports() -> dict[str, list[str]]:
     return {cid: sorted(v) for cid, v in used_by.items()}
 
 
+VALIDATION_JSON = ROOT / "lib" / "validation.json"
+
+
+def load_evidence() -> dict:
+    """Field evidence from lib/validation.json (written by scripts/sync_notes.py from review-page print reports)."""
+    if not VALIDATION_JSON.exists():
+        return {}
+    return json.loads(VALIDATION_JSON.read_text(encoding="utf-8"))
+
+
 def build_index() -> dict:
     import_all_components()
     used_by = scan_model_imports()
+    evidence = load_evidence()
     components = {}
     for cid in sorted(REGISTRY):
         m = REGISTRY[cid]
@@ -91,6 +102,10 @@ def build_index() -> dict:
         d["file"] = str(Path(m.file).resolve().relative_to(ROOT))
         d["used_by"] = used_by.get(cid, [])
         d["import"] = f"from {m.module} import {m.qualname}"
+        ev = evidence.get(cid, [])
+        d["material_notes"]["evidence"] = ev
+        d["material_notes"]["field_validated"] = sorted({e["material"] for e in ev if e.get("outcome") == "ok" and e.get("material")})
+        d["material_notes"]["field_failed"] = sorted({e["material"] for e in ev if e.get("outcome") == "fail" and e.get("material")})
         components[cid] = d
     models = {}
     for proj_dir in sorted(p.parent for p in MODELS_DIR.glob("*/model.py")):
@@ -126,7 +141,12 @@ def render_markdown(index: dict) -> str:
             out += [f"- **import:** `{c['import']}`  ", f"- **returns:** `{c['returns']}`  ", f"- **tags:** {', '.join(c['tags'])}  "]
             mn = c["material_notes"]
             val = ", ".join(mn["validated"]) if mn["validated"] else "UNVALIDATED"
-            out += [f"- **validated in:** {val}  ", f"- **orientation:** {mn['orientation']}  "]
+            out += [f"- **validated in:** {val}  "]
+            if mn.get("field_validated") or mn.get("field_failed"):
+                ok = [f"{e['material']} ({e['model']} {e['date']})" for e in mn["evidence"] if e.get("outcome") == "ok"]
+                bad = [f"{e['material']} ({e['model']} {e['date']})" for e in mn["evidence"] if e.get("outcome") == "fail"]
+                out += [f"- **field-validated:** {', '.join(ok) or '—'}" + (f"; **failed:** {', '.join(bad)}" if bad else "") + "  "]
+            out += [f"- **orientation:** {mn['orientation']}  "]
             if mn.get("notes"):
                 out += [f"- **notes:** {mn['notes']}  "]
             if c["used_by"]:
