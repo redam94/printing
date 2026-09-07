@@ -1,0 +1,35 @@
+{
+  "skill_name": "printable-parts",
+  "evals": [
+    {
+      "id": 0,
+      "name": "pi5-enclosure-reuse",
+      "prompt": "Design an enclosure for a Pi 5 with a 30mm fan cutout and heat-set inserts",
+      "expected_output": "A models/pi5_enclosure (or similar) model that imports patterns.pi5_mount, patterns.fan_mount, fasteners.heat_set_boss and primitives.rounded_box/box_lid from lib rather than redefining hole positions; params.py with all dimensions; built via scripts/build.py; STL+STEP exported; renders viewed; bbox/volume reported; golden written; reindex run.",
+      "files": [],
+      "followup_prompt": "Add a snap-fit lid to that enclosure using an existing cantilever latch",
+      "followup_expected": "Modifies the same model to use mechanisms.cantilever_latch and mechanisms.latch_window from lib (not a new latch), rebuilds, updates the golden deliberately, reports."
+    },
+    {
+      "id": 1,
+      "name": "list-compliant-mechanisms",
+      "prompt": "What compliant mechanisms do I already have?",
+      "expected_output": "Answers from PARTS.md: lists exactly the mechanisms.* components (cantilever_latch, latch_window, living_hinge_web, living_hinge_lattice, snap_ridge, snap_groove, parallel_flexure) with version, summary, validated materials and print orientation. No invented components, no new geometry written.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "boss-wall-major-bump-impact",
+      "prompt": "Change the default M3 boss wall thickness to 2.4mm and tell me what it affects",
+      "expected_output": "Edits lib/fasteners/hardware.py (M3 HeatSetInsert min_wall 1.6 -> 2.4) and/or heat_set_boss default, bumps the component major version, runs scripts/impact.py fasteners.heat_set_boss, reports esp32_devkit_case body volume change (~+9%), does NOT accept new goldens without asking, runs reindex.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "l-bracket-new-geometry-promote",
+      "prompt": "L-bracket, 40mm arms, three M3 clearance holes per arm, 4mm thick",
+      "expected_output": "Reports that no bracket exists in the library but fasteners.clearance_hole does and uses it; builds models/l_bracket with params.py (no magic numbers), runs build.py, exports, reports bbox/volume/printability; offers (or performs) promotion of a parametric l_bracket to lib/primitives with metadata and reindex.",
+      "files": []
+    }
+  ]
+}

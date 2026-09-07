@@ -29,7 +29,7 @@ def render_mesh(mesh, out_png: Path, title: str) -> None:
     tris = v[f]
     normals = mesh.face_normals
     light = np.array([0.4, -0.6, 0.7]); light /= np.linalg.norm(light)
-    shade = 0.35 + 0.65 * np.clip(normals @ light, 0, 1)
+    shade = 0.30 + 0.70 * np.clip(normals @ light, 0, 1)
     base = np.array([0.36, 0.60, 0.86])
     colors = np.clip(shade[:, None] * base[None, :], 0, 1)
 
@@ -40,7 +40,7 @@ def render_mesh(mesh, out_png: Path, title: str) -> None:
     fig = plt.figure(figsize=(15, 5.2), dpi=110)
     for i, (name, elev, azim) in enumerate(VIEWS, 1):
         ax = fig.add_subplot(1, 3, i, projection="3d")
-        coll = Poly3DCollection(tris, facecolors=colors, edgecolors=(0, 0, 0, 0.08), linewidths=0.2)
+        coll = Poly3DCollection(tris, facecolors=colors, edgecolors='none', antialiased=False)
         ax.add_collection3d(coll)
         for setter, c in zip((ax.set_xlim, ax.set_ylim, ax.set_zlim), ctr):
             setter(c - span, c + span)

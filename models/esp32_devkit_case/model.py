@@ -1,7 +1,9 @@
 """ESP32-DevKitC V4 enclosure: body (bed side down) + screw-on lid (printed upside down).
 
 Parts: ``body`` — open-top shell with edge-slot cradle for the hole-less dev board,
-micro-USB opening, side vents, cable grommet, four M3 heat-set bosses.
+micro-USB opening, side vents, cable grommet, four M3 heat-set bosses beyond the PCB ends.
+The cradle is an open ledge (no top lip): the DevKitC header bodies run to the board edge, so the board
+is retained by the lid, not by a slot.
 ``lid`` — flat plate with drop-in lip and four M3 clearance holes.
 Both parts are returned in print orientation (bed at z=0): body floor down, lid top face down.
 """
@@ -11,6 +13,7 @@ from lib.component import on_bed
 from lib.fasteners.clearance_hole import clearance_hole
 from lib.fasteners.heat_set_boss import heat_set_boss
 from lib.primitives.cable_grommet import cable_grommet
+from lib.patterns.esp32 import esp32_footprint
 from lib.primitives.pcb_cradle import pcb_slot_cradle
 from lib.primitives.rounded_box import box_lid, rounded_box
 from lib.primitives.vented_panel import vent_slots
@@ -31,7 +34,7 @@ def build() -> dict[str, Part]:
                        corner_r=P.CORNER_R, bottom_chamfer=P.BED_CHAMFER)
 
     cradle = pcb_slot_cradle(P.BOARD.length, P.BOARD.width, P.BOARD.pcb_t, rail_h=P.CRADLE_H, rail_t=P.CRADLE_RAIL_T,
-                             slot_depth=P.CRADLE_SLOT_DEPTH, clearance=P.CRADLE_CLEARANCE, slot_z=P.BOARD_Z)
+                             slot_depth=P.CRADLE_SLOT_DEPTH, clearance=P.CRADLE_CLEARANCE, slot_z=P.BOARD_Z, top_lip=P.CRADLE_TOP_LIP)
     body = body + Pos(0, 0, P.FLOOR_T) * cradle
 
     bosses = [loc * heat_set_boss(P.LID_SCREW, height=P.BOSS_H) for loc in _boss_locations()]
@@ -56,6 +59,16 @@ def build() -> dict[str, Part]:
                  for loc in _boss_locations()]
     lid = on_bed(Rot(180, 0, 0) * lid)   # print orientation: top face on the bed
     return {"body": body, "lid": lid}
+
+
+def fit_checks(parts: dict[str, Part]) -> dict[str, tuple[Part, Part]]:
+    """Assembled-state interference checks run by scripts/build.py."""
+    body, lid = parts["body"], parts["lid"]
+    # lid back in assembled orientation: plate on the rim, lip hanging inside
+    lid_assembled = Pos(0, 0, P.OUTER_H + P.LID_T) * Rot(180, 0, 0) * Pos(0, 0, -lid.bounding_box().max.Z) * lid
+    # PCB envelope (board + components) sitting in the cradle
+    pcb = Pos(0, 0, P.FLOOR_T + P.BOARD_Z) * extrude(esp32_footprint("devkitc_v4"), amount=P.BOARD.pcb_t + P.BOARD.module_h)
+    return {"lid_vs_body": (lid_assembled, body), "pcb_vs_body": (pcb, body)}
 
 
 if __name__ == "__main__":

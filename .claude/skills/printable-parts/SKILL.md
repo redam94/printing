@@ -55,6 +55,12 @@ Do not guess or pad with things that are not there.
      solid **in print orientation with the bed at z=0** (use `lib.component.on_bed`, `Rot(180,0,0)`
      for lids). No numeric literals in `model.py` except 0/1/2/±1/0.5 and right angles;
      `scripts/lint_models.py` enforces this and flags inlined hole patterns and hardware-sized holes.
+   - `fit_checks(parts) -> dict[str, tuple[Shape, Shape]]` (optional but expected for anything with
+     two parts or enclosed hardware): pairs that must not intersect once assembled, e.g. the lid
+     placed back on the body, or a PCB envelope (footprint extruded by board + component height)
+     against the body. `build.py` intersects each pair and fails on overlap. The printability check
+     looks at one part at a time and cannot see a boss colliding with a lid lip or a PCB corner;
+     both of those happened in the seed model before this hook existed.
    - Module docstring: what the parts are, what hardware they fit, which face is on the bed, and
      any assumptions you made.
    - See `references/build123d_cheatsheet.md` for the 0.11 idioms that work here (algebra API,
@@ -65,8 +71,8 @@ Do not guess or pad with things that are not there.
    metrics in `tests/regression/<project>.json`. **Open each render PNG with Read and look at it.**
    Misplaced cutouts and features running out of a wall are obvious in the picture and invisible in
    the numbers.
-5. **Report** bounding box and volume for each part, the printability result, and anything the
-   check flagged (thin walls, overhangs, flat ceilings, multiple bodies). Fix real problems before
+5. **Report** bounding box and volume for each part, the printability result, fit-check results,
+   and anything the check flagged (thin walls, overhangs, flat ceilings, multiple bodies). Fix real problems before
    moving on; explain the warnings you are accepting and why.
 6. **Goldens.** A new model gets its golden written automatically on first build. When you change
    a model on purpose, rebuild with `--update-golden`. Never update a golden to make a failure go

@@ -989,7 +989,9 @@
       "returns": "Sketch",
       "docstring": "Example:\npocket = extrude(esp32_footprint(\"devkitc_v4\", clearance=0.5), amount=pcb_t)",
       "example": "pocket = extrude(esp32_footprint(\"devkitc_v4\", clearance=0.5), amount=pcb_t)",
-      "used_by": [],
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
       "import": "from lib.patterns.esp32 import esp32_footprint"
     },
     "patterns.esp32_header_rows": {
@@ -1587,7 +1589,7 @@
     },
     "primitives.pcb_slot_cradle": {
       "id": "primitives.pcb_slot_cradle",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "summary": "Pair of rails with slots that grip a PCB by its two long edges (for boards with no mount holes), centred on the origin.",
       "params": [
         {
@@ -1645,6 +1647,13 @@
           "units": "mm",
           "default": 3.0,
           "description": "height of the slot floor above z=0"
+        },
+        {
+          "name": "top_lip",
+          "type": "bool",
+          "units": "bool",
+          "default": true,
+          "description": "keep rail material above the slot (true slot). False = open ledge, for boards whose edge components (header bodies) run to the edge"
         }
       ],
       "tags": [
@@ -1661,7 +1670,7 @@
           "PLA"
         ],
         "orientation": "rails vertical; slot faces are then vertical walls, no bridging",
-        "notes": "Board slides in from the +X end; leave that end open in the enclosure or make one rail cantilevered."
+        "notes": "With top_lip the board slides in from the +X end; leave that end open or make one rail cantilevered. Dev boards with header bodies flush to the edge (ESP32 DevKitC) need top_lip=False and lid retention."
       },
       "category": "primitives",
       "module": "lib.primitives.pcb_cradle",
@@ -1964,6 +1973,7 @@
       "components": [
         "fasteners.clearance_hole",
         "fasteners.heat_set_boss",
+        "patterns.esp32_footprint",
         "primitives.box_lid",
         "primitives.cable_grommet",
         "primitives.pcb_slot_cradle",

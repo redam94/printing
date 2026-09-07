@@ -18,8 +18,10 @@ CRADLE_H = BOARD_Z + BOARD.pcb_t + 2.0
 CRADLE_SLOT_DEPTH = 1.5
 CRADLE_RAIL_T = 1.6
 CRADLE_CLEARANCE = 0.3
+CRADLE_TOP_LIP = False     # header bodies sit flush to the DevKitC edge; a lip would collide
 
-INNER_L = BOARD.length + 2 * CLEARANCE_XY
+END_CLEARANCE = 11.0       # extra length at each end so the lid bosses sit beyond the PCB ends
+INNER_L = BOARD.length + 2 * END_CLEARANCE
 INNER_W = BOARD.width + 2 * (CRADLE_RAIL_T + CLEARANCE_XY)
 OUTER_L = INNER_L + 2 * WALL
 OUTER_W = INNER_W + 2 * WALL
@@ -45,7 +47,7 @@ CABLE_Z = FLOOR_T + BOARD_Z + 6.0
 # --- lid: M3 heat-set bosses in the corners, screws through the lid ---
 LID_SCREW = "M3"
 BOSS_H = OUTER_H - FLOOR_T            # bosses run floor to rim
-BOSS_INSET = 4.6                      # boss centre from inner wall
+BOSS_INSET = 6.2                      # boss centre from inner wall; boss edge (r=3.6) clears the lid lip (1.45) by ~1 mm
 LID_LIP_H = 3.0
 LID_LIP_T = 1.2
 LID_CLEARANCE = 0.25

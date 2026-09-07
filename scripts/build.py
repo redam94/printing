@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, write_golden  # noqa: E402
+from scripts._common import ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, FIT_TOL_MM3  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.render import render_project  # noqa: E402
 from scripts._common import to_trimesh  # noqa: E402
@@ -50,6 +50,16 @@ def main() -> int:
             stl, step = export(shape, a.project, name)
             print(f"      exported {stl.relative_to(ROOT)}  {step.relative_to(ROOT)}")
         print()
+
+    fits = run_fit_checks(a.project, parts)
+    if fits:
+        for name, vol in fits.items():
+            bad = vol > FIT_TOL_MM3
+            ok &= not bad
+            print(f"[{'FAIL' if bad else 'OK'}] fit check {name}: {vol} mm³ intersection" + ("  <- parts collide" if bad else ""))
+        print()
+    else:
+        print("(no fit_checks() defined in the model — add one if the parts must mate or enclose hardware)\n")
 
     if not a.no_render:
         for png in render_project(a.project, parts=parts):

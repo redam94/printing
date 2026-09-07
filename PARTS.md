@@ -37,6 +37,7 @@ ESP32 dev-board PCB outline (no mount holes exist on these boards) centred on th
 - **validated in:** PLA  
 - **orientation:** any (2D pattern)  
 - **notes:** Boards have no holes: hold by edge slots (pcb_slot_cradle) or header sockets.  
+- **used by:** models/esp32_devkit_case/model.py  
 
 | param | type | units | default | description |
 |---|---|---|---|---|
@@ -553,7 +554,7 @@ Cylindrical foot / bumper standing on z=0 with a chamfered bed edge.
 body = body + [loc * foot() for loc in GridLocations(80, 50, 2, 2)]
 ```
 
-### `primitives.pcb_slot_cradle` v1.0.0
+### `primitives.pcb_slot_cradle` v1.1.0
 
 Pair of rails with slots that grip a PCB by its two long edges (for boards with no mount holes), centred on the origin.
 
@@ -562,7 +563,7 @@ Pair of rails with slots that grip a PCB by its two long edges (for boards with 
 - **tags:** card guide, cradle, esp32, holder, pcb, rails, slot  
 - **validated in:** PLA  
 - **orientation:** rails vertical; slot faces are then vertical walls, no bridging  
-- **notes:** Board slides in from the +X end; leave that end open in the enclosure or make one rail cantilevered.  
+- **notes:** With top_lip the board slides in from the +X end; leave that end open or make one rail cantilevered. Dev boards with header bodies flush to the edge (ESP32 DevKitC) need top_lip=False and lid retention.  
 - **used by:** models/esp32_devkit_case/model.py  
 
 | param | type | units | default | description |
@@ -575,6 +576,7 @@ Pair of rails with slots that grip a PCB by its two long edges (for boards with 
 | `slot_depth` | float | mm | `1.5` | how far the slot bites in over each edge |
 | `clearance` | float | mm | `0.3` | added to pcb_t (slot height) and to board_w (slot span) |
 | `slot_z` | float | mm | `3.0` | height of the slot floor above z=0 |
+| `top_lip` | bool | bool | `True` | keep rail material above the slot (true slot). False = open ledge, for boards whose edge components (header bodies) run to the edge |
 
 ```python
 cradle = pcb_slot_cradle(*esp32_dims)
@@ -677,4 +679,4 @@ side = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)
 
 | project | components used | golden |
 |---|---|---|
-| `esp32_devkit_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `primitives.box_lid`, `primitives.cable_grommet`, `primitives.pcb_slot_cradle`, `primitives.rounded_box`, `primitives.vent_slots` | yes |
+| `esp32_devkit_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `patterns.esp32_footprint`, `primitives.box_lid`, `primitives.cable_grommet`, `primitives.pcb_slot_cradle`, `primitives.rounded_box`, `primitives.vent_slots` | yes |

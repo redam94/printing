@@ -6,3 +6,4 @@ models/*/exports/
 *.egg-info/
 .remember/
 .claude/skills/*-workspace/
+.claude/worktrees/

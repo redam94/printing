@@ -3,8 +3,14 @@
 Model convention
 ----------------
 ``models/<project>/model.py`` defines ``build() -> dict[str, Shape]`` mapping a
-print-part name to a build123d solid (Part or Compound).  ``params.py`` beside
-it holds every dimension.  Exports land in ``models/<project>/exports/``.
+print-part name to a build123d solid (Part or Compound) in PRINT orientation.
+``params.py`` beside it holds every dimension.  Exports land in
+``models/<project>/exports/``.
+
+Optionally ``fit_checks(parts) -> dict[str, tuple[Shape, Shape]]`` returns
+pairs of shapes that must NOT intersect once assembled (lid placed on body,
+PCB envelope vs bosses, ...).  ``build.py`` intersects each pair and fails on
+any overlap: the printability check cannot see two parts colliding.
 """
 from __future__ import annotations
 
@@ -192,3 +198,23 @@ def format_changes(changes: list[dict]) -> str:
         d = f"  ({c['delta']})" if c.get("delta") else ""
         lines.append(f"  {c['part']:<20s} {c['field']:<12s} {str(c['old']):>18s} -> {str(c['new']):<18s}{d}")
     return "\n".join(lines)
+
+
+FIT_TOL_MM3 = 0.05
+
+
+def run_fit_checks(project: str, parts: dict) -> dict[str, float]:
+    """Return {check_name: intersection volume mm^3} for the model's fit_checks(), or {}."""
+    mod = load_model(project)
+    fn = getattr(mod, "fit_checks", None)
+    if fn is None:
+        return {}
+    out = {}
+    for name, (a, b) in fn(parts).items():
+        try:
+            inter = a & b
+            vol = float(inter.volume) if inter is not None and inter.wrapped is not None else 0.0
+        except Exception:
+            vol = 0.0
+        out[name] = round(vol, 3)
+    return out
