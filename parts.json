@@ -169,7 +169,8 @@
       "docstring": "Cutter whose top face sits at z=0 and extends downward ``depth``.\n\nExample:\n    plate = plate - [Pos(x, y, plate_t) * clearance_hole(\"M3\", depth=plate_t) for x, y in pts]",
       "example": "plate = plate - [Pos(x, y, plate_t) * clearance_hole(\"M3\", depth=plate_t) for x, y in pts]",
       "used_by": [
-        "models/esp32_devkit_case/model.py"
+        "models/esp32_devkit_case/model.py",
+        "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.fasteners.clearance_hole import clearance_hole"
     },
@@ -256,7 +257,8 @@
       "docstring": "Boss standing on z=0 with an insert pocket opening at the top.\n\nThe boss is centred on the origin so it can be placed with a Location::\n\nExample:\n    from lib.component import locations_of\n    from lib.patterns.pi import pi5_mount\n    bosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\n    floor = floor + bosses",
       "example": "from lib.component import locations_of\nfrom lib.patterns.pi import pi5_mount\nbosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\nfloor = floor + bosses",
       "used_by": [
-        "models/esp32_devkit_case/model.py"
+        "models/esp32_devkit_case/model.py",
+        "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.fasteners.heat_set_boss import heat_set_boss"
     },
@@ -484,7 +486,9 @@
       "returns": "Part",
       "docstring": "The beam's back face is at x=0 (attach it there), hook faces +X.\nTotal height = length + hook_height.\n\nExample:\n    latch = cantilever_latch(length=10, thickness=1.6)\n    lid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\n    body = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
       "example": "latch = cantilever_latch(length=10, thickness=1.6)\nlid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\nbody = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.mechanisms.cantilever_latch import cantilever_latch"
     },
     "mechanisms.latch_window": {
@@ -551,7 +555,9 @@
       "returns": "Part",
       "docstring": "Window centred on the origin in Y and Z, cutting through X in both directions.\n\nExample:\n    body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",
       "example": "body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.mechanisms.cantilever_latch import latch_window"
     },
     "mechanisms.living_hinge_lattice": {
@@ -890,6 +896,78 @@
       "used_by": [],
       "import": "from lib.mechanisms.snap_fit import snap_ridge"
     },
+    "patterns.corner_holes": {
+      "id": "patterns.corner_holes",
+      "version": "1.0.0",
+      "summary": "Four holes inset from the corners of a length x width rectangle (lid screws / corner bosses), centred on the origin.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 100.0,
+          "description": "rectangle X (usually the box INNER length)"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 70.0,
+          "description": "rectangle Y (usually the box INNER width)"
+        },
+        {
+          "name": "inset",
+          "type": "float",
+          "units": "mm",
+          "default": 4.6,
+          "description": "hole centre distance from each of the two adjacent rectangle edges"
+        },
+        {
+          "name": "hole_d",
+          "type": "float",
+          "units": "mm",
+          "default": 3.4,
+          "description": "hole diameter before print compensation (default M3 medium clearance 3.4)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to diameter because FDM holes print small"
+        }
+      ],
+      "tags": [
+        "M3",
+        "bosses",
+        "corners",
+        "enclosure",
+        "holes",
+        "lid",
+        "pattern",
+        "screws"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.corners",
+      "qualname": "corner_holes",
+      "file": "lib/patterns/corners.py",
+      "line": 9,
+      "returns": "Sketch",
+      "docstring": "Four circles at ``(+/-(length/2 - inset), +/-(width/2 - inset))``.\n\nPass the box *inner* cavity size and the boss inset to get the corner-boss\ncentres of a ``rounded_box``; ``locations_of()`` turns them into boss\nplacements, and the same call with the lid gives the matching screw holes.\n\nExample:\n    holes = corner_holes(inner_l, inner_w, inset=3.4)\n    bosses = [loc * heat_set_boss(\"M3\", height=h) for loc in locations_of(holes)]",
+      "example": "holes = corner_holes(inner_l, inner_w, inset=3.4)\nbosses = [loc * heat_set_boss(\"M3\", height=h) for loc in locations_of(holes)]",
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
+      "import": "from lib.patterns.corners import corner_holes"
+    },
     "patterns.din_rail_ts35_profile": {
       "id": "patterns.din_rail_ts35_profile",
       "version": "1.0.0",
@@ -1113,7 +1191,9 @@
       "returns": "Sketch",
       "docstring": "Subtract from a wall to mount a fan.\n\nExample:\n    side = Plane.XZ * (Rectangle(w, h) - fan_mount(30))",
       "example": "side = Plane.XZ * (Rectangle(w, h) - fan_mount(30))",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.patterns.fan import fan_mount"
     },
     "patterns.pi4_mount": {
@@ -1218,8 +1298,76 @@
       "returns": "Sketch",
       "docstring": "Four circles at the Pi 5 hole positions; subtract from a floor, or use\n``locations_of()`` to place bosses.  ``active_cooler_holes`` adds the two\n3 mm push-pin holes of the official Active Cooler (x=+29, y=+/-18.5).\n\nExample:\n    floor = Rectangle(95, 66) - pi5_mount()\n    bosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
       "example": "floor = Rectangle(95, 66) - pi5_mount()\nbosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.patterns.pi import pi5_mount"
+    },
+    "patterns.pi5_port_cutouts": {
+      "id": "patterns.pi5_port_cutouts",
+      "version": "1.0.0",
+      "summary": "Raspberry Pi 5 connector windows for one board edge as a wall-plane sketch (x along the edge, y = height above PCB top).",
+      "params": [
+        {
+          "name": "edge",
+          "type": "str",
+          "units": "enum",
+          "default": "power",
+          "description": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window)"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.75,
+          "description": "added on every side of the connector/plug envelope"
+        },
+        {
+          "name": "plug_envelope",
+          "type": "bool",
+          "units": "bool",
+          "default": true,
+          "description": "size windows for the mating plug overmold (True) or just the connector body (False, flush panels)"
+        },
+        {
+          "name": "ports",
+          "type": "list[str] | None",
+          "units": "-",
+          "default": null,
+          "description": "optional subset of port names to include, e.g. ['usb_c']; default = every port on that edge"
+        }
+      ],
+      "tags": [
+        "connector",
+        "cutout",
+        "ethernet",
+        "hdmi",
+        "microsd",
+        "pi 5",
+        "pi5",
+        "ports",
+        "raspberry pi",
+        "usb-a",
+        "usb-c",
+        "window"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "windows cut through a vertical wall; the wall above each window is a short bridge (<= 18 mm)",
+        "notes": "UNVALIDATED: positions from the official drawing, connector/plug envelopes from Pi 4 data and typical cables \u2014 test-fit before printing many."
+      },
+      "category": "patterns",
+      "module": "lib.patterns.pi",
+      "qualname": "pi5_port_cutouts",
+      "file": "lib/patterns/pi.py",
+      "line": 179,
+      "returns": "Sketch",
+      "docstring": "Rectangles to subtract from an enclosure wall so the Pi 5 connectors are reachable.\n\nSketch frame: x runs along the board edge in hole-pattern coordinates\n(lib X for ``power``, lib Y for ``usb``/``sd``), y is height above the PCB\ntop surface.  Place it with ``Pos(x_of_pi_origin, z_of_pcb_top)`` on the\nwall plane and extrude through the wall with ``both=True``.\n\nExample:\n    win = pi5_port_cutouts(\"power\")\n    body = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)",
+      "example": "win = pi5_port_cutouts(\"power\")\nbody = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)",
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
+      "import": "from lib.patterns.pi import pi5_port_cutouts"
     },
     "patterns.pi_board_outline": {
       "id": "patterns.pi_board_outline",
@@ -1374,7 +1522,7 @@
     },
     "primitives.box_lid": {
       "id": "primitives.box_lid",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "summary": "Flat lid for rounded_box with an inner lip that drops inside the walls; printed upside down (top face on the bed).",
       "params": [
         {
@@ -1439,6 +1587,13 @@
           "units": "mm",
           "default": 0.4,
           "description": "chamfer on the outer top edge (bed-contact edge when printed inverted)"
+        },
+        {
+          "name": "lip_cutouts",
+          "type": "Sketch | None",
+          "units": "-",
+          "default": null,
+          "description": "optional sketch in the lid XY frame subtracted from the lip only (e.g. circles clearing corner bosses); None = full lip"
         }
       ],
       "tags": [
@@ -1462,10 +1617,11 @@
       "file": "lib/primitives/rounded_box.py",
       "line": 47,
       "returns": "Part",
-      "docstring": "Lid plate spans z in [0, thickness] with the lip hanging below z=0 (as\nassembled on the box); flip for printing.\n\nExample:\n    lid = box_lid(110, 80, wall=2.0)",
-      "example": "lid = box_lid(110, 80, wall=2.0)",
+      "docstring": "Lid plate spans z in [0, thickness] with the lip hanging below z=0 (as\nassembled on the box); flip for printing.  ``lip_cutouts`` (v1.1.0) is\nsubtracted from the lip ring before extruding so the lip can step around\ncorner bosses that run up to the box rim; the plate is untouched.\n\nExample:\n    lid = box_lid(110, 80, wall=2.0)\n    lid = box_lid(110, 80, lip_cutouts=Sketch() + [loc * Circle(boss_r + 0.3) for loc in boss_locs])",
+      "example": "lid = box_lid(110, 80, wall=2.0)\nlid = box_lid(110, 80, lip_cutouts=Sketch() + [loc * Circle(boss_r + 0.3) for loc in boss_locs])",
       "used_by": [
-        "models/esp32_devkit_case/model.py"
+        "models/esp32_devkit_case/model.py",
+        "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.primitives.rounded_box import box_lid"
     },
@@ -1763,7 +1919,8 @@
       "docstring": "Example:\nbody = rounded_box(110, 80, 35, wall=2.0)\nbody = body + Pos(0, 0, floor_t) * bosses",
       "example": "body = rounded_box(110, 80, 35, wall=2.0)\nbody = body + Pos(0, 0, floor_t) * bosses",
       "used_by": [
-        "models/esp32_devkit_case/model.py"
+        "models/esp32_devkit_case/model.py",
+        "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.primitives.rounded_box import rounded_box"
     },
@@ -1816,7 +1973,9 @@
       "returns": "Part",
       "docstring": "Example:\nbody = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
       "example": "body = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
-      "used_by": [],
+      "used_by": [
+        "models/pi5_fan_case/model.py"
+      ],
       "import": "from lib.primitives.feet import rubber_foot_recess"
     },
     "primitives.teardrop": {
@@ -1953,7 +2112,8 @@
       "docstring": "Example:\nside = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
       "example": "side = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
       "used_by": [
-        "models/esp32_devkit_case/model.py"
+        "models/esp32_devkit_case/model.py",
+        "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.primitives.vented_panel import vent_slots"
     }
@@ -1968,6 +2128,24 @@
         "primitives.cable_grommet",
         "primitives.pcb_slot_cradle",
         "primitives.rounded_box",
+        "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "pi5_fan_case": {
+      "path": "models/pi5_fan_case",
+      "components": [
+        "fasteners.clearance_hole",
+        "fasteners.heat_set_boss",
+        "mechanisms.cantilever_latch",
+        "mechanisms.latch_window",
+        "patterns.corner_holes",
+        "patterns.fan_mount",
+        "patterns.pi5_mount",
+        "patterns.pi5_port_cutouts",
+        "primitives.box_lid",
+        "primitives.rounded_box",
+        "primitives.rubber_foot_recess",
         "primitives.vent_slots"
       ],
       "golden": true

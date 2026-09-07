@@ -34,7 +34,22 @@ GPIO along the top edge; USB-A/Ethernet on the right edge. Library convention di
 | Active Cooler | heatsink 63.5 x 42.5, 30 mm fan, 13.7 tall above PCB | Verified |
 
 Enclosure rule of thumb (Pi 4/5): inner cavity ≥ 88 x 59, lid clearance ≥ 20 above PCB top
-without cooler, ≥ 24 with the Active Cooler (leave ≥ 10 mm of air above the fan).
+without cooler, ≥ 24 with the Active Cooler (leave ≥ 10 mm of air above the fan). If the lid
+screws into corner bosses (Ø7.2 for M3 inserts), the cavity needs ≥ 5.6 mm between the board edge
+and the wall on every side — the Ethernet jack sits 2.2 mm from the USB-C-edge corner.
+
+Pi 5 connector envelopes used by `patterns.pi5_port_cutouts` (heights relative to PCB top; the
+plug envelope is what a cable overmold needs when the wall stands a few mm off the board edge):
+
+| Port | Centre (lib coords) | Body W x H | Plug envelope W x [z0, z1] | Status |
+|---|---|---|---|---|
+| USB-C | x = −21.3, −Y edge | 9.0 x 3.2 | 13.0 x [−1.9, 5.1] | position Verified; body Pi 4; plug UNVERIFIED |
+| micro-HDMI 0 / 1 | x = −6.7 / +6.7, −Y edge | 7.6 x 3.0 | 10.0 x [−1.5, 4.5] | position Verified; body/plug UNVERIFIED |
+| Ethernet | y = −17.8, +X edge | 16.0 x 13.5 | = body | position Verified; body Pi 4 |
+| USB-A stacks | y = +1.1 / +19.0, +X edge | 13.3 x 15.6 | = body | position Verified; body generic dual USB-A |
+| microSD window | y = 0, −X edge | 12.0 x [−3.6, 0] | 16.0 x [−3.6, 0] | UNVERIFIED (slot assumed centred, card under PCB) |
+
+Component default adds 0.75 mm clearance per side. Webs between adjacent windows end up 1.6–3 mm.
 
 Sources: https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-mechanical-drawing.pdf ·
 https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-mechanical-drawing.pdf ·
