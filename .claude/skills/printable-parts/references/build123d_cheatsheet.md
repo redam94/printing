@@ -55,3 +55,8 @@ fillet(edges, r)      chamfer(edges, length)
   extrude/subtract once rather than subtracting cylinders in a loop.
 - Inner fillets on a shell: `shell.edges().group_by(Axis.Z)[1]` is the inner floor loop when the
   floor is thinner than the walls; verify with `len()` before filleting.
+- **Unioning a boss that already has its pocket cut into a wall re-fills the pocket** wherever the
+  wall material overlaps it. Build solids first (shell + solid pillars), then cut pockets and holes
+  last (`heat_set_pocket`, `clearance_hole`), or place bosses fully inside the cavity.
+- **Section views are cheap verification:** `part & Box(...)` or `section(part, Plane.XY.offset(z))`
+  then render; use them when a cutout's position matters more than the overall shape.
