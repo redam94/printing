@@ -303,7 +303,7 @@ function renderReport(run){
   const params=(r.params||[]);
   const changes=(r.golden_changes||[]);
   el.innerHTML=`<div class="rep">
-    <div class="k">${esc(r.project)} · built ${esc(r.built_at)} · build ${esc(r.build_id)}</div>
+    <div class="k">${esc(r.project)} · built ${esc(r.built_at)} · build ${esc(r.build_id)}${r.notes_synced?' · notes synced into the repo through '+esc(r.notes_synced):''}</div>
     ${r.docstring?`<h3>Model notes</h3><div class="doc">${esc(r.docstring)}</div>`:''}
     <h3>Parts</h3><div class="tw"><table><thead><tr><th>part</th><th>bbox mm</th><th>cm³</th><th>watertight</th><th>bodies</th><th>min wall</th><th>overhang</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     ${issues.length?`<h3>Printability findings</h3><ul>${issues.join('')}</ul>`:'<h3>Printability findings</h3><p class="dim">No problems or warnings.</p>'}

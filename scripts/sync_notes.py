@@ -17,8 +17,10 @@ The artifact databases are only reachable through Claude's Artifact tool, so the
          material validates every component the model uses (prune with --components if only
          some parts were printed); a failed print is recorded as a failure, never as validation
        - files inbox ideas into ideas/<slug>/IDEA.md
-       - writes .sync/actions.json: the write_db updates Claude should apply (mark ideas filed,
-         stamp notes as synced) — this script never talks to the artifact db itself
+       - writes .sync/actions.json: OPTIONAL write_db updates (mark ideas filed, stamp notes as
+         synced). The pages compute the same state from the repo (an inbox idea is "filed" when
+         ideas/<slugify(title)>/IDEA.md exists; a review page shows the notes.json sync date), so a
+         headless routine, which cannot approve db writes, simply skips them.
   3. uv run python scripts/reindex.py   (PARTS.md / parts.json pick up the evidence)
   4. Claude applies .sync/actions.json, rebuilds + republishes affected review pages and the Studio page.
 
@@ -224,7 +226,8 @@ def format_summary(s: dict) -> str:
         out.append("\ninbox ideas filed:")
         for i in s["ideas_filed"]:
             out.append(f"  ideas/{i['slug']}/IDEA.md  {i['title']}")
-    out.append(f"\n{len(s['actions'])} db update(s) queued in .sync/actions.json (apply with Artifact write_db)")
+    out.append(f"\n{len(s['actions'])} optional db update(s) queued in .sync/actions.json (Artifact write_db; interactive sessions only — "
+               "the pages derive filed/synced state from the repo, so skipping them loses nothing)")
     out.append("next: uv run python scripts/reindex.py && uv run python -m pytest -q; then rebuild + republish affected review pages and the Studio page")
     return "\n".join(out)
 

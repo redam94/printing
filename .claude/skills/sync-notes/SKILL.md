@@ -81,25 +81,33 @@ What it writes, and what the writes mean:
 ```
 uv run python scripts/reindex.py
 uv run python -m pytest -q
+uv run python scripts/build.py --all
+uv run python scripts/studio.py --html
 ```
 
-Then rebuild every model whose components gained evidence or whose notes changed, so its review
-page report shows the print log and the validation chips:
-`uv run python scripts/build.py <project>` (geometry is unchanged, so the golden must still
-match; if it does not, stop and report rather than updating it). Regenerate the Studio page:
-`uv run python scripts/studio.py --html`.
+Rebuild **every** model, not only the ones whose notes changed: exports (build reports, renders)
+are gitignored, so in a fresh checkout the Studio page would otherwise be generated without
+renders or metrics for the models you skipped. Geometry is unchanged, so every golden must still
+match (a mesh-hash-only difference is platform tessellation and passes); if bbox or volume
+differ, stop and report rather than updating a golden. Each rebuild refreshes that model's
+review page report with the print log, component validation chips and the notes sync date.
 
 ## 4. Push state back to the pages
 
-- Republish each rebuilt model's `models/<p>/exports/view.html` with `url` = its review.json
-  URL, and `exports/studio.html` with `url` = the studio.json URL. Never publish without `url`.
-- Apply `.sync/actions.json`: for each action,
-  `Artifact action: "write_db", url: <artifact_url>, db_op: "update", collection: <collection>,
-  doc_id: <doc_id>, data: <data>`. These stamp notes as `synced` and mark inbox ideas `filed`
-  with their path. Never delete documents; never change a note's text.
+- Republish each model's `models/<p>/exports/view.html` with `url` = its review.json URL, and
+  `exports/studio.html` with `url` = the studio.json URL. Never publish without `url`. If a
+  publish is refused because the live version was not viewed in this session, run
+  `Artifact action: "read"` on that URL and publish again; never pass `force`.
+- `.sync/actions.json` lists optional `write_db` updates (stamp notes `synced`, mark inbox ideas
+  `filed` with their path). **Interactive sessions apply them**
+  (`Artifact action: "write_db", db_op: "update", collection, doc_id, data`); **a headless routine
+  skips them**: writing to an artifact database asks for an approval a routine cannot give, and
+  the pages do not depend on it — the Studio page treats an inbox idea as filed when
+  `ideas/<slugify(title)>/IDEA.md` exists in the repo, and a review page shows the notes.json
+  sync date. Never delete documents; never change a note's text.
 - For a print report that resolved an open critique (the user says "fixed, printed, works"),
-  mark that critique resolved with `resolution` text; otherwise leave critiques open — they
-  are for the next design pass, not for this sync.
+  mark that critique resolved with `resolution` text (interactive only); otherwise leave
+  critiques open — they are for the next design pass, not for this sync.
 
 ## 5. Commit
 

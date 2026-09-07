@@ -25,12 +25,24 @@ from scripts._common import to_trimesh  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("project")
+    ap.add_argument("project", nargs="?")
+    ap.add_argument("--all", action="store_true", help="build every model in models/ (exports + renders + review pages)")
     ap.add_argument("--update-golden", action="store_true")
     ap.add_argument("--no-render", action="store_true")
     ap.add_argument("--no-export", action="store_true")
     ap.add_argument("--nozzle", type=float, default=0.4)
     a = ap.parse_args()
+    if a.all:
+        from scripts._common import list_projects
+        worst = 0
+        for proj in list_projects():
+            print(f"===== {proj} =====")
+            sub = [sys.executable, str(Path(__file__).resolve()), proj] + [f for f in sys.argv[1:] if f not in ("--all", proj)]
+            import subprocess
+            worst = max(worst, subprocess.call(sub))
+        return worst
+    if not a.project:
+        ap.error("give a project or --all")
 
     t0 = time.time()
     parts = build_parts(a.project)

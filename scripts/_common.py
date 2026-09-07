@@ -275,6 +275,12 @@ def review_info(project: str) -> dict:
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
+def notes_info(project: str) -> dict:
+    """models/<project>/notes.json: repo mirror of the review page's notes from the last sync."""
+    p = MODELS_DIR / project / "notes.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
 def prints_info(project: str) -> dict:
     """models/<project>/prints.json: print log written by scripts/sync_notes.py from review-page print reports."""
     p = MODELS_DIR / project / "prints.json"
@@ -304,6 +310,7 @@ def write_build_report(project: str, parts: dict, part_metrics: dict, checks: di
         "golden_changes": golden_changes,
         "review": review_info(project),
         "prints": prints_info(project).get("prints", []),
+        "notes_synced": notes_info(project).get("synced", ""),
     }
     out = MODELS_DIR / project / "exports" / "build_report.json"
     out.parent.mkdir(parents=True, exist_ok=True)

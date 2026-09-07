@@ -310,9 +310,11 @@ function ideaCard(i){
     ${secs?`<details><summary>full write-up</summary>${secs}</details>`:''}
   </div>`;
 }
+function slugify(t){return String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,48)||'idea';}
+function filedIn(n){if(n.status==='filed')return n.path||true;const s=slugify(n.title);const i=D.ideas.find(x=>x.slug===s);return i?i.path:null;}
 function inboxCard(n){
-  const filed=n.status==='filed';
-  return `<div class="card" style="${filed?'opacity:.7':''}"><div class="t">${esc(n.title||'(untitled)')}</div><div class="k">${esc(n.kind||'part')} · ${esc((n.created||'').slice(0,10))}${filed?' · filed as <span class="mono">'+esc(n.path||'')+'</span>':''}</div>
+  const filedPath=filedIn(n);const filed=!!filedPath;
+  return `<div class="card" style="${filed?'opacity:.7':''}"><div class="t">${esc(n.title||'(untitled)')}</div><div class="k">${esc(n.kind||'part')} · ${esc((n.created||'').slice(0,10))}${filed?' · filed as <span class="mono">'+esc(typeof filedPath==='string'?filedPath:(n.path||''))+'</span>':''}</div>
     ${n.hardware?`<div class="k">fits: ${esc(n.hardware)}</div>`:''}${n.text?`<div class="txt">${esc(n.text)}</div>`:''}
     <div class="acts">${filed?`<button class="btn small" data-unfile="${esc(n.id)}">back to inbox</button>`:`<button class="btn small" data-file="${esc(n.id)}">mark filed</button>`}<button class="btn small" data-del="${esc(n.id)}" aria-label="delete">×</button></div></div>`;
 }
@@ -320,8 +322,8 @@ function renderBoard(){
   const b=document.getElementById('board');
   const showFiled=b.querySelector('#showFiled')?.checked||false;
   const draft={title:b.querySelector('#nTitle')?.value||'',text:b.querySelector('#nText')?.value||'',kind:b.querySelector('#nKind')?.value||'part',hardware:b.querySelector('#nHw')?.value||''};
-  const items=inbox.filter(n=>showFiled||n.status!=='filed').sort((a,c)=>(c.created||'').localeCompare(a.created||''));
-  const open=inbox.filter(n=>n.status!=='filed').length;
+  const items=inbox.filter(n=>showFiled||!filedIn(n)).sort((a,c)=>(c.created||'').localeCompare(a.created||''));
+  const open=inbox.filter(n=>!filedIn(n)).length;
   let h=`<div class="col inbox"><h3><span>Inbox ${open?`(${open})`:''}</span><span class="store" id="store"></span></h3>
     <form class="newidea" id="newIdea"><input type="text" id="nTitle" placeholder="title, e.g. 'wall mount for the label printer'" required value="${esc(draft.title)}">
       <textarea id="nText" placeholder="what is it for, what must it fit, what is wrong with the current thing">${esc(draft.text)}</textarea>
