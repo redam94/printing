@@ -21,20 +21,25 @@ to every page. Run everything from the repo root with `uv run python ...`.
 
 ## 1. Dump every collection
 
-The artifact databases are reachable only through the Artifact tool, so dump them to `.sync/`
-(gitignored), one call per page, with `out_dir` so each document lands as a file:
+The artifact databases are reachable only through the Artifact tool. Read each collection and
+write what comes back to `.sync/` (gitignored), one file per page:
 
 ```
 for each models/<p>/review.json:
-  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "notes",
-                   out_dir: ".sync/<p>"
+  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "notes"
+  -> Write .sync/<p>/notes.json  as a JSON list: [{"id": "<doc id>", ...all fields}, ...]
 if studio.json exists:
-  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "ideas",
-                   out_dir: ".sync/studio"
+  Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "ideas"
+  -> Write .sync/studio/ideas.json the same way
 ```
 
-A page with no documents writes nothing; that is fine. If a `read_db` fails (page deleted,
-no access) say so in the report and continue with the others.
+Copy documents verbatim (id, text, part, status, kind, material, outcome, created, build_id,
+synced ...); the ingest script reads only what you wrote. A collection that returns "no
+documents" gets an empty list `[]`. Do not use read_db's `out_dir` option in a routine: writing
+the dump from inside the tool needs a file-write approval that a headless session cannot give,
+and the run stalls. (Interactively it is fine: it writes `.sync/<p>/notes/<doc_id>.json`, which
+the script also understands.) If a `read_db` fails (page deleted, no access) say so in the
+report and continue with the others.
 
 ## 2. Ingest
 

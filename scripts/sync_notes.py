@@ -3,10 +3,12 @@
 
 The artifact databases are only reachable through Claude's Artifact tool, so the flow is:
 
-  1. Claude dumps each collection with read_db + out_dir:
-       models/<p>/review.json  -> Artifact read_db collection "notes"  out_dir .sync/<p>
-       studio.json             -> Artifact read_db collection "ideas"  out_dir .sync/studio
-     which writes .sync/<p>/notes/<doc_id>.json and .sync/studio/ideas/<doc_id>.json.
+  1. Claude reads each collection with the Artifact tool (read_db, db_op list) and writes the
+     documents it got back as a JSON list to .sync/<p>/notes.json (models/<p>/review.json pages)
+     and .sync/studio/ideas.json (studio.json inbox). Each list item is {"id": <doc id>, ...fields}
+     (an {"id", "data": {...}} envelope is also accepted). read_db's out_dir option, which writes
+     .sync/<p>/notes/<doc_id>.json per document, works too but needs a file-write approval that a
+     headless routine cannot give.
   2. uv run python scripts/sync_notes.py ingest [.sync]      (this script; --dry-run to preview)
        - mirrors every note into models/<p>/notes.json (committed; the repo copy of the critique log)
        - extracts print reports (kind == "print", or free text that reads like one -> inferred)
@@ -47,17 +49,41 @@ GOOD_WORDS = re.compile(r"\b(worked|works|fits?|good|great|perfect|snug|solid|no
 BAD_WORDS = re.compile(r"\b(fail(ed|s)?|broke|snapped|crack(ed)?|warp(ed)?|too (tight|loose)|didn'?t fit|stringy|delaminat)\b", re.I)
 
 
+def _unwrap(doc, fallback_id: str) -> dict:
+    if isinstance(doc, dict) and "data" in doc and "id" in doc and isinstance(doc["data"], dict):  # {id, data} envelope
+        doc = dict(doc["data"]) | {"id": doc["id"]}
+    doc.setdefault("id", fallback_id)
+    return doc
+
+
 def load_docs(d: Path) -> list[dict]:
-    docs = []
+    """Documents of one collection, from either layout:
+    <d>/<doc_id>.json per document (read_db out_dir), or a single <d>.json / <d>/all.json holding
+    a JSON list of documents (or {"documents": [...]}) that Claude wrote from a read_db result."""
+    docs: list[dict] = []
+    for bundle in (d.with_suffix(".json"), d / "all.json"):
+        if bundle.exists():
+            try:
+                data = json.loads(bundle.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            items = data.get("documents", data.get("docs", [])) if isinstance(data, dict) else data
+            for i, doc in enumerate(items or []):
+                if isinstance(doc, dict):
+                    docs.append(_unwrap(doc, f"{bundle.stem}-{i}"))
+    seen = {x["id"] for x in docs}
     for f in sorted(d.glob("*.json")) if d.exists() else []:
+        if f.name == "all.json":
+            continue
         try:
             doc = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
-        if isinstance(doc, dict) and "data" in doc and "id" in doc and isinstance(doc["data"], dict):  # {id, data} envelope
-            doc = dict(doc["data"]) | {"id": doc["id"]}
-        doc.setdefault("id", f.stem)
-        docs.append(doc)
+        if not isinstance(doc, dict):
+            continue
+        doc = _unwrap(doc, f.stem)
+        if doc["id"] not in seen:
+            docs.append(doc); seen.add(doc["id"])
     return docs
 
 
