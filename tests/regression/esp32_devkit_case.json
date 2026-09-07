@@ -1,0 +1,58 @@
+{
+  "project": "esp32_devkit_case",
+  "generated": "2026-09-07",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "body": {
+      "bbox_min": [
+        -29.75,
+        -18.17,
+        -0.0
+      ],
+      "bbox_max": [
+        29.75,
+        18.17,
+        17.2
+      ],
+      "bbox_size": [
+        59.5,
+        36.34,
+        17.2
+      ],
+      "volume": 11551.565,
+      "surface_area": 13378.413,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "487b45b1c32cf7e2",
+      "triangles": 15560
+    },
+    "lid": {
+      "bbox_min": [
+        -29.75,
+        -18.17,
+        0.0
+      ],
+      "bbox_max": [
+        29.75,
+        18.17,
+        4.6
+      ],
+      "bbox_size": [
+        59.5,
+        36.34,
+        4.6
+      ],
+      "volume": 3983.29,
+      "surface_area": 5580.999,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "f8bd1442c27e27e7",
+      "triangles": 3740
+    }
+  }
+}

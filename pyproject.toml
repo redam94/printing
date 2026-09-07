@@ -1,0 +1,17 @@
+[project]
+name = "printing"
+version = "0.1.0"
+description = "Parametric 3D-printable parts: shared build123d component library + models"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "build123d>=0.8",
+    "trimesh[easy]>=4.0",
+    "numpy",
+    "ocp-vscode",
+    "pytest",
+    "matplotlib>=3.10.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

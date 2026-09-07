@@ -1,0 +1,1976 @@
+{
+  "schema": 1,
+  "components": {
+    "fasteners.captive_nut_slot": {
+      "id": "fasteners.captive_nut_slot",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) side-entry slot for a captive hex nut plus the screw clearance hole.",
+      "params": [
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "nut size: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "slot_length",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "how far the entry slot runs from the nut centre in +X (reach the part's edge)"
+        },
+        {
+          "name": "nut_clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "added across flats so the nut slides in"
+        },
+        {
+          "name": "thickness_clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "added to nut thickness"
+        },
+        {
+          "name": "screw_depth_above",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "screw clearance hole length in +Z above the nut"
+        },
+        {
+          "name": "screw_depth_below",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "screw clearance hole length in -Z below the nut"
+        },
+        {
+          "name": "screw_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "FDM oversize on the screw hole"
+        }
+      ],
+      "tags": [
+        "M3",
+        "M4",
+        "captive",
+        "hex",
+        "negative",
+        "nut",
+        "slot",
+        "trap"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "PLA"
+        ],
+        "orientation": "nut axis vertical; if the slot roof is a horizontal bridge keep slot_length short or add a sacrificial layer",
+        "notes": ""
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.captive_nut",
+      "qualname": "captive_nut_slot",
+      "file": "lib/fasteners/captive_nut.py",
+      "line": 12,
+      "returns": "Part",
+      "docstring": "Cutter centred on the nut, nut mid-plane at z=0, slot running in +X.\n\nExample:\n    body = body - Pos(x, y, z_nut) * captive_nut_slot(\"M3\", slot_length=wall_to_edge)",
+      "example": "body = body - Pos(x, y, z_nut) * captive_nut_slot(\"M3\", slot_length=wall_to_edge)",
+      "used_by": [],
+      "import": "from lib.fasteners.captive_nut import captive_nut_slot"
+    },
+    "fasteners.clearance_hole": {
+      "id": "fasteners.clearance_hole",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) clearance hole for a metric screw, with print oversize and optional counterbore or countersink.",
+      "params": [
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "screw size: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "hole length along -Z from the surface at z=0 (make it through the whole part)"
+        },
+        {
+          "name": "fit",
+          "type": "str",
+          "units": "enum",
+          "default": "medium",
+          "description": "ISO 273 series: fine, medium, coarse"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to diameter because FDM holes print small (0.2-0.4 typical)"
+        },
+        {
+          "name": "head",
+          "type": "str",
+          "units": "enum",
+          "default": "none",
+          "description": "none, counterbore (socket head) or countersink (90 deg)"
+        },
+        {
+          "name": "head_clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "added to head diameter for counterbore/countersink"
+        },
+        {
+          "name": "head_depth",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "counterbore depth; default = head height"
+        }
+      ],
+      "tags": [
+        "M2",
+        "M2.5",
+        "M3",
+        "M4",
+        "clearance",
+        "counterbore",
+        "countersink",
+        "hole",
+        "negative",
+        "screw"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any; for horizontal holes use primitives.teardrop instead",
+        "notes": ""
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.clearance_hole",
+      "qualname": "clearance_hole",
+      "file": "lib/fasteners/clearance_hole.py",
+      "line": 12,
+      "returns": "Part",
+      "docstring": "Cutter whose top face sits at z=0 and extends downward ``depth``.\n\nExample:\n    plate = plate - [Pos(x, y, plate_t) * clearance_hole(\"M3\", depth=plate_t) for x, y in pts]",
+      "example": "plate = plate - [Pos(x, y, plate_t) * clearance_hole(\"M3\", depth=plate_t) for x, y in pts]",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.fasteners.clearance_hole import clearance_hole"
+    },
+    "fasteners.heat_set_boss": {
+      "id": "fasteners.heat_set_boss",
+      "version": "1.0.0",
+      "summary": "Cylindrical boss with a correctly sized pocket for a brass heat-set insert.",
+      "params": [
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "insert size: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "total boss height from its base (z=0) to the insert face"
+        },
+        {
+          "name": "wall",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "plastic wall around the insert hole; defaults to the insert's minimum"
+        },
+        {
+          "name": "pocket_depth",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "insert pocket depth; default = insert length + 1 mm for melt relief"
+        },
+        {
+          "name": "top_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "lead-in chamfer at the mouth of the pocket (helps the insert seat square)"
+        },
+        {
+          "name": "base_fillet",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "fillet where the boss meets its parent surface (0 = none)"
+        },
+        {
+          "name": "through",
+          "type": "bool",
+          "units": "bool",
+          "default": false,
+          "description": "make the pocket a through hole (for bosses on thin floors)"
+        }
+      ],
+      "tags": [
+        "M2",
+        "M2.5",
+        "M3",
+        "M4",
+        "boss",
+        "heat-set",
+        "insert",
+        "screw",
+        "standoff"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "PLA"
+        ],
+        "orientation": "boss axis vertical (insert pressed in along Z); pocket walls are then continuous perimeters",
+        "notes": "Insert pocket is sized per the insert spec, never per the screw. In PLA keep iron at ~200 C."
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.heat_set_boss",
+      "qualname": "heat_set_boss",
+      "file": "lib/fasteners/heat_set_boss.py",
+      "line": 12,
+      "returns": "Part",
+      "docstring": "Boss standing on z=0 with an insert pocket opening at the top.\n\nThe boss is centred on the origin so it can be placed with a Location::\n\nExample:\n    from lib.component import locations_of\n    from lib.patterns.pi import pi5_mount\n    bosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\n    floor = floor + bosses",
+      "example": "from lib.component import locations_of\nfrom lib.patterns.pi import pi5_mount\nbosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\nfloor = floor + bosses",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.fasteners.heat_set_boss import heat_set_boss"
+    },
+    "fasteners.heat_set_pocket": {
+      "id": "fasteners.heat_set_pocket",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) pocket for a heat-set insert in a solid wall or floor.",
+      "params": [
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "insert size: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "depth",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "pocket depth; default = insert length + 1 mm"
+        },
+        {
+          "name": "extra",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "extra height above z=0 so the cutter clears the surface cleanly"
+        }
+      ],
+      "tags": [
+        "heat-set",
+        "hole",
+        "insert",
+        "negative",
+        "pocket"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "PLA"
+        ],
+        "orientation": "pocket axis vertical preferred",
+        "notes": ""
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.heat_set_boss",
+      "qualname": "heat_set_pocket",
+      "file": "lib/fasteners/heat_set_boss.py",
+      "line": 69,
+      "returns": "Part",
+      "docstring": "Cylinder to subtract; its top face sits at z=0 (the wall surface) and it\nextends downward by ``depth``.\n\nExample:\n    lid = lid - [loc * heat_set_pocket(\"M3\") for loc in locations_of(holes)]",
+      "example": "lid = lid - [loc * heat_set_pocket(\"M3\") for loc in locations_of(holes)]",
+      "used_by": [],
+      "import": "from lib.fasteners.heat_set_boss import heat_set_pocket"
+    },
+    "fasteners.screw_boss": {
+      "id": "fasteners.screw_boss",
+      "version": "1.0.0",
+      "summary": "Boss with a pilot hole for a machine screw to self-thread into printed plastic.",
+      "params": [
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "screw size: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "boss height from z=0"
+        },
+        {
+          "name": "wall",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "wall around the pilot (>= 2 perimeters, 1.6 mm recommended for M3)"
+        },
+        {
+          "name": "pilot_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "pilot hole diameter; default from hardware table (thread-forming size)"
+        },
+        {
+          "name": "pilot_depth",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "pilot depth; default = full height minus one wall thickness of floor"
+        },
+        {
+          "name": "top_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "entry chamfer"
+        },
+        {
+          "name": "base_fillet",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "fillet at the base (0 = none)"
+        }
+      ],
+      "tags": [
+        "M2",
+        "M2.5",
+        "M3",
+        "M4",
+        "boss",
+        "pilot",
+        "screw",
+        "self-tapping",
+        "thread-forming"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "boss axis vertical so the screw threads cut across layers, not between them",
+        "notes": "Good for ~5 insert/remove cycles. Use heat_set_boss for anything serviced often. PLA cracks under over-torque."
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.screw_boss",
+      "qualname": "screw_boss",
+      "file": "lib/fasteners/screw_boss.py",
+      "line": 12,
+      "returns": "Part",
+      "docstring": "Boss standing on z=0, pilot hole opening at the top.\n\nExample:\n    boss = screw_boss(\"M3\", height=10)\n    body = body + Pos(20, 10, floor_t) * boss",
+      "example": "boss = screw_boss(\"M3\", height=10)\nbody = body + Pos(20, 10, floor_t) * boss",
+      "used_by": [],
+      "import": "from lib.fasteners.screw_boss import screw_boss"
+    },
+    "mechanisms.cantilever_latch": {
+      "id": "mechanisms.cantilever_latch",
+      "version": "1.0.0",
+      "summary": "Cantilever snap-fit hook: flexing beam along +Z from z=0 with a ramped hook on the +X face at the tip.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 12.0,
+          "description": "beam length from root (z=0) to the underside of the hook"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "beam width (Y)"
+        },
+        {
+          "name": "thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "beam thickness (X) \u2014 the flexing dimension"
+        },
+        {
+          "name": "hook_depth",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "how far the hook protrudes in +X beyond the beam face = deflection required to release"
+        },
+        {
+          "name": "hook_height",
+          "type": "float",
+          "units": "mm",
+          "default": 2.5,
+          "description": "height of the hook block (Z)"
+        },
+        {
+          "name": "entry_angle",
+          "type": "float",
+          "units": "deg",
+          "default": 30.0,
+          "description": "ramp angle on the top of the hook (lower = easier to push closed)"
+        },
+        {
+          "name": "retention_angle",
+          "type": "float",
+          "units": "deg",
+          "default": 90.0,
+          "description": "angle of the underside of the hook (90 = permanent, 45 = easy release)"
+        },
+        {
+          "name": "root_fillet",
+          "type": "float",
+          "units": "mm",
+          "default": 0.5,
+          "description": "fillet at the beam root to spread stress"
+        }
+      ],
+      "tags": [
+        "cantilever",
+        "clip",
+        "compliant",
+        "hook",
+        "latch",
+        "lid",
+        "snap",
+        "snap-fit"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "beam lying flat in the bed plane (beam length along X or Y, thickness along Z). Never print the beam standing up: bending then peels layers apart and the root cracks.",
+        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.cantilever_latch",
+      "qualname": "cantilever_latch",
+      "file": "lib/mechanisms/cantilever_latch.py",
+      "line": 17,
+      "returns": "Part",
+      "docstring": "The beam's back face is at x=0 (attach it there), hook faces +X.\nTotal height = length + hook_height.\n\nExample:\n    latch = cantilever_latch(length=10, thickness=1.6)\n    lid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\n    body = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
+      "example": "latch = cantilever_latch(length=10, thickness=1.6)\nlid = lid + Pos(x, y, lid_t) * Rot(0, 0, 180) * latch     # hook facing inward\nbody = body - Pos(x, y, z) * latch_window(width=6, hook_depth=1.2)",
+      "used_by": [],
+      "import": "from lib.mechanisms.cantilever_latch import cantilever_latch"
+    },
+    "mechanisms.latch_window": {
+      "id": "mechanisms.latch_window",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) rectangular window through a wall for a cantilever_latch hook to snap into.",
+      "params": [
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "latch beam width"
+        },
+        {
+          "name": "hook_depth",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "latch hook_depth"
+        },
+        {
+          "name": "hook_height",
+          "type": "float",
+          "units": "mm",
+          "default": 2.5,
+          "description": "latch hook_height"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "added around the hook (0.3 slip fit)"
+        },
+        {
+          "name": "wall_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "wall thickness to punch through (window depth in X, both ways)"
+        }
+      ],
+      "tags": [
+        "catch",
+        "latch",
+        "lid",
+        "negative",
+        "snap",
+        "window"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "beam lying flat in the bed plane (beam length along X or Y, thickness along Z). Never print the beam standing up: bending then peels layers apart and the root cracks.",
+        "notes": "PETG and ABS/ASA flex reliably; PLA snaps below ~1.2 mm thickness or after a few dozen cycles. Strain at the root ~ 1.5*t*hook_depth/length^2 \u2014 keep under ~2% for PETG. Defaults give ~1.0%."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.cantilever_latch",
+      "qualname": "latch_window",
+      "file": "lib/mechanisms/cantilever_latch.py",
+      "line": 64,
+      "returns": "Part",
+      "docstring": "Window centred on the origin in Y and Z, cutting through X in both directions.\n\nExample:\n    body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",
+      "example": "body = body - Pos(wall_x, y, z_hook) * latch_window(6, 1.2, 2.5)",
+      "used_by": [],
+      "import": "from lib.mechanisms.cantilever_latch import latch_window"
+    },
+    "mechanisms.living_hinge_lattice": {
+      "id": "mechanisms.living_hinge_lattice",
+      "version": "1.0.0",
+      "summary": "Lattice (kerf-style) living hinge: staggered slots cut through a panel so it can bend about the Y axis; returns the slot pattern to subtract.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "bend region length along X (direction of bending)"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "panel width along the hinge axis (Y)"
+        },
+        {
+          "name": "slot_w",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "slot width (X)"
+        },
+        {
+          "name": "slot_gap",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "gap between consecutive slots along Y in the same column (the torsion links)"
+        },
+        {
+          "name": "column_pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "X pitch between slot columns"
+        },
+        {
+          "name": "link_w",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "solid material between slots in Y = torsion link width"
+        }
+      ],
+      "tags": [
+        "bend",
+        "compliant",
+        "flexible",
+        "hinge",
+        "kerf",
+        "lattice",
+        "living hinge"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "flat on the bed; slot walls vertical. Works even in PLA because links twist rather than bend across layers.",
+        "notes": "Bend radius ~ length / total bend angle; more columns = gentler bend."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.living_hinge",
+      "qualname": "living_hinge_lattice",
+      "file": "lib/mechanisms/living_hinge.py",
+      "line": 46,
+      "returns": "Sketch",
+      "docstring": "Slots alternate offset by half a period between columns. Subtract (extruded through the panel) from your plate.\n\nExample:\n    plate = plate - extrude(living_hinge_lattice(20, 40), amount=plate_t)",
+      "example": "plate = plate - extrude(living_hinge_lattice(20, 40), amount=plate_t)",
+      "used_by": [],
+      "import": "from lib.mechanisms.living_hinge import living_hinge_lattice"
+    },
+    "mechanisms.living_hinge_web": {
+      "id": "mechanisms.living_hinge_web",
+      "version": "1.0.0",
+      "summary": "Thin flexible web joining two thicker panels (single-strip living hinge), hinge axis along Y, printed flat.",
+      "params": [
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "hinge width along the axis (Y)"
+        },
+        {
+          "name": "web_thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 0.5,
+          "description": "flexing web thickness (1-2 layers: 0.4-0.6)"
+        },
+        {
+          "name": "web_length",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "web span between the panels (X)"
+        },
+        {
+          "name": "panel_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "thickness of the joined panels"
+        },
+        {
+          "name": "panel_len",
+          "type": "float",
+          "units": "mm",
+          "default": 5.0,
+          "description": "length of each stub panel included (X) \u2014 union your real panels onto these"
+        },
+        {
+          "name": "fillet_r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "fillet where the web meets the panels (spreads strain)"
+        }
+      ],
+      "tags": [
+        "compliant",
+        "flexible",
+        "fold",
+        "hinge",
+        "lid",
+        "living hinge",
+        "web"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "TPU"
+        ],
+        "orientation": "flat on the bed, hinge axis in the bed plane; the web is then 1-2 continuous layers with extrusion lines along the axis",
+        "notes": "PLA fatigue-cracks within tens of cycles; PP and TPU are best. Fold immediately after printing while warm for PETG."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.living_hinge",
+      "qualname": "living_hinge_web",
+      "file": "lib/mechanisms/living_hinge.py",
+      "line": 9,
+      "returns": "Part",
+      "docstring": "Web sits at the bottom (z=0 to web_thickness), centred at x=0; panels extend to +/-X.\n\nExample:\n    hinge = living_hinge_web(width=40, web_thickness=0.5)\n    part = left_panel + hinge + right_panel",
+      "example": "hinge = living_hinge_web(width=40, web_thickness=0.5)\npart = left_panel + hinge + right_panel",
+      "used_by": [],
+      "import": "from lib.mechanisms.living_hinge import living_hinge_web"
+    },
+    "mechanisms.parallel_flexure": {
+      "id": "mechanisms.parallel_flexure",
+      "version": "1.0.0",
+      "summary": "Parallel-beam flexure stage: fixed block and moving block joined by N thin beams; moving block translates in Y.",
+      "params": [
+        {
+          "name": "beam_length",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "beam span along X between the blocks"
+        },
+        {
+          "name": "beam_thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "beam thickness (Y) \u2014 flexing dimension, 0.8-1.2"
+        },
+        {
+          "name": "beam_count",
+          "type": "int",
+          "units": "count",
+          "default": 2,
+          "description": "number of parallel beams (2 = classic parallelogram)"
+        },
+        {
+          "name": "beam_spacing",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "Y pitch between beams"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "part depth (Z), i.e. beam height"
+        },
+        {
+          "name": "block_w",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "X width of the two end blocks"
+        }
+      ],
+      "tags": [
+        "button",
+        "compliant",
+        "flexure",
+        "linear guide",
+        "parallel",
+        "spring",
+        "stage"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "flat on the bed with beams in the XY plane so bending stress runs along the extrusion lines, not across layers",
+        "notes": "Stiffness ~ N*E*depth*t^3/L^3. Halve thickness for 8x softer. PLA works for tiny strokes only."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.flexure",
+      "qualname": "parallel_flexure",
+      "file": "lib/mechanisms/flexure.py",
+      "line": 9,
+      "returns": "Part",
+      "docstring": "Fixed block at -X, moving block at +X; whole thing stands on z=0 and is centred in Y.\n\nExample:\n    stage = parallel_flexure(beam_length=25, beam_thickness=0.8)\n    button = stage + Pos(x_moving_block, 0, 0) * button_cap",
+      "example": "stage = parallel_flexure(beam_length=25, beam_thickness=0.8)\nbutton = stage + Pos(x_moving_block, 0, 0) * button_cap",
+      "used_by": [],
+      "import": "from lib.mechanisms.flexure import parallel_flexure"
+    },
+    "mechanisms.snap_groove": {
+      "id": "mechanisms.snap_groove",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) half-round groove matching snap_ridge, cut into a wall face at y=0 going into -Y.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "groove length along X"
+        },
+        {
+          "name": "r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "matching ridge radius"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.1,
+          "description": "added to radius so the bead seats without binding"
+        }
+      ],
+      "tags": [
+        "compliant",
+        "detent",
+        "groove",
+        "lid",
+        "negative",
+        "snap"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "PLA"
+        ],
+        "orientation": "ridge running horizontally along a vertical wall prints fine (the half-round is a shallow overhang)",
+        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.snap_fit",
+      "qualname": "snap_groove",
+      "file": "lib/mechanisms/snap_fit.py",
+      "line": 32,
+      "returns": "Part",
+      "docstring": "Example:\nbody = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
+      "example": "body = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
+      "used_by": [],
+      "import": "from lib.mechanisms.snap_fit import snap_groove"
+    },
+    "mechanisms.snap_ridge": {
+      "id": "mechanisms.snap_ridge",
+      "version": "1.0.0",
+      "summary": "Half-round snap ridge (bead) running along X, protruding in +Y from a wall face at y=0; sits on a lid lip.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "ridge length along X"
+        },
+        {
+          "name": "r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "bead radius (protrusion)"
+        },
+        {
+          "name": "end_taper",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "reserved (0)"
+        }
+      ],
+      "tags": [
+        "bead",
+        "compliant",
+        "detent",
+        "friction",
+        "lid",
+        "ridge",
+        "snap"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG",
+          "PLA"
+        ],
+        "orientation": "ridge running horizontally along a vertical wall prints fine (the half-round is a shallow overhang)",
+        "notes": "Interference 0.4-0.6 mm total for PETG walls 1.2-1.6 thick; PLA prefers <=0.4."
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.snap_fit",
+      "qualname": "snap_ridge",
+      "file": "lib/mechanisms/snap_fit.py",
+      "line": 15,
+      "returns": "Part",
+      "docstring": "Example:\nlip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
+      "example": "lip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
+      "used_by": [],
+      "import": "from lib.mechanisms.snap_fit import snap_ridge"
+    },
+    "patterns.din_rail_ts35_profile": {
+      "id": "patterns.din_rail_ts35_profile",
+      "version": "1.0.0",
+      "summary": "TS35 top-hat DIN rail cross-section (35 mm wide) as a sketch in XY, for subtracting a rail pocket from a clip.",
+      "params": [
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 7.5,
+          "description": "rail depth: 7.5 (standard) or 15"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "grown outward so the clip slides on"
+        },
+        {
+          "name": "sheet_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "rail sheet-metal thickness"
+        }
+      ],
+      "tags": [
+        "clip",
+        "din rail",
+        "electrical",
+        "en 60715",
+        "enclosure",
+        "profile",
+        "ts35"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "clip printed with rail axis vertical (Z) so the lips are solid perimeters",
+        "notes": "UNVALIDATED: geometry from standard, no test print yet"
+      },
+      "category": "patterns",
+      "module": "lib.patterns.din_rail",
+      "qualname": "din_rail_ts35_profile",
+      "file": "lib/patterns/din_rail.py",
+      "line": 15,
+      "returns": "Sketch",
+      "docstring": "Profile drawn in XY: rail lips at y=0 (top, where a clip hooks), base at y=-depth.\nExtrude along Z for the rail length.\n\nExample:\n    clip = clip - extrude(din_rail_ts35_profile(clearance=0.3), amount=clip_len)",
+      "example": "clip = clip - extrude(din_rail_ts35_profile(clearance=0.3), amount=clip_len)",
+      "used_by": [],
+      "import": "from lib.patterns.din_rail import din_rail_ts35_profile"
+    },
+    "patterns.esp32_footprint": {
+      "id": "patterns.esp32_footprint",
+      "version": "1.0.0",
+      "summary": "ESP32 dev-board PCB outline (no mount holes exist on these boards) centred on the origin, USB end at -X.",
+      "params": [
+        {
+          "name": "board",
+          "type": "str",
+          "units": "enum",
+          "default": "devkitc_v4",
+          "description": "devkitc_v4, s3_devkitc_1, nodemcu_32s, doit_v1_30, c3_supermini"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "grown outward on all sides"
+        }
+      ],
+      "tags": [
+        "devkitc",
+        "doit",
+        "esp32",
+        "esp32-c3",
+        "esp32-s3",
+        "footprint",
+        "microcontroller",
+        "outline",
+        "pcb",
+        "supermini"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": "Boards have no holes: hold by edge slots (pcb_slot_cradle) or header sockets."
+      },
+      "category": "patterns",
+      "module": "lib.patterns.esp32",
+      "qualname": "esp32_footprint",
+      "file": "lib/patterns/esp32.py",
+      "line": 40,
+      "returns": "Sketch",
+      "docstring": "Example:\npocket = extrude(esp32_footprint(\"devkitc_v4\", clearance=0.5), amount=pcb_t)",
+      "example": "pocket = extrude(esp32_footprint(\"devkitc_v4\", clearance=0.5), amount=pcb_t)",
+      "used_by": [],
+      "import": "from lib.patterns.esp32 import esp32_footprint"
+    },
+    "patterns.esp32_header_rows": {
+      "id": "patterns.esp32_header_rows",
+      "version": "1.0.0",
+      "summary": "Two rectangular strips where the ESP32 dev-board header rows sit (for pin-clearance pockets or socket recesses).",
+      "params": [
+        {
+          "name": "board",
+          "type": "str",
+          "units": "enum",
+          "default": "devkitc_v4",
+          "description": "devkitc_v4, s3_devkitc_1, nodemcu_32s, doit_v1_30, c3_supermini"
+        },
+        {
+          "name": "strip_width",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "width of each strip across the pins"
+        },
+        {
+          "name": "extra_length",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "added to the strip length beyond the pin run"
+        }
+      ],
+      "tags": [
+        "2.54",
+        "esp32",
+        "header",
+        "keep-out",
+        "pins",
+        "pocket"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.esp32",
+      "qualname": "esp32_header_rows",
+      "file": "lib/patterns/esp32.py",
+      "line": 57,
+      "returns": "Sketch",
+      "docstring": "Example:\nfloor = floor - extrude(esp32_header_rows(), amount=pin_len)",
+      "example": "floor = floor - extrude(esp32_header_rows(), amount=pin_len)",
+      "used_by": [],
+      "import": "from lib.patterns.esp32 import esp32_header_rows"
+    },
+    "patterns.fan_mount": {
+      "id": "patterns.fan_mount",
+      "version": "1.0.0",
+      "summary": "Axial fan four-hole pattern plus optional circular airflow cutout, centred on the origin.",
+      "params": [
+        {
+          "name": "size",
+          "type": "int",
+          "units": "mm",
+          "default": 30,
+          "description": "fan frame size: 25, 30, 40, 50, 60, 70, 80, 92, 120, 140"
+        },
+        {
+          "name": "hole_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "screw hole diameter; default per fan size (3.2 for 30 mm M3, 4.3-4.5 for 60 mm+)"
+        },
+        {
+          "name": "cutout",
+          "type": "bool",
+          "units": "bool",
+          "default": true,
+          "description": "include the circular airflow opening"
+        },
+        {
+          "name": "cutout_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "airflow opening diameter; default = size - 2"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "FDM oversize added to the screw holes"
+        }
+      ],
+      "tags": [
+        "120mm",
+        "30mm",
+        "40mm",
+        "80mm",
+        "cooling",
+        "cutout",
+        "fan",
+        "holes",
+        "vent"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.fan",
+      "qualname": "fan_mount",
+      "file": "lib/patterns/fan.py",
+      "line": 16,
+      "returns": "Sketch",
+      "docstring": "Subtract from a wall to mount a fan.\n\nExample:\n    side = Plane.XZ * (Rectangle(w, h) - fan_mount(30))",
+      "example": "side = Plane.XZ * (Rectangle(w, h) - fan_mount(30))",
+      "used_by": [],
+      "import": "from lib.patterns.fan import fan_mount"
+    },
+    "patterns.pi4_mount": {
+      "id": "patterns.pi4_mount",
+      "version": "1.0.0",
+      "summary": "Raspberry Pi 4 B (and 3 B/B+) four-hole mount pattern (58 x 49 mm, M2.5).",
+      "params": [
+        {
+          "name": "hole_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "hole diameter before print compensation; default = M2.5 clearance (2.7)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to diameter because FDM holes print small"
+        }
+      ],
+      "tags": [
+        "M2.5",
+        "holes",
+        "mount",
+        "pi 4",
+        "pi3",
+        "pi4",
+        "raspberry pi",
+        "sbc"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.pi",
+      "qualname": "pi4_mount",
+      "file": "lib/patterns/pi.py",
+      "line": 86,
+      "returns": "Sketch",
+      "docstring": "Identical spacing to the Pi 5; kept as its own id so models document which board they target.\n\nExample:\n    floor = Rectangle(95, 66) - pi4_mount()",
+      "example": "floor = Rectangle(95, 66) - pi4_mount()",
+      "used_by": [],
+      "import": "from lib.patterns.pi import pi4_mount"
+    },
+    "patterns.pi5_mount": {
+      "id": "patterns.pi5_mount",
+      "version": "1.0.0",
+      "summary": "Raspberry Pi 5 four-hole mount pattern (58 x 49 mm, M2.5) centred on the origin.",
+      "params": [
+        {
+          "name": "hole_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "hole diameter before print compensation; default = M2.5 clearance (2.7)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to diameter because FDM holes print small"
+        },
+        {
+          "name": "active_cooler_holes",
+          "type": "bool",
+          "units": "bool",
+          "default": false,
+          "description": "also cut the two 3 mm Active Cooler push-pin holes"
+        }
+      ],
+      "tags": [
+        "M2.5",
+        "active cooler",
+        "holes",
+        "mount",
+        "pi 5",
+        "pi5",
+        "raspberry pi",
+        "sbc"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.pi",
+      "qualname": "pi5_mount",
+      "file": "lib/patterns/pi.py",
+      "line": 62,
+      "returns": "Sketch",
+      "docstring": "Four circles at the Pi 5 hole positions; subtract from a floor, or use\n``locations_of()`` to place bosses.  ``active_cooler_holes`` adds the two\n3 mm push-pin holes of the official Active Cooler (x=+29, y=+/-18.5).\n\nExample:\n    floor = Rectangle(95, 66) - pi5_mount()\n    bosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
+      "example": "floor = Rectangle(95, 66) - pi5_mount()\nbosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
+      "used_by": [],
+      "import": "from lib.patterns.pi import pi5_mount"
+    },
+    "patterns.pi_board_outline": {
+      "id": "patterns.pi_board_outline",
+      "version": "1.0.0",
+      "summary": "Raspberry Pi PCB outline (rounded rectangle) positioned to line up with the matching mount pattern.",
+      "params": [
+        {
+          "name": "board",
+          "type": "str",
+          "units": "enum",
+          "default": "pi5",
+          "description": "pi5, pi4, pi3 or pi_zero"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "grown outward on every side (use for pocket/keep-out)"
+        }
+      ],
+      "tags": [
+        "footprint",
+        "keep-out",
+        "outline",
+        "pcb",
+        "pi zero",
+        "pi4",
+        "pi5",
+        "raspberry pi"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.pi",
+      "qualname": "pi_board_outline",
+      "file": "lib/patterns/pi.py",
+      "line": 114,
+      "returns": "Sketch",
+      "docstring": "Board outline sketch sharing the mount pattern's origin, so\n``pi_board_outline() - pi5_mount()`` is the drilled PCB footprint.\n\nExample:\n    pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
+      "example": "pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
+      "used_by": [],
+      "import": "from lib.patterns.pi import pi_board_outline"
+    },
+    "patterns.pi_zero_mount": {
+      "id": "patterns.pi_zero_mount",
+      "version": "1.0.0",
+      "summary": "Raspberry Pi Zero / Zero 2 W four-hole mount pattern (58 x 23 mm, M2.5).",
+      "params": [
+        {
+          "name": "hole_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "hole diameter before print compensation; default = M2.5 clearance (2.7)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to diameter because FDM holes print small"
+        }
+      ],
+      "tags": [
+        "M2.5",
+        "holes",
+        "mount",
+        "pi zero",
+        "raspberry pi",
+        "sbc",
+        "zero 2 w"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "any (2D pattern)",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.pi",
+      "qualname": "pi_zero_mount",
+      "file": "lib/patterns/pi.py",
+      "line": 101,
+      "returns": "Sketch",
+      "docstring": "Example:\nfloor = Rectangle(75, 40) - pi_zero_mount()",
+      "example": "floor = Rectangle(75, 40) - pi_zero_mount()",
+      "used_by": [],
+      "import": "from lib.patterns.pi import pi_zero_mount"
+    },
+    "patterns.vesa_mount": {
+      "id": "patterns.vesa_mount",
+      "version": "1.0.0",
+      "summary": "VESA MIS-D/E four-hole pattern (75, 100, 200x100, 200) centred on the origin.",
+      "params": [
+        {
+          "name": "pattern",
+          "type": "str",
+          "units": "enum",
+          "default": "100",
+          "description": "75, 100, 200x100 or 200"
+        },
+        {
+          "name": "hole_d",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "hole diameter; default = M4 medium clearance (4.5) or M6 (6.6)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "FDM oversize"
+        }
+      ],
+      "tags": [
+        "M4",
+        "M6",
+        "holes",
+        "monitor",
+        "mount",
+        "tv",
+        "vesa"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "any (2D pattern); print the bracket so screw load is in-plane",
+        "notes": ""
+      },
+      "category": "patterns",
+      "module": "lib.patterns.vesa",
+      "qualname": "vesa_mount",
+      "file": "lib/patterns/vesa.py",
+      "line": 16,
+      "returns": "Sketch",
+      "docstring": "Example:\nplate = RectangleRounded(120, 120, 5) - vesa_mount(\"100\")",
+      "example": "plate = RectangleRounded(120, 120, 5) - vesa_mount(\"100\")",
+      "used_by": [],
+      "import": "from lib.patterns.vesa import vesa_mount"
+    },
+    "primitives.box_lid": {
+      "id": "primitives.box_lid",
+      "version": "1.0.0",
+      "summary": "Flat lid for rounded_box with an inner lip that drops inside the walls; printed upside down (top face on the bed).",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 100.0,
+          "description": "outer X of the box it fits"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 70.0,
+          "description": "outer Y of the box it fits"
+        },
+        {
+          "name": "wall",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "box wall thickness"
+        },
+        {
+          "name": "corner_r",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "box outer corner radius"
+        },
+        {
+          "name": "thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "lid plate thickness"
+        },
+        {
+          "name": "lip_height",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "how far the lip drops into the box"
+        },
+        {
+          "name": "lip_thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "lip wall thickness"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.25,
+          "description": "gap per side between lip and box inner wall (slip fit 0.2-0.3)"
+        },
+        {
+          "name": "top_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "chamfer on the outer top edge (bed-contact edge when printed inverted)"
+        }
+      ],
+      "tags": [
+        "box",
+        "cover",
+        "enclosure",
+        "lid",
+        "lip"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "top face down on the bed, lip pointing up",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.rounded_box",
+      "qualname": "box_lid",
+      "file": "lib/primitives/rounded_box.py",
+      "line": 47,
+      "returns": "Part",
+      "docstring": "Lid plate spans z in [0, thickness] with the lip hanging below z=0 (as\nassembled on the box); flip for printing.\n\nExample:\n    lid = box_lid(110, 80, wall=2.0)",
+      "example": "lid = box_lid(110, 80, wall=2.0)",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.primitives.rounded_box import box_lid"
+    },
+    "primitives.cable_grommet": {
+      "id": "primitives.cable_grommet",
+      "version": "1.0.0",
+      "summary": "Cable pass-through cutout: teardrop hole for the cable plus a keyhole slit to the panel edge so a pre-terminated cable can be slipped in.",
+      "params": [
+        {
+          "name": "cable_d",
+          "type": "float",
+          "units": "mm",
+          "default": 5.0,
+          "description": "cable outer diameter"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "added to diameter"
+        },
+        {
+          "name": "slit_w",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "slit width (0 = no slit, plain teardrop)"
+        },
+        {
+          "name": "slit_len",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "slit length from hole centre in +Y (reach the panel edge)"
+        }
+      ],
+      "tags": [
+        "cable",
+        "grommet",
+        "keyhole",
+        "pass-through",
+        "slot",
+        "strain relief"
+      ],
+      "material_notes": {
+        "validated": [
+          "PETG"
+        ],
+        "orientation": "hole axis horizontal, slit pointing up",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.cable_grommet",
+      "qualname": "cable_grommet",
+      "file": "lib/primitives/cable_grommet.py",
+      "line": 33,
+      "returns": "Sketch",
+      "docstring": "Example:\nback = back - extrude(Plane.XZ * Pos(0, 10) * cable_grommet(4.0, slit_w=2.0, slit_len=12), amount=wall, both=True)",
+      "example": "back = back - extrude(Plane.XZ * Pos(0, 10) * cable_grommet(4.0, slit_w=2.0, slit_len=12), amount=wall, both=True)",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.primitives.cable_grommet import cable_grommet"
+    },
+    "primitives.foot": {
+      "id": "primitives.foot",
+      "version": "1.0.0",
+      "summary": "Cylindrical foot / bumper standing on z=0 with a chamfered bed edge.",
+      "params": [
+        {
+          "name": "d",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "foot diameter"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "foot height"
+        },
+        {
+          "name": "bed_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "chamfer on the bed-contact edge"
+        }
+      ],
+      "tags": [
+        "base",
+        "bumper",
+        "feet",
+        "foot",
+        "standoff"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG",
+          "TPU"
+        ],
+        "orientation": "printed as part of the body, bed side down",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.feet",
+      "qualname": "foot",
+      "file": "lib/primitives/feet.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Example:\nbody = body + [loc * foot() for loc in GridLocations(80, 50, 2, 2)]",
+      "example": "body = body + [loc * foot() for loc in GridLocations(80, 50, 2, 2)]",
+      "used_by": [],
+      "import": "from lib.primitives.feet import foot"
+    },
+    "primitives.pcb_slot_cradle": {
+      "id": "primitives.pcb_slot_cradle",
+      "version": "1.0.0",
+      "summary": "Pair of rails with slots that grip a PCB by its two long edges (for boards with no mount holes), centred on the origin.",
+      "params": [
+        {
+          "name": "board_l",
+          "type": "float",
+          "units": "mm",
+          "default": 54.4,
+          "description": "PCB length along the rails (X)"
+        },
+        {
+          "name": "board_w",
+          "type": "float",
+          "units": "mm",
+          "default": 27.9,
+          "description": "PCB width across the rails (Y)"
+        },
+        {
+          "name": "pcb_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "PCB thickness"
+        },
+        {
+          "name": "rail_h",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "total rail height"
+        },
+        {
+          "name": "rail_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "rail wall thickness outside the slot"
+        },
+        {
+          "name": "slot_depth",
+          "type": "float",
+          "units": "mm",
+          "default": 1.5,
+          "description": "how far the slot bites in over each edge"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "added to pcb_t (slot height) and to board_w (slot span)"
+        },
+        {
+          "name": "slot_z",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "height of the slot floor above z=0"
+        }
+      ],
+      "tags": [
+        "card guide",
+        "cradle",
+        "esp32",
+        "holder",
+        "pcb",
+        "rails",
+        "slot"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA"
+        ],
+        "orientation": "rails vertical; slot faces are then vertical walls, no bridging",
+        "notes": "Board slides in from the +X end; leave that end open in the enclosure or make one rail cantilevered."
+      },
+      "category": "primitives",
+      "module": "lib.primitives.pcb_cradle",
+      "qualname": "pcb_slot_cradle",
+      "file": "lib/primitives/pcb_cradle.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Example:\ncradle = pcb_slot_cradle(*esp32_dims)\nbody = body + Pos(0, 0, floor_t) * cradle",
+      "example": "cradle = pcb_slot_cradle(*esp32_dims)\nbody = body + Pos(0, 0, floor_t) * cradle",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.primitives.pcb_cradle import pcb_slot_cradle"
+    },
+    "primitives.rounded_box": {
+      "id": "primitives.rounded_box",
+      "version": "1.0.0",
+      "summary": "Open-top rounded rectangular shell (enclosure body) with floor, standing on z=0; outer dimensions given.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 100.0,
+          "description": "outer X"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 70.0,
+          "description": "outer Y"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "outer Z including floor"
+        },
+        {
+          "name": "wall",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "side wall thickness (multiple of 0.4)"
+        },
+        {
+          "name": "floor_t",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "floor thickness; default = wall"
+        },
+        {
+          "name": "corner_r",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "outer vertical corner radius"
+        },
+        {
+          "name": "bottom_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "chamfer on the bed-contact edge (elephant foot)"
+        },
+        {
+          "name": "inner_fillet",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "fillet where floor meets the inner walls (0 = none)"
+        }
+      ],
+      "tags": [
+        "body",
+        "box",
+        "case",
+        "enclosure",
+        "rounded",
+        "shell"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "floor on the bed, open top up",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.rounded_box",
+      "qualname": "rounded_box",
+      "file": "lib/primitives/rounded_box.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Example:\nbody = rounded_box(110, 80, 35, wall=2.0)\nbody = body + Pos(0, 0, floor_t) * bosses",
+      "example": "body = rounded_box(110, 80, 35, wall=2.0)\nbody = body + Pos(0, 0, floor_t) * bosses",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.primitives.rounded_box import rounded_box"
+    },
+    "primitives.rubber_foot_recess": {
+      "id": "primitives.rubber_foot_recess",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) shallow recess to locate a stick-on rubber foot; top face at z=0, extends down.",
+      "params": [
+        {
+          "name": "d",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "rubber foot diameter"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "recess depth"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "added to diameter"
+        }
+      ],
+      "tags": [
+        "foot",
+        "negative",
+        "pocket",
+        "recess",
+        "rubber"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA"
+        ],
+        "orientation": "any",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.feet",
+      "qualname": "rubber_foot_recess",
+      "file": "lib/primitives/feet.py",
+      "line": 29,
+      "returns": "Part",
+      "docstring": "Example:\nbody = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
+      "example": "body = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
+      "used_by": [],
+      "import": "from lib.primitives.feet import rubber_foot_recess"
+    },
+    "primitives.teardrop": {
+      "id": "primitives.teardrop",
+      "version": "1.0.0",
+      "summary": "Teardrop hole profile (circle with a pointed top) so a horizontal-axis hole bridges without support; subtract from a vertical wall.",
+      "params": [
+        {
+          "name": "d",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "nominal hole diameter"
+        },
+        {
+          "name": "angle",
+          "type": "float",
+          "units": "deg",
+          "default": 45.0,
+          "description": "half-angle of the point (45 = printable without support)"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.3,
+          "description": "FDM oversize"
+        }
+      ],
+      "tags": [
+        "bridge",
+        "cable",
+        "hole",
+        "horizontal",
+        "overhang",
+        "teardrop"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "hole axis horizontal, point up (+Y in the sketch)",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.cable_grommet",
+      "qualname": "teardrop",
+      "file": "lib/primitives/cable_grommet.py",
+      "line": 9,
+      "returns": "Sketch",
+      "docstring": "Drawn in XY with the point in +Y; map onto the wall plane (e.g. Plane.XZ) so +Y becomes up.\n\nExample:\n    wall = wall - extrude(Plane.XZ * Pos(x, z) * teardrop(cable_d), amount=wall_t, both=True)",
+      "example": "wall = wall - extrude(Plane.XZ * Pos(x, z) * teardrop(cable_d), amount=wall_t, both=True)",
+      "used_by": [],
+      "import": "from lib.primitives.cable_grommet import teardrop"
+    },
+    "primitives.vent_slots": {
+      "id": "primitives.vent_slots",
+      "version": "1.0.0",
+      "summary": "Grid of rounded ventilation slots filling a rectangular area, centred on the origin (subtract from a wall).",
+      "params": [
+        {
+          "name": "area_l",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "length of the vented area along the slots"
+        },
+        {
+          "name": "area_w",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "width across the slots"
+        },
+        {
+          "name": "slot_w",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "slot width (>= 1.5 for reliable bridging / cleaning)"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "centre-to-centre across slots (web = pitch - slot_w, keep >= 1.2)"
+        },
+        {
+          "name": "slot_l",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "slot length; default fills area_l"
+        },
+        {
+          "name": "rows",
+          "type": "int",
+          "units": "count",
+          "default": 1,
+          "description": "number of slot columns along the length; default 1"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotate the whole pattern in-plane"
+        }
+      ],
+      "tags": [
+        "airflow",
+        "cooling",
+        "grille",
+        "panel",
+        "slots",
+        "vent"
+      ],
+      "material_notes": {
+        "validated": [
+          "PLA",
+          "PETG"
+        ],
+        "orientation": "on a vertical wall run slots vertically so they need no bridging",
+        "notes": ""
+      },
+      "category": "primitives",
+      "module": "lib.primitives.vented_panel",
+      "qualname": "vent_slots",
+      "file": "lib/primitives/vented_panel.py",
+      "line": 9,
+      "returns": "Sketch",
+      "docstring": "Example:\nside = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
+      "example": "side = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
+      "used_by": [
+        "models/esp32_devkit_case/model.py"
+      ],
+      "import": "from lib.primitives.vented_panel import vent_slots"
+    }
+  },
+  "models": {
+    "esp32_devkit_case": {
+      "path": "models/esp32_devkit_case",
+      "components": [
+        "fasteners.clearance_hole",
+        "fasteners.heat_set_boss",
+        "primitives.box_lid",
+        "primitives.cable_grommet",
+        "primitives.pcb_slot_cradle",
+        "primitives.rounded_box",
+        "primitives.vent_slots"
+      ],
+      "golden": true
+    }
+  }
+}

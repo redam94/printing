@@ -1,0 +1,8 @@
+#!/bin/sh
+# Fail the commit if lib/ or models/ changed but PARTS.md / parts.json were not regenerated.
+if git diff --cached --name-only | grep -qE '^(lib/|models/)'; then
+  if ! uv run python scripts/reindex.py --check >/dev/null 2>&1; then
+    echo "pre-commit: PARTS.md/parts.json are stale. Run: uv run python scripts/reindex.py  and stage the result." >&2
+    exit 1
+  fi
+fi
