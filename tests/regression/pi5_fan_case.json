@@ -1,0 +1,82 @@
+{
+  "project": "pi5_fan_case",
+  "generated": "2026-09-07",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "body": {
+      "bbox_min": [
+        -50.6,
+        -37.3,
+        -0.0
+      ],
+      "bbox_max": [
+        50.6,
+        37.3,
+        29.2
+      ],
+      "bbox_size": [
+        101.2,
+        74.6,
+        29.2
+      ],
+      "volume": 28590.856,
+      "surface_area": 34739.37,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "fa8d29d8a2421b4f",
+      "triangles": 23188
+    },
+    "lid": {
+      "bbox_min": [
+        -50.6,
+        -36.1,
+        0.0
+      ],
+      "bbox_max": [
+        50.6,
+        36.1,
+        5.0
+      ],
+      "bbox_size": [
+        101.2,
+        72.2,
+        5.0
+      ],
+      "volume": 14178.596,
+      "surface_area": 15851.956,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "e209b16d6cf290c0",
+      "triangles": 5544
+    },
+    "lid_snap": {
+      "bbox_min": [
+        -50.6,
+        -37.95,
+        0.0
+      ],
+      "bbox_max": [
+        50.6,
+        37.95,
+        10.3
+      ],
+      "bbox_size": [
+        101.2,
+        75.9,
+        10.3
+      ],
+      "volume": 14406.93,
+      "surface_area": 16202.761,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "8e0afaa29da4c42b",
+      "triangles": 3816
+    }
+  }
+}

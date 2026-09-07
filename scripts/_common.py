@@ -311,16 +311,30 @@ PRINTER = {
 PLATE_GAP = 10.0  # mm between parts on the plate
 
 
-def plate_layout(parts: dict) -> dict[str, tuple[float, float, float]]:
-    """Side-by-side layout along X with PLATE_GAP, centred on the origin, every part on z=0.
-    Returns {name: (dx, dy, dz)} translations."""
-    boxes = {n: s.bounding_box() for n, s in parts.items()}
-    total_x = sum(b.size.X for b in boxes.values()) + PLATE_GAP * (len(boxes) - 1)
-    x = -total_x / 2
+def plate_layout(parts: dict, bed_x: float | None = None) -> dict[str, tuple[float, float, float]]:
+    """Shelf-pack parts onto the bed: rows along X (wrapping at the bed width minus a margin),
+    rows stacked along Y, PLATE_GAP between parts, the whole arrangement centred on the origin,
+    every part on z=0.  Returns {name: (dx, dy, dz)} translations."""
+    bed_x = (PRINTER["bed"][0] if bed_x is None else bed_x) - 2 * PLATE_GAP
+    boxes = sorted(((n, s.bounding_box()) for n, s in parts.items()), key=lambda nb: -nb[1].size.Y)
+    rows: list[list] = [[]]
+    row_w = 0.0
+    for n, b in boxes:
+        w = b.size.X
+        if rows[-1] and row_w + PLATE_GAP + w > bed_x:
+            rows.append([]); row_w = 0.0
+        rows[-1].append((n, b)); row_w += (PLATE_GAP if len(rows[-1]) > 1 else 0) + w
+    row_h = [max(b.size.Y for _, b in r) for r in rows]
+    total_h = sum(row_h) + PLATE_GAP * (len(rows) - 1)
     out = {}
-    for n, b in boxes.items():
-        out[n] = (x - b.min.X, -(b.min.Y + b.max.Y) / 2, -b.min.Z)
-        x += b.size.X + PLATE_GAP
+    y = -total_h / 2
+    for r, h in zip(rows, row_h):
+        total_w = sum(b.size.X for _, b in r) + PLATE_GAP * (len(r) - 1)
+        x = -total_w / 2
+        for n, b in r:
+            out[n] = (x - b.min.X, y + h / 2 - (b.min.Y + b.max.Y) / 2, -b.min.Z)
+            x += b.size.X + PLATE_GAP
+        y += h + PLATE_GAP
     return out
 
 

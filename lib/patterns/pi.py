@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from build123d import Circle, GridLocations, Pos, RectangleRounded, Sketch
+from build123d import Circle, GridLocations, Pos, Rectangle, RectangleRounded, Sketch
 
 from lib.component import MaterialNotes, component
 
@@ -128,3 +128,91 @@ def pi_board_outline(board: str = "pi5", clearance: float = 0.0) -> Sketch:
     """
     b = PI_BOARDS[board]
     return Pos(b.outline_offset_x, 0) * RectangleRounded(b.length + 2 * clearance, b.width + 2 * clearance, b.corner_r + clearance)
+
+
+# ---------------------------------------------------------------------------
+# Pi 5 connector windows
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class PiPort:
+    """One edge connector, in hole-pattern coordinates (see module docstring).
+
+    ``along`` is the connector centre measured along its board edge: lib X for
+    the -Y (USB-C/HDMI) edge, lib Y for the +X (USB-A/Ethernet) and -X (SD)
+    edges.  Heights are relative to the PCB TOP surface (z=0).  ``body_*`` is
+    the connector shell on the board; ``plug_*`` is the envelope a mating
+    plug/overmold needs to pass through a wall that stands a few mm off the
+    board edge.
+    """
+    name: str
+    edge: str
+    along: float
+    body_w: float
+    body_z0: float
+    body_z1: float
+    plug_w: float
+    plug_z0: float
+    plug_z1: float
+    status: str
+
+
+# Positions from the official Pi 5 drawing (board coords -> lib coords: x-32.5, y-28).
+# Connector body sizes are Pi 4 values / generic connector specs; plug envelopes are typical
+# cable overmolds.  Both flagged UNVERIFIED in references/hardware_dimensions.md sec. 1.
+PI5_PORTS: tuple[PiPort, ...] = (
+    PiPort("usb_c",       "power", -21.3, 9.0,  0.0,  3.2, 13.0, -1.9,  5.1,  "position verified; body Pi 4; plug envelope UNVERIFIED (13 x 7 overmold)"),
+    PiPort("hdmi0",       "power",  -6.7, 7.6,  0.0,  3.0, 10.0, -1.5,  4.5,  "position verified; body/plug UNVERIFIED"),
+    PiPort("hdmi1",       "power",   6.7, 7.6,  0.0,  3.0, 10.0, -1.5,  4.5,  "position verified; body/plug UNVERIFIED"),
+    PiPort("ethernet",    "usb",   -17.8, 16.0, 0.0, 13.5, 16.0,  0.0, 13.5,  "position verified; body Pi 4 (13.5 tall)"),
+    PiPort("usb_a_lower", "usb",     1.1, 13.3, 0.0, 15.6, 13.3,  0.0, 15.6,  "position verified; body generic dual USB-A"),
+    PiPort("usb_a_upper", "usb",    19.0, 13.3, 0.0, 15.6, 13.3,  0.0, 15.6,  "position verified; body generic dual USB-A"),
+    PiPort("microsd",     "sd",      0.0, 12.0, -3.6, 0.0, 16.0, -3.6, 0.0,   "UNVERIFIED: slot assumed centred on the SD edge, card under the PCB"),
+)
+PI5_PORT_EDGES = {
+    "power": "-Y edge (USB-C, micro-HDMI 0/1); map with Plane.XZ, sketch x = lib X",
+    "usb": "+X edge (Ethernet, two USB-A stacks); map with Plane.YZ, sketch x = lib Y",
+    "sd": "-X edge (microSD access window); map with Plane.YZ, sketch x = lib Y",
+}
+
+
+@component(
+    id="patterns.pi5_port_cutouts", version="1.0.0",
+    summary="Raspberry Pi 5 connector windows for one board edge as a wall-plane sketch (x along the edge, y = height above PCB top).",
+    tags=["raspberry pi", "pi5", "pi 5", "ports", "cutout", "usb-c", "hdmi", "ethernet", "usb-a", "microsd", "connector", "window"],
+    units={"edge": "enum", "clearance": "mm", "plug_envelope": "bool", "ports": "-"},
+    descriptions={
+        "edge": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window)",
+        "clearance": "added on every side of the connector/plug envelope",
+        "plug_envelope": "size windows for the mating plug overmold (True) or just the connector body (False, flush panels)",
+        "ports": "optional subset of port names to include, e.g. ['usb_c']; default = every port on that edge",
+    },
+    material_notes=MaterialNotes(
+        validated=[], orientation="windows cut through a vertical wall; the wall above each window is a short bridge (<= 18 mm)",
+        notes="UNVALIDATED: positions from the official drawing, connector/plug envelopes from Pi 4 data and typical cables — test-fit before printing many.",
+    ),
+)
+def pi5_port_cutouts(edge: str = "power", clearance: float = 0.75, plug_envelope: bool = True,
+                     ports: list[str] | None = None) -> Sketch:
+    """Rectangles to subtract from an enclosure wall so the Pi 5 connectors are reachable.
+
+    Sketch frame: x runs along the board edge in hole-pattern coordinates
+    (lib X for ``power``, lib Y for ``usb``/``sd``), y is height above the PCB
+    top surface.  Place it with ``Pos(x_of_pi_origin, z_of_pcb_top)`` on the
+    wall plane and extrude through the wall with ``both=True``.
+
+    Example:
+        win = pi5_port_cutouts("power")
+        body = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)
+    """
+    if edge not in PI5_PORT_EDGES:
+        raise ValueError(f"unknown edge {edge!r}; known: {sorted(PI5_PORT_EDGES)}")
+    sel = [p for p in PI5_PORTS if p.edge == edge and (ports is None or p.name in ports)]
+    if not sel:
+        raise ValueError(f"no ports selected on edge {edge!r} from {ports}")
+    rects = []
+    for p in sel:
+        w, z0, z1 = (p.plug_w, p.plug_z0, p.plug_z1) if plug_envelope else (p.body_w, p.body_z0, p.body_z1)
+        w, z0, z1 = w + 2 * clearance, z0 - clearance, z1 + clearance
+        rects.append(Pos(p.along, (z0 + z1) / 2) * Rectangle(w, z1 - z0))
+    return Sketch() + rects
