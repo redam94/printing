@@ -1587,6 +1587,132 @@
       "used_by": [],
       "import": "from lib.primitives.feet import foot"
     },
+    "primitives.l_bracket": {
+      "id": "primitives.l_bracket",
+      "version": "1.0.0",
+      "summary": "90-degree L (angle) bracket with a row of screw clearance holes along each arm, standing on its side on z=0 (strongest print orientation).",
+      "params": [
+        {
+          "name": "arm_a",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "arm along +X, measured from the outer corner to the free end"
+        },
+        {
+          "name": "arm_b",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "arm along +Y, measured from the outer corner to the free end"
+        },
+        {
+          "name": "thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "arm thickness (multiple of 0.4; >= 3 for M3 hardware)"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "bracket width = print height along Z"
+        },
+        {
+          "name": "size",
+          "type": "str",
+          "units": "enum",
+          "default": "M3",
+          "description": "screw size for the holes: M2, M2.5, M3, M4, M5"
+        },
+        {
+          "name": "holes_per_arm",
+          "type": "int",
+          "units": "count",
+          "default": 3,
+          "description": "holes in the single row on each arm (0 = plain bracket)"
+        },
+        {
+          "name": "hole_pitch",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "centre-to-centre along the arm; default spreads the holes evenly over the arm span beyond the other arm"
+        },
+        {
+          "name": "hole_style",
+          "type": "str",
+          "units": "enum",
+          "default": "teardrop",
+          "description": "teardrop (horizontal hole bridges without support) or round"
+        },
+        {
+          "name": "fit",
+          "type": "str",
+          "units": "enum",
+          "default": "medium",
+          "description": "ISO 273 clearance series: fine, medium, coarse"
+        },
+        {
+          "name": "print_oversize",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to hole diameter because FDM holes print small"
+        },
+        {
+          "name": "inner_r",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "fillet radius on the inside corner (vertical edge; stress relief, 0 = sharp)"
+        },
+        {
+          "name": "outer_r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "fillet radius on the outside corner (0 = sharp)"
+        },
+        {
+          "name": "bottom_chamfer",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "chamfer on the bed-contact edge loop (elephant foot, 0 = none)"
+        }
+      ],
+      "tags": [
+        "L",
+        "M3",
+        "M4",
+        "angle",
+        "bracket",
+        "corner",
+        "holes",
+        "mount",
+        "structural"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "on its side: L profile in the bed plane, width along Z, so the corner is loaded along the layers; holes are horizontal (teardrop point up)",
+        "notes": "UNVALIDATED: no test print yet. Printing one arm flat on the bed puts the corner's bending load across layers."
+      },
+      "category": "primitives",
+      "module": "lib.primitives.l_bracket",
+      "qualname": "l_bracket",
+      "file": "lib/primitives/l_bracket.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Outer corner at the origin; arm A runs along +X (its outer face on y=0), arm B along +Y\n(outer face on x=0); z spans [0, width] so the part sits on the bed as returned.  Holes run\nhorizontally through each arm, centred on the width, in one row.\n\nExample:\n    bracket = l_bracket(40, 40, thickness=4, width=20, size=\"M3\", holes_per_arm=3)\n    plate = plate + Pos(x, y, 0) * l_bracket(30, 20, holes_per_arm=2)",
+      "example": "bracket = l_bracket(40, 40, thickness=4, width=20, size=\"M3\", holes_per_arm=3)\nplate = plate + Pos(x, y, 0) * l_bracket(30, 20, holes_per_arm=2)",
+      "used_by": [
+        "models/l_bracket_40/model.py"
+      ],
+      "import": "from lib.primitives.l_bracket import l_bracket"
+    },
     "primitives.pcb_slot_cradle": {
       "id": "primitives.pcb_slot_cradle",
       "version": "1.1.0",
@@ -1979,6 +2105,13 @@
         "primitives.pcb_slot_cradle",
         "primitives.rounded_box",
         "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "l_bracket_40": {
+      "path": "models/l_bracket_40",
+      "components": [
+        "primitives.l_bracket"
       ],
       "golden": true
     }
