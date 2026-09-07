@@ -22,13 +22,13 @@
         40.0,
         20.0
       ],
-      "volume": 5810.639,
-      "surface_area": 3921.662,
+      "volume": 5723.646,
+      "surface_area": 3974.825,
       "solids": 1,
       "valid": true,
       "watertight": true,
-      "mesh_hash": "f9e3c75daba9b74c",
-      "triangles": 2636
+      "mesh_hash": "fc5ad151faf941f8",
+      "triangles": 3420
     }
   }
 }

@@ -7,8 +7,8 @@ WIDTH = 20.0            # mm, bracket width = print height (ASSUMED: user did no
 
 # --- holes: one row of three per arm ---
 SCREW = "M3"
-HOLES_PER_ARM = 3
-HOLE_PITCH = None       # mm; None = spread evenly over the arm span beyond the other arm (12 mm here)
+HOLES_PER_ARM = 4         # per review note 2026-09-07: "I want 4 holes per side"
+HOLE_PITCH = None       # mm; None = spread evenly over the arm span beyond the other arm (9 mm here)
 HOLE_STYLE = "teardrop" # holes are horizontal in print orientation; teardrop bridges without support
 HOLE_FIT = "medium"     # ISO 273 medium: 3.4 mm for M3
 HOLE_OVERSIZE = 0.2     # mm, FDM compensation -> 3.6 mm printed hole
