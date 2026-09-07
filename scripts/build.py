@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, FIT_TOL_MM3  # noqa: E402
+from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, FIT_TOL_MM3  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.render import render_project  # noqa: E402
 from scripts._common import to_trimesh  # noqa: E402
@@ -64,6 +64,10 @@ def main() -> int:
     if not a.no_render:
         for png in render_project(a.project, parts=parts):
             print(f"rendered {png.relative_to(ROOT)}   <- open this with Read to inspect")
+        if not a.no_export:
+            from scripts.export_viewer import project_run, write_viewer
+            html_out = write_viewer([project_run(a.project)], MODELS_DIR / a.project / "exports" / "view.html", f"{a.project} viewer", a.project)
+            print(f"interactive viewer {html_out.relative_to(ROOT)}   <- open in a browser (orbit, section plane, translucent)")
         print()
 
     golden = load_golden(a.project)

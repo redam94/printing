@@ -1,0 +1,297 @@
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8;
+  --accent:#E8791D; --accent-ink:#FFFFFF; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F;
+  --viewport:#262B31; --focus:#2F6FE8;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --accent-ink:#1A1F25;
+}}
+:root[data-theme="dark"]{ --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --accent-ink:#1A1F25; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.45;height:100vh;display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+header{display:flex;align-items:center;gap:18px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em}
+header .sub{color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--panel);color:var(--ink);border:0;padding:5px 12px;font:inherit;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+main{display:grid;grid-template-columns:300px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);background:var(--panel);overflow-y:auto;display:flex;flex-direction:column}
+section{padding:12px 14px;border-bottom:1px solid var(--line)}
+section h2{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.runs{display:flex;flex-direction:column;gap:2px}
+.run{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:5px;cursor:pointer;border:1px solid transparent}
+.run:hover{background:var(--panel-2)}
+.run[aria-current="true"]{border-color:var(--accent);background:var(--panel-2)}
+.run .name{font-weight:500}
+.run .meta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.evalname{font-family:var(--mono);font-size:11px;color:var(--muted);margin:8px 0 3px}
+.parts{display:flex;flex-direction:column;gap:6px}
+.part{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:start;padding:8px;border-radius:6px;background:var(--panel-2)}
+.part input{margin:3px 0 0}
+.part .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.part .pname{font-weight:500}
+.part dl{grid-column:2;margin:0;display:grid;grid-template-columns:auto 1fr;gap:1px 10px;font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums}
+.part dt{color:var(--muted)}
+.part dd{margin:0}
+.flag{display:inline-block;padding:0 6px;border-radius:9px;font-size:10.5px;font-family:var(--mono);color:#fff}
+.flag.ok{background:var(--ok)} .flag.bad{background:var(--bad)} .flag.warn{background:var(--warn)}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center}
+.ctl label{color:var(--muted)}
+.ctl output{font-family:var(--mono);font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.toggles label{display:flex;gap:6px;align-items:center;color:var(--ink)}
+.views{display:flex;gap:6px;flex-wrap:wrap}
+.views button,.btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:5px;padding:4px 10px;font:inherit;cursor:pointer}
+.views button:hover,.btn:hover{border-color:var(--accent)}
+#stage{position:relative;background:var(--viewport);min-width:0;min-height:0}
+#stage canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:#C9D1D9;background:rgba(20,23,27,.72);padding:8px 10px;border-radius:5px;font-variant-numeric:tabular-nums;pointer-events:none;white-space:pre}
+.hint{position:absolute;right:14px;bottom:12px;font-family:var(--mono);font-size:11px;color:#8B949E;pointer-events:none}
+.drawer{position:absolute;top:0;right:0;height:100%;width:min(560px,60%);background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column}
+.drawer[data-open="true"]{transform:none}
+.drawer header{justify-content:space-between}
+.drawer pre{margin:0;padding:14px 18px;overflow:auto;white-space:pre-wrap;font-family:var(--mono);font-size:12px;line-height:1.5;color:var(--ink)}
+.drawer-tab{position:absolute;top:12px;right:14px}
+@media (prefers-reduced-motion: reduce){.drawer{transition:none}}
+@media (max-width:820px){main{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{max-height:42vh;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+
+<header>
+  <h1>__HEADING__</h1>
+  <span class="sub" id="runTitle"></span>
+  <span style="flex:1"></span>
+  <div class="seg" id="configSeg" hidden>
+    <button data-config="with_skill" aria-pressed="false">with skill</button>
+    <button data-config="without_skill" aria-pressed="false">without skill</button>
+  </div>
+</header>
+<main>
+  <aside>
+    <section id="runsSection"><h2>Runs</h2><div class="runs" id="runs"></div></section>
+    <section><h2>Parts on the plate</h2><div class="parts" id="parts"></div></section>
+    <section>
+      <h2>Inspect</h2>
+      <div class="ctl">
+        <label for="cut">Section plane, Z</label><output id="cutOut">off</output>
+        <input id="cut" type="range" min="0" max="100" value="100" step="0.2">
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="wire"> wireframe</label>
+        <label><input type="checkbox" id="xray"> translucent</label>
+        <label><input type="checkbox" id="bed" checked> bed grid</label>
+        <label><input type="checkbox" id="plate" checked> lay out on plate</label>
+      </div>
+    </section>
+    <section>
+      <h2>View</h2>
+      <div class="views">
+        <button data-view="iso">isometric</button><button data-view="top">top</button>
+        <button data-view="front">front</button><button data-view="right">right</button>
+        <button data-view="bottom">bottom</button>
+      </div>
+    </section>
+  </aside>
+  <div id="stage">
+    <div class="hud" id="hud"></div>
+    <div class="hint">drag: orbit · shift-drag / right-drag: pan · wheel: zoom</div>
+    <button class="btn drawer-tab" id="drawerBtn" hidden>Show report</button>
+    <div class="drawer" id="drawer" data-open="false">
+      <header><span class="sub" id="drawerTitle">Report</span><button class="btn" id="drawerClose">Close</button></header>
+      <pre id="report"></pre>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const RUNS = DATA.runs;
+const PART_COLORS = [0xB7C2CC, 0xE8791D, 0x3FA7A0, 0x8E7CC3, 0xD9C15A, 0xC96B8A];
+
+// ---------- binary STL -> BufferGeometry ----------
+function b64ToBuf(b64){const s=atob(b64);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer;}
+function parseSTL(buf){
+  const dv=new DataView(buf); const n=dv.getUint32(80,true);
+  const pos=new Float32Array(n*9), nor=new Float32Array(n*9);
+  let o=84;
+  for(let i=0;i<n;i++){
+    const nx=dv.getFloat32(o,true),ny=dv.getFloat32(o+4,true),nz=dv.getFloat32(o+8,true); o+=12;
+    for(let v=0;v<3;v++){const k=i*9+v*3;
+      pos[k]=dv.getFloat32(o,true);pos[k+1]=dv.getFloat32(o+4,true);pos[k+2]=dv.getFloat32(o+8,true);o+=12;
+      nor[k]=nx;nor[k+1]=ny;nor[k+2]=nz;}
+    o+=2;
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.setAttribute('normal',new THREE.BufferAttribute(nor,3));
+  g.computeBoundingBox();
+  return g;
+}
+function volumeOf(g){ // signed tetra sum, mm^3
+  const p=g.attributes.position.array; let v=0;
+  for(let i=0;i<p.length;i+=9){
+    const ax=p[i],ay=p[i+1],az=p[i+2],bx=p[i+3],by=p[i+4],bz=p[i+5],cx=p[i+6],cy=p[i+7],cz=p[i+8];
+    v+=ax*(by*cz-bz*cy)-ay*(bx*cz-bz*cx)+az*(bx*cy-by*cx);
+  }
+  return Math.abs(v)/6;
+}
+
+// ---------- scene ----------
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.localClippingEnabled=true; renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+stage.insertBefore(renderer.domElement, stage.firstChild);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x262B31);
+const camera=new THREE.PerspectiveCamera(35,1,1,5000); camera.up.set(0,0,1);
+scene.add(new THREE.HemisphereLight(0xdfe6ee,0x2a2f36,0.85));
+const key=new THREE.DirectionalLight(0xffffff,0.9); key.position.set(120,-160,220); scene.add(key);
+const fill=new THREE.DirectionalLight(0xffffff,0.35); fill.position.set(-150,120,80); scene.add(fill);
+const bedGroup=new THREE.Group(); scene.add(bedGroup);
+const partGroup=new THREE.Group(); scene.add(partGroup);
+const clipPlane=new THREE.Plane(new THREE.Vector3(0,0,-1), 1e6);
+
+// orbit
+const orbit={target:new THREE.Vector3(),theta:-0.9,phi:1.05,dist:300};
+function applyCamera(){
+  const s=Math.sin(orbit.phi), c=Math.cos(orbit.phi);
+  camera.position.set(orbit.target.x+orbit.dist*s*Math.cos(orbit.theta), orbit.target.y+orbit.dist*s*Math.sin(orbit.theta), orbit.target.z+orbit.dist*c);
+  camera.lookAt(orbit.target);
+}
+let drag=null;
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+renderer.domElement.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,pan:e.button===2||e.shiftKey};renderer.domElement.setPointerCapture(e.pointerId);});
+renderer.domElement.addEventListener('pointerup',()=>drag=null);
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(!drag)return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y; drag.x=e.clientX; drag.y=e.clientY;
+  if(drag.pan){
+    const right=new THREE.Vector3(), up=new THREE.Vector3(); camera.matrix.extractBasis(right,up,new THREE.Vector3());
+    const k=orbit.dist*0.0016; orbit.target.addScaledVector(right,-dx*k).addScaledVector(up,dy*k);
+  } else { orbit.theta-=dx*0.008; orbit.phi=Math.min(Math.PI-0.02,Math.max(0.02,orbit.phi-dy*0.008)); }
+  applyCamera();
+});
+renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();orbit.dist*=Math.exp(e.deltaY*0.0012);orbit.dist=Math.max(20,Math.min(3000,orbit.dist));applyCamera();},{passive:false});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);
+
+// ---------- state ----------
+let current=null;   // run object
+const meshes=[];    // {mesh, part, visible}
+const cut=document.getElementById('cut'), cutOut=document.getElementById('cutOut');
+const ui={wire:document.getElementById('wire'),xray:document.getElementById('xray'),bed:document.getElementById('bed'),plate:document.getElementById('plate')};
+
+function buildBed(size, cx, cy){
+  bedGroup.clear();
+  const n=Math.ceil(size/10)*10;
+  const grid=new THREE.GridHelper(n, n/10, 0x4A535E, 0x363D46); grid.rotation.x=Math.PI/2; grid.position.set(cx,cy,-0.05);
+  bedGroup.add(grid);
+  const plate=new THREE.Mesh(new THREE.PlaneGeometry(n,n), new THREE.MeshBasicMaterial({color:0x1f2429}));
+  plate.position.set(cx,cy,-0.1); bedGroup.add(plate);
+  const axes=new THREE.AxesHelper(20); axes.position.set(cx-n/2,cy-n/2,0); bedGroup.add(axes);
+}
+
+function loadRun(run, keepCamera){
+  current=run;
+  partGroup.clear(); meshes.length=0;
+  document.getElementById('runTitle').textContent=run.title||'';
+  const partsEl=document.getElementById('parts'); partsEl.innerHTML='';
+  let zmax=0;
+  run.parts.forEach((p,i)=>{
+    if(!p._geom){p._geom=parseSTL(b64ToBuf(p.stl)); p._vol=volumeOf(p._geom); p._bb=p._geom.boundingBox;}
+    const color=PART_COLORS[i%PART_COLORS.length];
+    const mat=new THREE.MeshStandardMaterial({color,metalness:0.05,roughness:0.55,side:THREE.DoubleSide,clippingPlanes:[clipPlane],transparent:true,opacity:1});
+    const mesh=new THREE.Mesh(p._geom,mat); partGroup.add(mesh);
+    const entry={mesh,part:p,visible:true,color}; meshes.push(entry);
+    zmax=Math.max(zmax,p._bb.max.z);
+    const bb=p._bb, sz=new THREE.Vector3().subVectors(bb.max,bb.min);
+    const m=p.metrics||{};
+    const wt = m.watertight===undefined?'':(m.watertight?'<span class="flag ok">watertight</span>':'<span class="flag bad">not watertight</span>');
+    const el=document.createElement('label'); el.className='part';
+    el.innerHTML=`<input type="checkbox" checked><div><span class="sw" style="background:#${color.toString(16).padStart(6,'0')}"></span><span class="pname">${p.name}</span> ${wt}</div>
+      <dl><dt>bbox</dt><dd>${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm</dd>
+      <dt>volume</dt><dd>${(p._vol/1000).toFixed(2)} cm³</dd>
+      <dt>triangles</dt><dd>${(p._geom.attributes.position.count/3).toLocaleString()}</dd>
+      ${m.wall_min_mm!=null?`<dt>min wall</dt><dd>${m.wall_min_mm} mm</dd>`:''}</dl>`;
+    el.querySelector('input').addEventListener('change',e=>{entry.visible=e.target.checked;mesh.visible=entry.visible;layout();});
+    partsEl.appendChild(el);
+  });
+  cut.max=Math.ceil(zmax+1); cut.value=cut.max; clipPlane.constant=1e6; cutOut.textContent='off';
+  layout(!keepCamera);
+  applyToggles();
+  // report drawer
+  const btn=document.getElementById('drawerBtn'); btn.hidden=!run.report;
+  document.getElementById('report').textContent=run.report||''; document.getElementById('drawerTitle').textContent=(run.title||'')+' — report';
+  // config segment
+  const seg=document.getElementById('configSeg');
+  const siblings=RUNS.filter(r=>r.eval===run.eval);
+  seg.hidden=!(run.eval && siblings.length>1);
+  seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.config===run.config)));
+  document.querySelectorAll('.run').forEach(el=>el.setAttribute('aria-current',String(el.dataset.id===run.id)));
+}
+
+function layout(fit){
+  // arrange visible parts side by side along X with 10 mm gaps, each sitting on z=0
+  const vis=meshes.filter(m=>m.visible);
+  let x=0; const total=new THREE.Box3();
+  vis.forEach((m,i)=>{
+    const bb=m.part._bb; const sz=new THREE.Vector3().subVectors(bb.max,bb.min);
+    if(ui.plate.checked){ m.mesh.position.set(x-bb.min.x, -bb.min.y - sz.y/2, -bb.min.z); x+=sz.x+10; }
+    else { m.mesh.position.set(0,0,0); }
+    m.mesh.updateMatrixWorld(); total.union(new THREE.Box3().setFromObject(m.mesh));
+  });
+  if(vis.length){
+    const c=total.getCenter(new THREE.Vector3()), s=total.getSize(new THREE.Vector3());
+    buildBed(Math.max(s.x,s.y)*1.6+40, c.x, c.y);
+    if(fit){ orbit.target.set(c.x,c.y,s.z/2); orbit.dist=Math.max(s.x,s.y,s.z)*2.1+40; applyCamera(); }
+    document.getElementById('hud').textContent=vis.map(m=>{const sz=new THREE.Vector3().subVectors(m.part._bb.max,m.part._bb.min);return `${m.part.name.padEnd(10)} ${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm   ${(m.part._vol/1000).toFixed(2)} cm³`;}).join('\n')+`\nplate extent ${s.x.toFixed(1)} × ${s.y.toFixed(1)} mm · grid 10 mm`;
+  }
+  bedGroup.visible=ui.bed.checked;
+}
+
+function applyToggles(){
+  meshes.forEach(m=>{m.mesh.material.wireframe=ui.wire.checked; m.mesh.material.opacity=ui.xray.checked?0.45:1; m.mesh.material.depthWrite=!ui.xray.checked;});
+  bedGroup.visible=ui.bed.checked;
+}
+Object.values(ui).forEach(el=>el.addEventListener('change',()=>{applyToggles();layout(false);}));
+cut.addEventListener('input',()=>{const v=parseFloat(cut.value); if(v>=parseFloat(cut.max)){clipPlane.constant=1e6;cutOut.textContent='off';} else {clipPlane.constant=v;cutOut.textContent=v.toFixed(1)+' mm';}});
+
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.view; const eps=0.02;
+  if(v==='iso'){orbit.theta=-0.9;orbit.phi=1.05;} else if(v==='top'){orbit.theta=-Math.PI/2;orbit.phi=eps;} else if(v==='bottom'){orbit.theta=-Math.PI/2;orbit.phi=Math.PI-eps;}
+  else if(v==='front'){orbit.theta=-Math.PI/2;orbit.phi=Math.PI/2;} else if(v==='right'){orbit.theta=0;orbit.phi=Math.PI/2;}
+  applyCamera();
+}));
+document.getElementById('drawerBtn').addEventListener('click',()=>document.getElementById('drawer').dataset.open='true');
+document.getElementById('drawerClose').addEventListener('click',()=>document.getElementById('drawer').dataset.open='false');
+document.getElementById('configSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  const r=RUNS.find(r=>r.eval===current.eval && r.config===b.dataset.config); if(r) loadRun(r,true);
+}));
+
+// runs list grouped by eval
+const runsEl=document.getElementById('runs');
+if(RUNS.length<=1) document.getElementById('runsSection').hidden=true;
+const groups=[...new Set(RUNS.map(r=>r.eval||''))];
+groups.forEach(g=>{
+  if(g){const h=document.createElement('div');h.className='evalname';h.textContent=g;runsEl.appendChild(h);}
+  RUNS.filter(r=>(r.eval||'')===g).forEach(r=>{
+    const el=document.createElement('div'); el.className='run'; el.dataset.id=r.id; el.tabIndex=0; el.setAttribute('role','button');
+    el.innerHTML=`<div><div class="name">${r.label}</div><div class="meta">${r.parts.length} part${r.parts.length===1?'':'s'}${r.score?' · '+r.score:''}</div></div><div class="meta">${r.tokens?Math.round(r.tokens/1000)+'k tok':''}</div>`;
+    const go=()=>loadRun(r,false); el.addEventListener('click',go); el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+    runsEl.appendChild(el);
+  });
+});
+
+resize(); applyCamera();
+loadRun(RUNS[0], false);
+(function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);})();
+})();
+</script>

@@ -67,8 +67,10 @@ Do not guess or pad with things that are not there.
      `is_valid` is a property, `Plane.XZ` mapping, selecting edges).
 4. **Build it:** `uv run python scripts/build.py <project>`. This runs the model, prints bbox and
    volume per part, runs the printability check, exports STL + STEP to `models/<project>/exports/`,
-   renders `exports/renders/<part>.png` (isometric + top + front) and writes or diffs the golden
-   metrics in `tests/regression/<project>.json`. **Open each render PNG with Read and look at it.**
+   renders `exports/renders/<part>.png` (isometric + top + front), writes `exports/view.html` (an
+   interactive viewer: orbit, Z section plane, translucent, parts on a bed grid) and writes or diffs
+   the golden metrics in `tests/regression/<project>.json`. **Open each render PNG with Read and
+   look at it**, and tell the user the `view.html` path so they can inspect the part themselves.
    Misplaced cutouts and features running out of a wall are obvious in the picture and invisible in
    the numbers.
 5. **Report** bounding box and volume for each part, the printability result, fit-check results,
@@ -149,6 +151,7 @@ side, not a golden update.
 |---|---|
 | build, check, export, render, golden | `uv run python scripts/build.py <project> [--update-golden]` |
 | render only | `uv run python scripts/render.py <project>` |
+| interactive HTML viewer only | `uv run python scripts/export_viewer.py <project>` |
 | printability only | `uv run python scripts/check_printable.py <project>` or `--stl file.stl` |
 | regenerate catalogue | `uv run python scripts/reindex.py` (`--check` to verify) |
 | impact of a component change | `uv run python scripts/impact.py <component-id> [--accept]` |
