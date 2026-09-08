@@ -483,7 +483,9 @@
       "returns": "Sketch",
       "docstring": "Example:\nplate = extrude(blob_outline(((0, 0, 30), (25, 10, 20), (-20, 15, 18)), smooth_r=6), amount=3)",
       "example": "plate = extrude(blob_outline(((0, 0, 30), (25, 10, 20), (-20, 15, 18)), smooth_r=6), amount=3)",
-      "used_by": [],
+      "used_by": [
+        "models/vape_pen_holder/model.py"
+      ],
       "import": "from lib.form.outline import blob_outline"
     },
     "form.cloud_outline": {
@@ -572,6 +574,87 @@
         "models/cloud_pi_holder/model.py"
       ],
       "import": "from lib.form.outline import cloud_outline"
+    },
+    "form.dome_cluster": {
+      "id": "form.dome_cluster",
+      "version": "1.0.0",
+      "summary": "Union of dome blobs (upper half-ellipsoids) at given (x, y, r), flat faces on a common plane: caterpillar and creature bodies, pebbles, cloud lobes, bumpy grips.",
+      "params": [
+        {
+          "name": "domes",
+          "type": "Sequence[tuple[float, float, float]]",
+          "units": "mm",
+          "default": [
+            [
+              0.0,
+              0.0,
+              12.0
+            ],
+            [
+              13.0,
+              0.0,
+              10.0
+            ],
+            [
+              24.0,
+              -2.0,
+              8.0
+            ],
+            [
+              32.0,
+              -6.0,
+              6.0
+            ]
+          ],
+          "description": "sequence of (x, y, r); neighbours must overlap to make one solid"
+        },
+        {
+          "name": "squash",
+          "type": "float",
+          "units": "ratio",
+          "default": 1.0,
+          "description": "Z scale per dome: 1.0 = hemisphere, >1 = taller egg, <1 = flat pebble"
+        },
+        {
+          "name": "base_z",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "plane the flat faces sit on; pass a value below a ground surface to half-bury them"
+        }
+      ],
+      "tags": [
+        "blob",
+        "bumps",
+        "caterpillar",
+        "creature",
+        "dome",
+        "form",
+        "organic",
+        "pebble",
+        "segments",
+        "toy"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat faces down on the bed (or on the body that carries them): an upper half-ellipsoid has no down-facing surface at all, so any squash >= 1 needs no support",
+        "notes": "UNVALIDATED. squash < 1 flattens the dome and starts to add a shallow overhang near the rim; keep it above ~0.7 unless the cluster is supported. Domes that only touch become separate solids \u2014 overlap them.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.blobs",
+      "qualname": "dome_cluster",
+      "file": "lib/form/blobs.py",
+      "line": 39,
+      "returns": "Part",
+      "docstring": "Overlapping domes as one solid, the way ``blob_outline`` overlaps circles in 2D.\n\nA dome of radius ``r`` rises ``r * squash`` above ``base_z``.  Sink the cluster into whatever\ncarries it (``base_z`` a few mm below the ground surface) rather than resting it on top: a blob\nthat merely shares a face with the plate under it fuses into a separate loose solid.\n\nExample:\n    body = ground + dome_cluster(((0, 0, 12), (13, 1, 10), (23, -4, 8)), squash=1.4, base_z=-3)",
+      "example": "body = ground + dome_cluster(((0, 0, 12), (13, 1, 10), (23, -4, 8)), squash=1.4, base_z=-3)",
+      "used_by": [
+        "models/vape_pen_holder/model.py"
+      ],
+      "import": "from lib.form.blobs import dome_cluster"
     },
     "form.drain_holes": {
       "id": "form.drain_holes",
@@ -818,7 +901,8 @@
       "docstring": "The profile's last point is the top rim radius; the top is closed flat.  ``shell_open_top``\nhollows it; ``flutes`` (with this solid as ``reference``) ribs the shell.\n\nExample:\n    solid = revolved_body(((30, 0), (34, 30), (26, 80), (30, 100)))\n    vase = flutes(shell_open_top(solid, wall=2.0), count=20, reference=solid)",
       "example": "solid = revolved_body(((30, 0), (34, 30), (26, 80), (30, 100)))\nvase = flutes(shell_open_top(solid, wall=2.0), count=20, reference=solid)",
       "used_by": [
-        "models/ribbed_vase/model.py"
+        "models/ribbed_vase/model.py",
+        "models/vape_pen_holder/model.py"
       ],
       "import": "from lib.form.revolved import revolved_body"
     },
@@ -2963,9 +3047,118 @@
       "example": "body = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
       "used_by": [
         "models/cloud_pi_holder/model.py",
-        "models/pi5_fan_case/model.py"
+        "models/pi5_fan_case/model.py",
+        "models/vape_pen_holder/model.py"
       ],
       "import": "from lib.primitives.feet import rubber_foot_recess"
+    },
+    "primitives.socket_array": {
+      "id": "primitives.socket_array",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me): row or grid of blind cylindrical sockets with chamfered lead-ins; socket rims at z=0, bores extend down.",
+      "params": [
+        {
+          "name": "bore_d",
+          "type": "float",
+          "units": "mm",
+          "default": 12.0,
+          "description": "nominal diameter of the object being held, before clearance"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "socket depth from the rim (z=0) down to the bore floor"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 1,
+          "description": "sockets along X"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 18.0,
+          "description": "centre-to-centre along X"
+        },
+        {
+          "name": "rows",
+          "type": "int",
+          "units": "count",
+          "default": 1,
+          "description": "socket rows along Y"
+        },
+        {
+          "name": "row_pitch",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "centre-to-centre along Y; default = pitch"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "added to the DIAMETER (0.6 = 0.3 per side, drops in one-handed; 0.3 = snug)"
+        },
+        {
+          "name": "lead_in",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "45 degree chamfer at the rim so the object finds the hole; 0 = sharp rim"
+        },
+        {
+          "name": "vent_d",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "coaxial hole through the bore floor for dust / pushing a stuck item out; 0 = blind"
+        },
+        {
+          "name": "vent_len",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "how far the vent runs below the bore floor (make it reach the underside)"
+        }
+      ],
+      "tags": [
+        "bore",
+        "cylindrical",
+        "holder",
+        "negative",
+        "pen",
+        "pocket",
+        "rack",
+        "socket",
+        "tool"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "bores vertical (axis along Z), rims up: the lead-in cone is a 45 deg overhang and each bore floor is an up-facing floor, so nothing needs support",
+        "notes": "UNVALIDATED: no test print yet. Clearance is added to the DIAMETER, not per side. Leave vent_d at 0 for anything that can leak \u2014 a vent under the pocket drips onto the desk.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.socket_array",
+      "qualname": "socket_array",
+      "file": "lib/primitives/socket_array.py",
+      "line": 12,
+      "returns": "Part",
+      "docstring": "Sockets on a ``count`` x ``rows`` grid centred on the origin, rims in the z=0 plane.\n\nSubtract from a body whose top face is at ``top_z``::\n\n    block = block - Pos(x, y, top_z) * socket_array(...)\n\nThe wall left between two sockets is ``pitch - bore_d - clearance``; keep it at 2 mm or more\n(5 perimeters at a 0.4 nozzle) for anything that gets pushed sideways.\n\nExample:\n    holder = block - Pos(0, 0, block_h) * socket_array(11.0, depth=22, count=2, pitch=26)",
+      "example": "holder = block - Pos(0, 0, block_h) * socket_array(11.0, depth=22, count=2, pitch=26)",
+      "used_by": [
+        "models/vape_pen_holder/model.py"
+      ],
+      "import": "from lib.primitives.socket_array import socket_array"
     },
     "primitives.teardrop": {
       "id": "primitives.teardrop",
@@ -3176,6 +3369,17 @@
         "form.flutes",
         "form.revolved_body",
         "form.shell_open_top"
+      ],
+      "golden": true
+    },
+    "vape_pen_holder": {
+      "path": "models/vape_pen_holder",
+      "components": [
+        "form.blob_outline",
+        "form.dome_cluster",
+        "form.revolved_body",
+        "primitives.rubber_foot_recess",
+        "primitives.socket_array"
       ],
       "golden": true
     }
