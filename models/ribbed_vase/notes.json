@@ -1,0 +1,22 @@
+{
+  "project": "ribbed_vase",
+  "artifact_url": "https://claude.ai/code/artifact/ed30b91c-6c6c-41cf-bb67-2308eaf3bf03",
+  "synced": "2026-09-08",
+  "notes": [
+    {
+      "id": "ix3af10kmhjq3hon31a1",
+      "build_id": "20260907-195428",
+      "created": "2026-09-07T23:59:15.054Z",
+      "kind": "critique",
+      "part": "",
+      "run": "ribbed_vase",
+      "status": "open",
+      "text": "The top over hang is a bit dramatic make it a little thinner",
+      "view": "custom",
+      "visible": [
+        "vase"
+      ],
+      "z": null
+    }
+  ]
+}

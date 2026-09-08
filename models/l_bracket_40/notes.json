@@ -1,7 +1,7 @@
 {
   "project": "l_bracket_40",
   "artifact_url": "https://claude.ai/code/artifact/1e6e052d-cddf-4e7e-bdf2-3009f4f504a1",
-  "synced": "2026-09-07",
+  "synced": "2026-09-08",
   "notes": [
     {
       "id": "zi69ukix7bnmqt934e8x",
@@ -10,6 +10,7 @@
       "part": "",
       "run": "l_bracket_40",
       "status": "resolved",
+      "synced": "2026-09-07",
       "text": "I want 4 holes per wall",
       "view": "custom",
       "visible": [
@@ -25,6 +26,7 @@
       "resolution": "HOLES_PER_ARM 3 -> 4 in params.py. Pitch is now 9 mm (holes at 8.5 / 17.5 / 26.5 / 35.5 mm from the outer corner), 5.4 mm web between holes, 4.5 mm from the first hole to the other arm (clears an M3 socket head). Volume 5.81 -> 5.72 cm3, still watertight, golden updated. Commit 89c9937.",
       "run": "l_bracket_40",
       "status": "resolved",
+      "synced": "2026-09-07",
       "text": "I want 4 holes per side",
       "view": "custom",
       "visible": [
