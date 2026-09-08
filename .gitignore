@@ -10,3 +10,6 @@ models/*/exports/
 /exports/
 ideas/*/exports/
 /.sync/
+
+.DS_Store
+**/.DS_Store
