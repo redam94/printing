@@ -1,10 +1,10 @@
 ---
 title: Countertop edge drip rail for an undermount sink
-status: idea
+status: sketching
 kind: part
 created: 2026-09-07
-updated: 2026-09-07
-tags: [kitchen, drying, sink, drainage, clip, petg]
+updated: 2026-09-08
+tags: [kitchen, drying, sink, drainage, clip, petg, parametric]
 hardware: []
 reuse: [primitives.foot, primitives.rubber_foot_recess]
 gaps: [primitives.edge_clip]
@@ -19,10 +19,17 @@ the counter surface stops at the basin opening and the sink is glued underneath.
 one place a part can grip.
 
 ## Concept
-A short C-profile clip that grips the countertop at the cutout, carrying a shallow channel. The
-channel runs from under the drying rack's downhill edge, crosses the counter edge, and turns down
-past the opening so drips fall into the basin instead of tracking back under the counter. 150-200
-mm long, printed channel-up (open channel on top, no supports, nothing enclosed).
+A short C-profile clip that grips the countertop at the cutout, carrying a shallow pan. The pan
+sits on the counter under the drying rack's downhill edge, its floor pitched toward the sink, and
+its floor ends flush with the outboard face of the jaw that hangs down the square cut face — so
+runoff leaves the pan 3 mm out over the opening and falls into the basin, never touching the
+counter again. The jaw ends in a return lip that tucks into the reveal under the counter.
+
+The section is a Z (pan above the counter, jaw below it), which normally means supports. It does
+not here: printed lying on the jaw's outboard face, that face and the pan floor's end face are
+coplanar by construction, giving a flat bed face of `RAIL_LEN x (COUNTER_T + LIP_T + FLOOR_T)`
+with the pan floor, end walls and return lip all standing up off it. The only downward-facing
+surface left is the rim ramp at the inland end, held at ~41 degrees by `RAMP_RATIO`.
 
 The clip's throat has to swallow a stone countertop, which is thick — that is the whole design
 question. The inner leg reaches under the counter and bears on the sink's own flange; a soft pad
@@ -34,11 +41,13 @@ instead of overhanging the edge itself if the counter run is too shallow.
 
 ## Constraints
 - PETG. Splash zone, and PLA creeps when a hot pan drains into it.
-- Channel floor pitched >= 2 degrees toward the basin, with a drip break (a sharp downward lip) at
-  the outfall so water separates instead of wicking back along the underside.
-- No enclosed volume anywhere: the channel is open along its whole length and washable.
-- Printed channel-up, bed contact on the outside of the channel floor. Under 200 x 60 x 60 mm.
+- Pan floor pitched >= 2 degrees toward the basin (sketch uses 3), with a V drip break cut into the
+  outboard face 2 mm below the counter surface so water separates instead of wicking back under.
+- No enclosed volume anywhere: the pan is open along its whole length and washable.
+- Printed lying on the jaw's outboard face (see Concept). Sketched at 180 x 47.5 x 58 mm.
 - Must not rely on adhesive or on drilling the counter.
+- Relief at both counter corners so the printed inside corners cannot hold the clip off the stone
+  (a printed 90-degree inside corner always carries a small radius; a square stone arris does not).
 
 ## Reuse map
 | need | component | notes |
@@ -47,10 +56,13 @@ instead of overhanging the edge itself if the counter run is too shallow.
 | pad seat | primitives.rubber_foot_recess | if using stick-on pads instead of printed TPU |
 
 ## Gaps
-`primitives.edge_clip` — a C-profile clip that grips a panel or counter edge: `thickness` (the
-edge it grips), `depth` (how far the jaws reach in), `jaw_t`, `throat_clearance`, `spring` (the
-inner jaw as a compliant beam so it preloads onto the edge), `pad_recess` (optional seat for a
-stick-on or printed pad). Returned standing on z=0 in its print orientation.
+`primitives.edge_clip` — a C-profile clip that grips a panel or counter edge. Parameters as the
+sketch settled them: `thickness` (the edge it grips; 30 default = 3 cm stone slab),
+`throat_clearance` (0.4, added to thickness so it slides onto a square edge), `jaw_t` (3.0),
+`under_reach` (how far the return lip tucks under; 0 degenerates to a plain saddle), `lip_t` (2.4),
+`corner_relief` (1.2 radius at both inside corners), `pad_recess` (optional seat for a stick-on or
+printed pad). Returned in print orientation, jaw outboard face on z=0, so whatever is grown off
+its top flange prints without supports.
 
 Library-shaped: this idea, the [[drain_tiles]] spout tile, and any future shelf hook, desk-edge
 mount or monitor-lip hanger are the same C-section with different `thickness` and payload. It is
@@ -58,10 +70,12 @@ also the parent of the rim saddle that a rim-mounted sink bridge would have need
 was set aside only because this sink is undermount, not because the geometry was wrong.
 
 ## Open questions
-- Countertop thickness at the cutout (stone is typically 20-32 mm, sometimes 38 with a built-up
-  edge) and whether the sink flange leaves room underneath for the inner jaw.
-- Is the cutout edge square, bullnosed or eased? A radius changes the jaw's inner profile.
-- How far the rack sits back from the edge — sets the channel length.
+- Countertop thickness at the cutout. Sketch assumes the standard 30 mm (3 cm stone slab);
+  `COUNTER_T` is the lead knob and 20 / 25 / 30 / 38 all build, clear the slab with zero
+  interference and fit the bed. Confirm the real number before printing.
+- The reveal: how much counter underside is exposed at the cutout before the sink flange starts.
+  That is what `UNDER_REACH` (4 mm) may occupy. Zero reveal means setting it to 0.
+- How far the rack sits back from the edge — sets `PAN_REACH` (55 mm) and `RAIL_LEN` (180 mm).
 - Does anything (a garbage-disposal air switch, a soap dispenser, the faucet base) occupy the
   stretch of edge this would sit on?
 
@@ -69,3 +83,19 @@ was set aside only because this sink is undermount, not because the geometry was
 - 2026-09-07 captured in a drying-rack ideation session; picked by the user alongside
   [[pot_fin_rack]] and [[drain_tiles]]. Ranked as the cheapest print and the enabler for the
   other two.
+- 2026-09-08 sketch round 1 (`uv run python scripts/sketch.py sink_edge_drip_rail`). Square edge
+  confirmed by the user; `COUNTER_T` parameterised, default 30. Decisions this round:
+  - The Z-section prints support-free lying on the jaw's outboard face, once the pan floor ends
+    flush with that face rather than projecting as a separate spout. That removed the spout
+    entirely: water leaves the pan 3 mm out over the opening and there is nothing to cantilever.
+  - Rim ramp instead of a vertical rim wall — a vertical rim becomes a horizontal ledge in the
+    print orientation. `RAMP_RATIO` 1.15 holds it at ~41 degrees.
+  - End plates must be the whole filled section outline, not just the pan cavity: a cavity that
+    only shares the floor edge with the rail fuses into two loose bodies.
+  - Checker: 180 x 47.5 x 58 mm, 69.9 cm3, watertight, one body, 6017 mm2 bed contact,
+    overhang 2.0 %, no problems. 0.4 % of the surface reads under 0.8 mm (the relief arcs and the
+    V-notch flanks) — worth a look when this becomes a model, harmless in the sketch.
+  - Verified across COUNTER_T 20 / 25 / 30 / 38: zero interference with a mock slab, Y grows
+    exactly with thickness, all fit the bed.
+  Next: measure the real counter and the reveal, then promote the section to
+  `primitives.edge_clip` and build the model against it.
