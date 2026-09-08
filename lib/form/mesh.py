@@ -18,6 +18,7 @@ import numpy as np
 
 from lib.component import MaterialNotes, component
 
+DEBRIS_MM3 = 0.1        # mm3, the same threshold lib.component.drop_debris uses on the B-rep side
 MESH_TOLERANCE = 0.01
 MESH_ANGULAR_TOLERANCE = 0.1
 
@@ -39,12 +40,33 @@ def to_mesh(shape, tolerance: float = MESH_TOLERANCE, angular_tolerance: float =
     v = np.array([[p.X, p.Y, p.Z] for p in verts], dtype=float)
     f = np.array(tris, dtype=np.int64).reshape(-1, 3)
     m = trimesh.Trimesh(vertices=v, faces=f, process=True)
+    m = _without_debris(m)
     if not m.is_watertight:
         trimesh.repair.fill_holes(m)
         m.merge_vertices()
     if not m.is_winding_consistent:
         trimesh.repair.fix_normals(m)
     return m
+
+
+def _without_debris(mesh, max_volume: float = DEBRIS_MM3):
+    """Drop closed shells with no volume in them.
+
+    Tessellating a spot where two curved surfaces meet almost tangentially — a ball set into the
+    side of a bored, fluted body of revolution, say — leaves a four-triangle shell collapsed onto a
+    single point.  It has no volume, it cannot print, and it is invisible; the only thing it does is
+    report the part as three bodies.  Anything a printer could lay down is orders of magnitude above
+    the threshold and survives, so a genuinely loose piece still shows up in the build report.
+    """
+    import trimesh
+
+    parts = mesh.split(only_watertight=False)
+    if len(parts) < 2:
+        return mesh
+    keep = [p for p in parts if abs(p.volume) >= max_volume]
+    if len(keep) == len(parts) or not keep:
+        return mesh
+    return trimesh.util.concatenate(keep) if len(keep) > 1 else keep[0]
 
 
 def _manifold(mesh):
@@ -143,11 +165,12 @@ def exterior_mask(mesh, normals: np.ndarray, probe: float = 0.05) -> np.ndarray:
 
 
 @component(
-    id="form.textured", version="1.0.0",
+    id="form.textured", version="1.1.0",
     summary="Displace a shape's outer surface with Perlin noise or horizontal ripples and return a mesh (organic skin, hammered / wavy look).",
     tags=["texture", "noise", "perlin", "ripple", "displacement", "mesh", "organic", "skin", "form"],
     units={"shape": "-", "amplitude": "mm", "scale": "mm", "kind": "enum", "mask": "enum", "seed": "count",
-           "edge_length": "mm", "bed_margin": "mm", "octaves": "count"},
+           "edge_length": "mm", "bed_margin": "mm", "octaves": "count", "tolerance": "mm",
+           "angular_tolerance": "ratio"},
     descriptions={
         "shape": "Part or mesh to texture; None = default hollow revolved_body", "amplitude": "peak displacement along the normal",
         "scale": "feature size (noise wavelength / ripple pitch)", "kind": "noise | ripple",
@@ -158,7 +181,8 @@ def exterior_mask(mesh, normals: np.ndarray, probe: float = 0.05) -> np.ndarray:
     material_notes=_NOTES,
 )
 def textured(shape=None, amplitude: float = 0.4, scale: float = 8.0, kind: str = "noise", mask: str = "exterior",
-             seed: int = 0, edge_length: float = 1.0, bed_margin: float = 0.6, octaves: int = 2) -> "Trimesh":
+             seed: int = 0, edge_length: float = 1.0, bed_margin: float = 0.6, octaves: int = 2,
+             tolerance: float = MESH_TOLERANCE, angular_tolerance: float = MESH_ANGULAR_TOLERANCE) -> "Trimesh":
     """Refines the mesh to ``edge_length`` with manifold3d, then warps vertices along their normals
     (horizontally only, unless ``mask="all"``, so no height changes).  The bed face and everything
     below ``bed_margin`` stay put; ``exterior`` mask also keeps inner walls, bosses and holes exact so
@@ -168,7 +192,7 @@ def textured(shape=None, amplitude: float = 0.4, scale: float = 8.0, kind: str =
         tray = textured(tray_part, amplitude=0.35, scale=6, mask="exterior")
     """
     src = _default_shape() if shape is None else shape
-    base = to_mesh(src)
+    base = to_mesh(src, tolerance, angular_tolerance)
     m = _manifold(base).refine_to_length(edge_length)
     mesh = _from_manifold(m)
     mesh.merge_vertices()

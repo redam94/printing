@@ -8,28 +8,28 @@
   "parts": {
     "holder": {
       "bbox_min": [
-        -63.0,
-        -36.0,
-        0.0
+        -35.956,
+        -39.104,
+        -0.0
       ],
       "bbox_max": [
-        51.0,
-        37.0,
-        48.0
+        60.337,
+        45.431,
+        54.188
       ],
       "bbox_size": [
-        114.0,
-        73.0,
-        48.0
+        96.293,
+        84.535,
+        54.188
       ],
-      "volume": 83456.793,
-      "surface_area": 27261.496,
+      "volume": 96288.343,
+      "surface_area": 32089.528,
       "solids": 1,
       "valid": true,
       "watertight": true,
-      "mesh_hash": "d2402d4ce251c3e4",
-      "triangles": 98160,
-      "kind": "brep"
+      "mesh_hash": "7b8236588a926ac1",
+      "triangles": 388832,
+      "kind": "mesh"
     }
   }
 }

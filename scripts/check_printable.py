@@ -13,6 +13,17 @@ Checks per part:
   * overhang area: down-facing surfaces steeper than 45 deg that are not the
     bed face, plus flat horizontal ceilings (bridges) above the bed
   * footprint: which face is on the bed (z = min) and its area
+  * openwork mode (``PRINT_MODES = {"part": "openwork"}``, or --openwork): the part
+    is a lattice / perforated shell, and the inward-ray wall metric cannot measure
+    one.  Sampling is by AREA, and in a perforated wall most of the surface is the
+    inside of the holes, so a large fraction of samples sit within a nozzle width
+    of a hole rim and read as thin walls that are not there.  Measured: a plain
+    2.4 mm tube reads 0.00% under 0.8 mm; pierce it with a Voronoi lattice and the
+    SAME 2.4 mm wall reads 21%, while a morphological opening — the honest measure,
+    "material a 0.8 mm ball cannot reach" — puts it at 6% of volume against a 0.66%
+    baseline for the unpierced tube.  So in this mode wall thickness is reported and
+    warned on but does not gate; everything else (watertight, bodies, overhangs,
+    ceilings) gates as normal, and ``--opening`` runs the slow honest measure.
   * vase mode (``PRINT_MODES = {"part": "vase"}`` in the model, or --vase): the
     slicer prints ONE continuous outer perimeter per layer, so the checks become
     "exactly one outer contour per layer above the floor" (islands / handles
@@ -20,7 +31,8 @@ Checks per part:
     further) are problems not warnings, and flat ceilings above the floor are
     problems (nothing bridges them); wall thickness is informational only.
 
-Exit code 1 if any part is not watertight or has walls thinner than 2 x nozzle.
+Exit code 1 if any part is not watertight or has walls thinner than 2 x nozzle
+(openwork and vase parts excepted, see above).
 """
 from __future__ import annotations
 
@@ -38,6 +50,7 @@ SAMPLES = 4000
 VASE_LAYER_STEP = 1.0         # mm between checked layers
 VASE_FLOOR = 2.0              # mm of solid bottom layers the slicer prints before spiralising
 EXIT_PARALLEL_COS = -0.5      # exit face normal within 60 deg of anti-parallel to the entry normal
+OPENING_PITCH = 0.25          # mm, voxel pitch for the --opening measure; 0.25 resolves a 0.4 mm ball
 
 
 def wall_thickness_samples(mesh, samples: int = SAMPLES, seed: int = 0):
@@ -61,6 +74,27 @@ def wall_thickness_samples(mesh, samples: int = SAMPLES, seed: int = 0):
     parallel = (n[ray_idx] * n_exit).sum(axis=1) < EXIT_PARALLEL_COS
     th = th[parallel & np.isfinite(th) & (th > 1e-6)]
     return th
+
+
+def opening_thin_fraction(mesh, nozzle: float = 0.4, pitch: float = OPENING_PITCH) -> float:
+    """Fraction of VOLUME a ball of radius ``nozzle`` cannot reach: morphological opening.
+
+    The honest thin-material measure, and the one to reach for when the inward-ray sampler and your
+    eyes disagree on a perforated part.  It is slow (voxelising a 100 mm part takes ~30 s), which is
+    why it is opt-in rather than part of every build.  Expect a per-cent or so on ANY part: the
+    surface layer of voxels around every edge, chamfer and fillet is lost to the opening too, so
+    read it against the same part without the feature you are suspicious of, not against zero.
+    """
+    import numpy as np
+    from scipy import ndimage
+
+    grid = mesh.voxelized(pitch=pitch).fill().matrix
+    r = max(1, int(round(nozzle / pitch)))
+    zz, yy, xx = np.ogrid[-r:r + 1, -r:r + 1, -r:r + 1]
+    ball = (zz * zz + yy * yy + xx * xx) <= r * r
+    opened = ndimage.binary_dilation(ndimage.binary_erosion(grid, structure=ball), structure=ball)
+    total = int(grid.sum())
+    return float(total - int((grid & opened).sum())) / total if total else 0.0
 
 
 def vase_layers(mesh, step: float = VASE_LAYER_STEP, floor: float = VASE_FLOOR) -> dict:
@@ -92,8 +126,8 @@ def vase_layers(mesh, step: float = VASE_LAYER_STEP, floor: float = VASE_FLOOR) 
 def check_mesh(mesh, nozzle: float = 0.4, samples: int = SAMPLES, mode: str = "normal") -> dict:
     import numpy as np
 
-    vase = mode == "vase"
-    rep: dict = {"print_mode": "vase" if vase else "normal"}
+    vase, openwork = mode == "vase", mode == "openwork"
+    rep: dict = {"print_mode": mode if mode in ("vase", "openwork") else "normal"}
     rep["watertight"] = bool(mesh.is_watertight)
     rep["winding_consistent"] = bool(mesh.is_winding_consistent)
     rep["volume_mm3"] = round(float(mesh.volume), 2)
@@ -159,9 +193,13 @@ def check_mesh(mesh, nozzle: float = 0.4, samples: int = SAMPLES, mode: str = "n
             warnings.append(f"single wall: {rep['wall_below_2x_nozzle_pct']}% of surface < {2*nozzle:.1f} mm (fine in spiral mode, "
                             "the slicer extrudes one line regardless; not printable as a normal shell)")
     else:
-        if rep.get("wall_min_mm") is not None and rep["wall_below_2x_nozzle_pct"] > 0.5:
+        if openwork and rep.get("wall_min_mm") is not None and rep["wall_below_2x_nozzle_pct"] > 0.5:
+            warnings.append(f"openwork: {rep['wall_below_2x_nozzle_pct']}% of surface < {2*nozzle:.1f} mm by the inward-ray metric, "
+                            "which counts every hole rim — informational here, not a verdict. Size the webs at the "
+                            "INNERMOST radius they reach and confirm with --opening if in doubt")
+        elif rep.get("wall_min_mm") is not None and rep["wall_below_2x_nozzle_pct"] > 0.5:
             problems.append(f"{rep['wall_below_2x_nozzle_pct']}% of surface has walls < {2*nozzle:.1f} mm (min {rep['wall_min_mm']} mm)")
-        elif rep.get("wall_min_mm") is not None and rep["wall_below_3x_nozzle_pct"] > 5:
+        elif not openwork and rep.get("wall_min_mm") is not None and rep["wall_below_3x_nozzle_pct"] > 5:
             warnings.append(f"{rep['wall_below_3x_nozzle_pct']}% of surface has walls < {3*nozzle:.1f} mm — fine for lids/webs, weak for load paths")
         if rep["overhang_pct_of_surface"] > 2:
             warnings.append(f"{rep['overhang_area_mm2']} mm² of >45° overhang not on the bed — needs support or reorientation "
@@ -175,12 +213,14 @@ def check_mesh(mesh, nozzle: float = 0.4, samples: int = SAMPLES, mode: str = "n
 
 
 def format_report(name: str, rep: dict) -> str:
-    tag = "  [vase mode]" if rep.get("print_mode") == "vase" else ""
+    tag = {"vase": "  [vase mode]", "openwork": "  [openwork]"}.get(rep.get("print_mode"), "")
     lines = [f"[{ 'OK' if rep['ok'] else 'FAIL'}] {name}: {rep['bbox_mm'][0]} x {rep['bbox_mm'][1]} x {rep['bbox_mm'][2]} mm, "
              f"{rep['volume_mm3']/1000:.1f} cm³, watertight={rep['watertight']}, bodies={rep['bodies']}{tag}"]
     if rep.get("wall_min_mm") is not None:
         lines.append(f"      walls: min {rep['wall_min_mm']} mm, 5th pct {rep['wall_p05_mm']} mm, "
                      f"<0.8: {rep['wall_below_2x_nozzle_pct']}%, <1.2: {rep['wall_below_3x_nozzle_pct']}%")
+    if rep.get("opening_thin_pct") is not None:
+        lines.append(f"      opening: {rep['opening_thin_pct']}% of volume a {rep['opening_ball_mm']} mm ball cannot reach")
     deg = OVERHANG_DEG_VASE if rep.get("print_mode") == "vase" else OVERHANG_DEG
     lines.append(f"      bed contact {rep['bed_contact_area_mm2']} mm², overhang>{deg:.0f}° {rep['overhang_area_mm2']} mm² "
                  f"({rep['overhang_pct_of_surface']}%), flat ceilings {rep['bridge_ceiling_area_mm2']} mm²")
@@ -194,10 +234,19 @@ def format_report(name: str, rep: dict) -> str:
     return "\n".join(lines)
 
 
-def check_project(project: str, nozzle: float = 0.4, parts: dict | None = None) -> dict[str, dict]:
+def check_project(project: str, nozzle: float = 0.4, parts: dict | None = None,
+                  opening: bool = False) -> dict[str, dict]:
     parts = parts or build_parts(project)
     modes = print_modes(project)
-    return {name: check_mesh(to_trimesh(shape), nozzle, mode=modes.get(name, "normal")) for name, shape in parts.items()}
+    out = {}
+    for name, shape in parts.items():
+        mesh = to_trimesh(shape)
+        rep = check_mesh(mesh, nozzle, mode=modes.get(name, "normal"))
+        if opening:
+            rep["opening_thin_pct"] = round(100.0 * opening_thin_fraction(mesh, nozzle), 2)
+            rep["opening_ball_mm"] = 2 * nozzle
+        out[name] = rep
+    return out
 
 
 def main() -> int:
@@ -207,12 +256,21 @@ def main() -> int:
     ap.add_argument("--nozzle", type=float, default=0.4)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--vase", action="store_true", help="check a --stl as a spiral / vase-mode print")
+    ap.add_argument("--openwork", action="store_true", help="check a --stl as a lattice / perforated part")
+    ap.add_argument("--opening", action="store_true",
+                    help="also run the morphological opening measure (slow, ~30 s per part; the honest "
+                         "thin-material number when the ray metric and your eyes disagree)")
     a = ap.parse_args()
     if a.stl:
         import trimesh
-        reports = {a.stl.stem: check_mesh(trimesh.load(a.stl, force="mesh"), a.nozzle, mode="vase" if a.vase else "normal")}
+        mesh = trimesh.load(a.stl, force="mesh")
+        rep = check_mesh(mesh, a.nozzle, mode="vase" if a.vase else "openwork" if a.openwork else "normal")
+        if a.opening:
+            rep["opening_thin_pct"] = round(100.0 * opening_thin_fraction(mesh, a.nozzle), 2)
+            rep["opening_ball_mm"] = 2 * a.nozzle
+        reports = {a.stl.stem: rep}
     elif a.project:
-        reports = check_project(a.project, a.nozzle)
+        reports = check_project(a.project, a.nozzle, opening=a.opening)
     else:
         ap.error("give a project or --stl")
     if a.json:

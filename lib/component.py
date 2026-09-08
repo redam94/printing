@@ -219,6 +219,35 @@ def locations_of(sketch) -> list:
     return [Location(f.center()) for f in sketch.faces()]
 
 
+DEBRIS_MM3 = 0.1        # mm3, below the resolution of any FDM printer: a 0.5 x 0.2 x 3 mm needle
+
+
+def drop_debris(shape, max_volume: float = DEBRIS_MM3):
+    """Discard detached solids smaller than ``max_volume`` and keep everything else.
+
+    Cutting an openwork pattern into a spline surface of revolution reliably leaves OCC a needle or
+    two of uncut skin — a few hundredths of a mm3, well under one extrusion, at a spot that does not
+    move when you change the cell size, the corner radius or the roof angle.  They are boolean
+    debris, and the only thing they do downstream is report the part as two bodies.
+
+    The threshold is deliberately tiny: anything a printer could actually lay down survives this and
+    still shows up in the build report as a separate body, which is what you want to see when a
+    pattern really has isolated a piece of a wall.
+    """
+    from build123d import Part
+
+    solids = shape.solids()
+    if len(solids) < 2:
+        return shape
+    keep = [s for s in solids if s.volume >= max_volume]
+    if len(keep) == len(solids):
+        return shape
+    out = Part()
+    for s in keep:
+        out += s
+    return out
+
+
 def on_bed(shape):
     """Translate a shape so its lowest point sits on z=0 (the print bed).
 

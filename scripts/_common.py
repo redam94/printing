@@ -11,7 +11,9 @@ their golden volume tolerance is looser.  ``params.py`` beside it holds every
 dimension.  Exports land in ``models/<project>/exports/``.
 
 Optionally ``PRINT_MODES = {"<part>": "vase"}`` declares parts that print in
-spiral / vase mode; the printability check then enforces the single-wall rules
+spiral / vase mode (or ``"openwork"`` for a lattice, where the inward-ray wall
+metric measures hole rims rather than walls and so stops gating);
+the printability check then enforces the single-wall rules
 (one contour per layer, no unsupportable overhangs) instead of wall thickness.
 
 Optionally ``fit_checks(parts) -> dict[str, tuple[Shape, Shape]]`` returns
@@ -67,7 +69,7 @@ def build_parts(project: str) -> dict:
 
 
 def print_modes(project: str) -> dict[str, str]:
-    """``PRINT_MODES`` from the model module: {part name: "vase" | "normal"}; missing = normal."""
+    """``PRINT_MODES`` from the model: {part: "vase" | "openwork" | "normal"}; missing = normal."""
     mod = load_model(project)
     modes = getattr(mod, "PRINT_MODES", {}) or {}
     return {k: str(v) for k, v in modes.items()}

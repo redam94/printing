@@ -11,6 +11,8 @@ dependencies = [
     "pytest",
     "matplotlib>=3.10.9",
     "manifold3d>=3.5.2",
+    "scipy",        # Voronoi diagrams (lib.form.lattice) and the morphological opening check
+    "shapely",      # 2D cell webbing / roofing / seam clipping (lib.form.lattice)
 ]
 
 [tool.pytest.ini_options]

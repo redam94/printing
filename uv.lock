@@ -1638,6 +1638,10 @@ dependencies = [
     { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "ocp-vscode" },
     { name = "pytest" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "shapely" },
     { name = "trimesh", extra = ["easy"] },
 ]
 
@@ -1649,6 +1653,8 @@ requires-dist = [
     { name = "numpy" },
     { name = "ocp-vscode" },
     { name = "pytest" },
+    { name = "scipy" },
+    { name = "shapely" },
     { name = "trimesh", extras = ["easy"], specifier = ">=4.0" },
 ]
 
