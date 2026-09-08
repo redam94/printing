@@ -1,0 +1,380 @@
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8; --line-2:#E8EBE6;
+  --accent:#E8791D; --accent-ink:#FFFFFF; --accent-soft:#FBE9DA; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F; --focus:#2F6FE8;
+  --photo:#E6E4DE; --drop:#FDF4EC;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35; --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --photo:#0F1215; --drop:#2A2118;
+}}
+:root[data-theme="dark"]{ --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35; --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --photo:#0F1215; --drop:#2A2118; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.45;min-height:100vh}
+a{color:var(--focus)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+header.top{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+.top .row1{display:flex;align-items:baseline;gap:16px;padding:12px 20px 10px;flex-wrap:wrap}
+.top h1{font-size:16px;font-weight:600;margin:0;letter-spacing:.01em}
+.top .git{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.top .git b{color:var(--ink);font-weight:500}
+.top .store{margin-left:auto;font-size:12px;color:var(--muted)}
+.top .store .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warn);margin-right:6px;vertical-align:middle}
+.top .store.db .dot{background:var(--ok)}
+main{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:24px;padding:18px 20px 60px;max-width:1500px;align-items:start}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:600}
+h3{font-size:14px;margin:0;font-weight:600}
+.muted{color:var(--muted)} .mono{font-family:var(--mono);font-size:12.5px}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);background:var(--panel-2);white-space:nowrap;vertical-align:middle}
+.chip.ok{color:var(--ok);border-color:var(--ok)} .chip.bad{color:var(--bad);border-color:var(--bad)} .chip.warn{color:var(--warn);border-color:var(--warn)} .chip.acc{color:var(--accent);border-color:var(--accent)}
+.tag{display:inline-block;font-size:11px;padding:0 7px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line-2);color:var(--muted)}
+.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:5px 10px;font:inherit;cursor:pointer}
+.btn:hover{border-color:var(--muted)} .btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:2px 8px;font-size:12px}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 8px;width:100%}
+textarea{min-height:54px;resize:vertical}
+label.f{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 0 4px}
+/* composer */
+.composer{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;position:sticky;top:64px}
+@media (max-width:900px){.composer{position:static}}
+.composer p.lead{margin:0 0 10px;color:var(--muted)}
+.drop{margin-top:12px;border:1.5px dashed var(--line);border-radius:6px;padding:18px 12px;text-align:center;color:var(--muted);background:var(--panel-2);cursor:pointer}
+.drop.over{border-color:var(--accent);background:var(--drop);color:var(--ink)}
+.drop input{display:none}
+.drop b{color:var(--ink);font-weight:500}
+.staged{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.st{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:start;padding:8px;border:1px solid var(--line-2);border-radius:6px;background:var(--panel-2)}
+.st img{width:88px;height:88px;object-fit:cover;border-radius:4px;background:var(--photo);display:block}
+.st .meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px;display:flex;justify-content:space-between;gap:6px}
+.st textarea{min-height:46px}
+.row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.row .grow{flex:1}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+.note.bad{color:var(--bad)}
+/* board */
+.group{margin-bottom:22px}
+.group .gh{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.group .gh .k{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.card .ph{background:var(--photo);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:contain;display:block}
+.card .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card .cap{font-weight:500}
+.card .subj{color:var(--muted)}
+.card .st-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.card .feats{margin:0;padding-left:16px;color:var(--ink)}
+.card .feats li{margin:1px 0}
+.card details{font-size:12.5px}
+.card details summary{cursor:pointer;color:var(--muted)}
+.card .brief p{margin:4px 0}
+.card .acts{display:flex;gap:6px;margin-top:auto;padding-top:6px;flex-wrap:wrap}
+.card .path{font-family:var(--mono);font-size:11px;color:var(--muted);word-break:break-all}
+.card.busy .ph{position:relative}
+.card.busy .ph::after{content:"reading…";position:absolute;inset:auto 8px 8px auto;background:var(--accent);color:var(--accent-ink);font-size:11px;padding:2px 8px;border-radius:4px}
+.empty{padding:24px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);text-align:center}
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion:no-preference){.card.busy .ph::after{animation:pulse 1.2s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.55}}
+</style>
+
+<header class="top">
+  <div class="row1">
+    <h1>Inspiration</h1>
+    <span class="git">repo <b id="repo"></b> · <span id="git"></span> · <span id="gen"></span></span>
+    <span class="store" id="store"><span class="dot"></span><span id="storeMsg">connecting…</span></span>
+  </div>
+</header>
+
+<main>
+  <section class="composer" aria-labelledby="add-h">
+    <h2 id="add-h">Attach photos</h2>
+    <p class="lead">Reference shots for the look of a part: a vase you liked, a lamp base, a texture. Each photo is read by a small model into a design brief the studio works from.</p>
+    <label class="f" for="target">Attach to</label>
+    <select id="target"></select>
+    <div id="newWrap" hidden>
+      <label class="f" for="newTitle">New idea title</label>
+      <input type="text" id="newTitle" placeholder="e.g. Ribbed desk vase" maxlength="80">
+    </div>
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="choose or drop photos">
+      <input type="file" id="file" accept="image/*" multiple>
+      <b>Choose photos</b> or drop them here<br><span class="mono" id="sizeNote"></span>
+    </div>
+    <div class="staged" id="staged"></div>
+    <div class="row">
+      <label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="interp" checked> read each photo now (quick model)</label>
+      <span class="grow"></span>
+      <button class="btn primary" id="addBtn" disabled>Add to board</button>
+    </div>
+    <div class="note" id="note"></div>
+  </section>
+
+  <section aria-labelledby="board-h">
+    <h2 id="board-h">Board <span class="muted" id="counts"></span></h2>
+    <div id="board"></div>
+  </section>
+</main>
+
+<script>
+const D = __DATA__;
+const PROMPT = __PROMPT__;
+const COLL = 'inspiration';
+const LS_KEY = 'inspiration:local';
+const B64_BUDGET = Math.floor(D.max_bytes * 4 / 3) + 4000;   // stored data URI must stay well under the 256 KiB doc cap
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+$('repo').textContent = D.repo;
+$('git').textContent = 'HEAD ' + (D.git.hash || '?') + (D.git.dirty ? ' (dirty)' : '');
+$('gen').textContent = 'generated ' + D.generated;
+$('sizeNote').textContent = 'stored at ≤' + D.max_px + ' px · ≤' + Math.round(D.max_bytes / 1024) + ' kB each';
+
+// ---------- targets ----------
+const sel = $('target');
+function fillTargets(){
+  let h = '<optgroup label="Models">' + D.models.map(m => `<option value="model:${esc(m.project)}" title="${esc(m.summary)}">${esc(m.project)}</option>`).join('') + '</optgroup>';
+  h += '<optgroup label="Ideas">' + D.ideas.map(i => `<option value="idea:${esc(i.slug)}">${esc(i.title)} · ${esc(i.status)}</option>`).join('') + '</optgroup>';
+  h += '<option value="new:">New idea…</option>';
+  sel.innerHTML = h;
+  try { const last = localStorage.getItem('inspiration:target'); if (last && [...sel.options].some(o => o.value === last)) sel.value = last; } catch (e) {}
+  onTarget();
+}
+function onTarget(){ $('newWrap').hidden = !sel.value.startsWith('new:'); try { localStorage.setItem('inspiration:target', sel.value); } catch (e) {} updateAdd(); }
+sel.addEventListener('change', onTarget);
+$('newTitle').addEventListener('input', updateAdd);
+function currentTarget(){
+  const [kind, slug] = sel.value.split(':');
+  return { target_kind: kind, target: slug || '', title: kind === 'new' ? $('newTitle').value.trim() : '' };
+}
+function targetLabel(kind, slug, title){
+  if (kind === 'model') return 'models/' + slug;
+  if (kind === 'idea') { const i = D.ideas.find(x => x.slug === slug); return 'ideas/' + slug + (i ? ' · ' + i.title : ''); }
+  return 'new idea · ' + (title || '(untitled)');
+}
+
+// ---------- staging + downscale ----------
+let staged = [];   // {name, blob, dataUrl, w, h, caption}
+async function shrinkFile(file){
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (e) { bmp = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(file); }); }
+  const W = bmp.width || bmp.naturalWidth, H = bmp.height || bmp.naturalHeight;
+  let side = D.max_px, q = 0.85, blob, w, h;
+  for (let i = 0; i < 12; i++) {
+    const s = Math.min(1, side / Math.max(W, H));
+    w = Math.max(1, Math.round(W * s)); h = Math.max(1, Math.round(H * s));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(bmp, 0, 0, w, h);
+    blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+    if (blob && blob.size <= D.max_bytes) break;
+    if (q > 0.6) q -= 0.1; else side = Math.round(side * 0.8);
+  }
+  const dataUrl = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
+  return { blob, dataUrl, w, h };
+}
+async function stageFiles(files){
+  const list = [...files].filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic)$/i.test(f.name));
+  if (!list.length) { setNote('No image files in that selection.', true); return; }
+  setNote('Preparing ' + list.length + ' photo' + (list.length > 1 ? 's' : '') + '…');
+  for (const f of list) {
+    try { const r = await shrinkFile(f); staged.push({ name: f.name, caption: '', ...r }); }
+    catch (e) { setNote('Could not read ' + f.name + ' (' + (e && e.message || 'decode failed') + '). HEIC from an iPhone: export as JPEG first.', true); }
+  }
+  renderStaged(); if (staged.length) setNote('');
+}
+function renderStaged(){
+  $('staged').innerHTML = staged.map((s, i) => `<div class="st"><img src="${s.dataUrl}" alt="${esc(s.name)}">
+    <div><textarea data-cap="${i}" placeholder="What you like about it (optional): the ribs, the taper, the way the lid sits…">${esc(s.caption)}</textarea>
+    <div class="meta"><span>${s.w}×${s.h} · ${Math.round(s.blob.size / 1024)} kB</span><button class="btn small" data-rm="${i}" aria-label="remove ${esc(s.name)}">remove</button></div></div></div>`).join('');
+  $('staged').querySelectorAll('[data-cap]').forEach(t => t.addEventListener('input', () => { staged[+t.dataset.cap].caption = t.value; }));
+  $('staged').querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { staged.splice(+b.dataset.rm, 1); renderStaged(); }));
+  updateAdd();
+}
+function updateAdd(){
+  const t = currentTarget();
+  $('addBtn').disabled = !staged.length || (t.target_kind === 'new' && !t.title);
+  $('addBtn').textContent = staged.length ? `Add ${staged.length} to board` : 'Add to board';
+}
+function setNote(msg, bad){ const n = $('note'); n.textContent = msg; n.className = 'note' + (bad ? ' bad' : ''); }
+const drop = $('drop');
+drop.addEventListener('click', () => $('file').click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } });
+$('file').addEventListener('change', e => { stageFiles(e.target.files); e.target.value = ''; });
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => stageFiles(e.dataTransfer.files));
+document.addEventListener('paste', e => { const fs = [...(e.clipboardData && e.clipboardData.files || [])]; if (fs.length) stageFiles(fs); });
+
+// ---------- store: shared db, or this browser ----------
+let docs = [];            // db documents (or local)
+let col = null;           // db collection ref
+let sample = null;        // sample fn, or null
+let sampleImages = false;
+let storeKind = 'local';
+function localLoad(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch (e) { return []; } }
+function localSave(){ try { localStorage.setItem(LS_KEY, JSON.stringify(docs)); } catch (e) { setNote('This browser refused to store the photo (storage full or blocked).', true); } }
+function setStore(kind, msg){ storeKind = kind; $('store').className = 'store ' + kind; $('storeMsg').textContent = msg; }
+
+async function connect(){
+  docs = localLoad(); renderBoard();
+  setStore('local', 'photos saved in this browser only');
+  if (!(window.claude && window.claude.use)) return;
+  try {
+    const db = await window.claude.use('db');
+    if (db) {
+      col = db.collection(COLL);
+      col.orderBy('created', 'desc').onSnapshot(
+        snap => { docs = snap.docs.map(d => Object.assign({ id: d.id }, d.data())); renderBoard(); },
+        err => setStore('local', 'shared board unavailable (' + (err && err.code || 'error') + '), using this browser'));
+      setStore('db', 'shared board · Claude files it into the repo');
+    }
+  } catch (e) { setStore('local', 'shared board unavailable, using this browser'); }
+  try {
+    const s = await window.claude.use('sample');
+    if (s) {
+      const caps = await s.limits().catch(() => null);
+      sampleImages = !!(caps && caps.images);
+      sample = sampleImages ? s : null;
+    }
+  } catch (e) { sample = null; }
+  if (!sample) { $('interp').checked = false; $('interp').disabled = true; $('interp').parentElement.title = 'This viewer cannot send photos to Claude; briefs will be written when the repo syncs.'; }
+  renderBoard();
+}
+
+async function addDoc(doc){
+  doc = Object.assign({ status: 'inbox', created: new Date().toISOString(), source: 'inspiration page', brief: null, brief_model: null }, doc);
+  if (col) {
+    try { const ref = await col.add(doc); return ref.id; }
+    catch (e) {
+      const why = e && e.code === 'invalid_argument' ? 'photo too large for the shared board' : e && e.code === 'quota_exceeded' ? 'shared board is full' : 'write failed (' + (e && e.code || 'error') + ')';
+      setNote(why + ' — saved in this browser instead.', true);
+    }
+  }
+  doc.id = 'l' + Date.now() + Math.random().toString(36).slice(2, 6);
+  docs.unshift(doc); localSave(); renderBoard();
+  return doc.id;
+}
+async function patchDoc(id, patch){
+  if (col && !id.startsWith('l')) { try { await col.doc(id).update(patch); return; } catch (e) { setNote('update failed (' + (e && e.code || 'error') + ')', true); return; } }
+  const d = docs.find(x => x.id === id); if (d) { Object.assign(d, patch); localSave(); renderBoard(); }
+}
+async function deleteDoc(id){
+  if (col && !id.startsWith('l')) { try { await col.doc(id).delete(); return; } catch (e) { setNote('delete failed (' + (e && e.code || 'error') + ')', true); return; } }
+  docs = docs.filter(x => x.id !== id); localSave(); renderBoard();
+}
+
+// ---------- interpretation (quick tier, on the viewer's account) ----------
+const busy = new Set();
+const SAMPLE_COPY = {
+  not_granted: 'You declined the Claude call for this page; the brief will be written when the repo syncs.',
+  rate_limited: 'Too many reads at once — try again in a minute.',
+  invalid_json: 'The model did not answer in the expected shape; try "read now" again.',
+  images_unavailable: 'This viewer cannot send photos to Claude.',
+  image_rejected: 'That photo was rejected (format or size).',
+  prompt_too_large: 'Caption too long for one call.',
+};
+async function interpret(id, blob, caption){
+  if (!sample || busy.has(id)) return;
+  busy.add(id); renderBoard();
+  const input = PROMPT + (caption ? '\n\nUploader caption: ' + caption.slice(0, 2000) : '');
+  try {
+    const brief = await sample.json(input, { images: blob, modelTier: 'quick' });
+    if (!brief || typeof brief !== 'object' || !(brief.subject || brief.form || brief.features)) throw { code: 'invalid_json' };
+    await patchDoc(id, { brief, brief_model: 'page quick tier' });
+    setNote('');
+  } catch (e) {
+    const code = e && e.code || 'error';
+    if (code === 'not_granted') { sample = null; $('interp').checked = false; $('interp').disabled = true; }
+    setNote(SAMPLE_COPY[code] || ('Could not read the photo (' + code + ').'), true);
+  } finally { busy.delete(id); renderBoard(); }
+}
+async function blobFromDataUrl(u){ return (await fetch(u)).blob(); }
+
+$('addBtn').addEventListener('click', async () => {
+  const t = currentTarget();
+  if (!staged.length) return;
+  $('addBtn').disabled = true;
+  const items = staged.slice(); staged = []; renderStaged();
+  const readNow = $('interp').checked && !!sample;
+  for (const s of items) {
+    const id = await addDoc({ ...t, caption: s.caption.trim(), image: s.dataUrl, width: s.w, height: s.h, bytes: s.blob.size, name: s.name });
+    if (readNow) interpret(id, s.blob, s.caption.trim());
+  }
+  setNote(items.length + ' added' + (readNow ? '; reading…' : '') + '.');
+  updateAdd();
+});
+
+// ---------- board ----------
+const filedRepo = new Map(D.filed.map(r => [r.id, r]));
+function briefHtml(b){
+  if (!b) return '';
+  const li = xs => (xs || []).length ? '<ul class="feats">' + xs.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '';
+  return `<details><summary>full brief</summary><div class="brief">
+    ${b.form ? '<p><b>Form.</b> ' + esc(b.form) + '</p>' : ''}${b.surface ? '<p><b>Surface.</b> ' + esc(b.surface) + '</p>' : ''}
+    ${b.materials_colors ? '<p><b>Materials.</b> ' + esc(b.materials_colors) + '</p>' : ''}${b.print_notes ? '<p><b>Print.</b> ' + esc(b.print_notes) + '</p>' : ''}
+    ${(b.build123d_hints || []).length ? '<p><b>build123d.</b></p>' + li(b.build123d_hints) : ''}</div></details>`;
+}
+function card(x){
+  const filed = x.filedRec || x.status === 'filed';
+  const pending = !x.brief;
+  const isBusy = busy.has(x.id);
+  const state = isBusy ? '<span class="chip acc">reading</span>' : filed ? '<span class="chip ok">filed</span>' : '<span class="chip warn">inbox</span>';
+  const bstate = pending && !isBusy ? '<span class="chip">brief pending</span>' : '';
+  const b = x.brief || null;
+  const subject = b && b.subject ? b.subject : (x.filedRec && x.filedRec.subject) || '';
+  const tags = (b && b.tags) || (x.filedRec && x.filedRec.tags) || [];
+  const feats = (b && b.features) || (x.filedRec && x.filedRec.features) || [];
+  const img = x.image || (x.filedRec && x.filedRec.thumb) || '';
+  const canRead = sample && pending && !filed && x.image && !isBusy;
+  const canDelete = !filed && !isBusy;
+  return `<article class="card${isBusy ? ' busy' : ''}" data-id="${esc(x.id)}">
+    <div class="ph">${img ? `<img src="${img}" alt="${esc(x.caption || subject || 'inspiration photo')}" loading="lazy">` : '<span class="muted">no image</span>'}</div>
+    <div class="bd">
+      <div class="st-row">${state}${bstate}${b && b.style ? b.style.slice(0, 4).map(s => '<span class="tag">' + esc(s) + '</span>').join('') : ''}</div>
+      ${x.caption ? `<div class="cap">${esc(x.caption)}</div>` : ''}
+      ${subject ? `<div class="subj">${esc(subject)}</div>` : (pending ? '<div class="subj muted">no reading yet</div>' : '')}
+      ${feats.length ? '<ul class="feats">' + feats.slice(0, 4).map(f => '<li>' + esc(f) + '</li>').join('') + '</ul>' : ''}
+      ${tags.length ? '<div class="st-row">' + tags.map(t => '<span class="tag">' + esc(t) + '</span>').join('') + '</div>' : ''}
+      ${briefHtml(b)}
+      ${x.filedRec ? `<div class="path">${esc(x.filedRec.path)}</div>` : ''}
+      <div class="acts">${canRead ? `<button class="btn small" data-read="${esc(x.id)}">read now</button>` : ''}
+        ${canDelete ? `<button class="btn small" data-del="${esc(x.id)}">delete</button>` : ''}
+        <span class="muted" style="margin-left:auto;font-size:11px">${esc((x.created || '').slice(0, 10))}${x.brief_model ? ' · ' + esc(x.brief_model) : ''}</span></div>
+    </div></article>`;
+}
+function renderBoard(){
+  const items = docs.map(d => Object.assign({}, d, { filedRec: filedRepo.get(d.id) || null }));
+  const seen = new Set(items.map(d => d.id));
+  for (const r of D.filed) if (!seen.has(r.id)) items.push({ id: r.id, target_kind: r.kind, target: r.target, caption: r.caption, created: r.created, status: 'filed', brief: null, brief_model: r.brief_model, filedRec: r, image: '' });
+  const groups = new Map();
+  for (const x of items) {
+    const key = x.target_kind === 'new' ? 'new:' + (x.title || '') : x.target_kind + ':' + x.target;
+    if (!groups.has(key)) groups.set(key, { label: targetLabel(x.target_kind, x.target, x.title), items: [] });
+    groups.get(key).items.push(x);
+  }
+  const inbox = items.filter(x => !(x.filedRec || x.status === 'filed')).length;
+  const pend = items.filter(x => !x.brief && !(x.filedRec && !x.filedRec.pending)).length;
+  $('counts').textContent = items.length ? `· ${items.length} photo${items.length === 1 ? '' : 's'} · ${inbox} in inbox · ${pend} brief${pend === 1 ? '' : 's'} pending` : '';
+  const order = [...groups.entries()].sort((a, b) => a[0].startsWith('new') === b[0].startsWith('new') ? a[1].label.localeCompare(b[1].label) : a[0].startsWith('new') ? -1 : 1);
+  $('board').innerHTML = order.length ? order.map(([k, g]) => `<div class="group"><div class="gh"><h3>${esc(g.label)}</h3><span class="k">${g.items.length} photo${g.items.length === 1 ? '' : 's'}</span></div>
+    <div class="cards">${g.items.sort((a, b) => (b.created || '').localeCompare(a.created || '')).map(card).join('')}</div></div>`).join('')
+    : '<div class="empty">Nothing on the board yet. Attach a photo on the left; it lands here as inbox, gets a small-model brief, and the next sync files it into the repo next to its model or idea.</div>';
+  $('board').querySelectorAll('[data-read]').forEach(b => b.addEventListener('click', async () => {
+    const d = docs.find(x => x.id === b.dataset.read); if (!d || !d.image) return;
+    interpret(d.id, await blobFromDataUrl(d.image), d.caption || '');
+  }));
+  $('board').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.armed) { deleteDoc(b.dataset.del); return; }
+    b.dataset.armed = '1'; b.textContent = 'really delete?'; b.classList.add('danger');
+    setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = 'delete'; b.classList.remove('danger'); } }, 3000);
+  }));
+}
+
+fillTargets();
+connect();
+</script>

@@ -10,6 +10,7 @@ dependencies = [
     "ocp-vscode",
     "pytest",
     "matplotlib>=3.10.9",
+    "manifold3d>=3.5.2",
 ]
 
 [tool.pytest.ini_options]

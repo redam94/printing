@@ -42,6 +42,27 @@ fillet(edges, r)      chamfer(edges, length)
 - Sketch face centres: `[Location(f.center()) for f in sketch.faces()]` (`lib.component.locations_of`).
 - `export_stl(shape, path, tolerance=0.01, angular_tolerance=0.1)`, `export_step(shape, path)`.
 
+## Organic forms (used by lib/form, verified in 0.11)
+```python
+Spline((r0, 0), (r1, z1), ..., tangents=[(0, 1), (-1, 1)])   # in a Plane.XZ sketch; close with Lines, make_face
+revolve(Plane.XZ * face, Axis.Z)                        # body of revolution
+offset(solid, amount=-wall, openings=solid.faces().sort_by(Axis.Z)[-1])   # open-top shell, uniform wall
+offset(solid, amount=-d)                                # inward offset solid; NOTE it also lowers the top by d
+Solid.extrude_linear_with_rotation(face, (0,0,0), (0,0,h), angle)   # twist; one call per face
+loft([Plane.XY.offset(z) * Rot(0,0,a) * sk.scale(s) for ...], ruled=False)   # twist + taper
+make_face(Spline(*pts, periodic=True))                  # closed wavy outline from sampled points
+fillet(sketch.vertices(), r)                            # 2D fillet; fails on tangent joins -> filter real corners first
+```
+- Cutting many bars through a shell: `shell - (bars - inner_offset)` is robust; `(shell - bars) + (shell & inner)`
+  and `shell - (band & bars)` both produced Null / invalid shapes.
+- Extend a solid past its planar ends (`extrude(top_face, amount=d, both=True)`) before an inward offset when
+  the offset must keep the full height; otherwise the top `d` of the wall is unprotected by the offset.
+- Booleans that end exactly at a face (bars stopping at the rim) leave coincident faces and non-watertight
+  tessellations; overshoot by 1 mm.
+- Mesh branch: `lib.form.mesh.to_mesh(shape)` then manifold3d (`Mesh.merge()` first: OCC tessellations leave a
+  few seam vertices); `refine_to_length`, `warp_batch`, `level_set(f(x,y,z), bounds, edge)` are all fast.
+  trimesh's `bounding_box` is a property, so detect meshes with `type(obj).__name__ == "Trimesh"`.
+
 ## Gotchas seen in this repo
 - A hook/rib that only touches its parent along an edge or point becomes a second solid.
   Overlap by ≥ 0.01 mm or share a full face.

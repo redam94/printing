@@ -168,21 +168,26 @@ PI5_PORTS: tuple[PiPort, ...] = (
     PiPort("usb_a_lower", "usb",     1.1, 13.3, 0.0, 15.6, 13.3,  0.0, 15.6,  "position verified; body generic dual USB-A"),
     PiPort("usb_a_upper", "usb",    19.0, 13.3, 0.0, 15.6, 13.3,  0.0, 15.6,  "position verified; body generic dual USB-A"),
     PiPort("microsd",     "sd",      0.0, 12.0, -3.6, 0.0, 16.0, -3.6, 0.0,   "UNVERIFIED: slot assumed centred on the SD edge, card under the PCB"),
+    # 40-pin GPIO header centred on the +Y edge (board x 32.5 = lib x 0, verified).  ``body`` = the bare
+    # ribbon leaving the top of a 2x20 IDC socket (52 wide, 1.27 mm pitch x 40 + margin); ``plug`` = the
+    # IDC socket with strain relief passing the window (58 x 8..19 above PCB top).  Heights UNVERIFIED.
+    PiPort("gpio_ribbon", "gpio",    0.0, 52.0, 15.0, 18.0, 58.0,  8.0, 19.0,  "position verified; IDC socket / strain-relief heights UNVERIFIED"),
 )
 PI5_PORT_EDGES = {
     "power": "-Y edge (USB-C, micro-HDMI 0/1); map with Plane.XZ, sketch x = lib X",
     "usb": "+X edge (Ethernet, two USB-A stacks); map with Plane.YZ, sketch x = lib Y",
     "sd": "-X edge (microSD access window); map with Plane.YZ, sketch x = lib Y",
+    "gpio": "+Y edge (40-pin header: ribbon-cable / IDC window); map with Plane.XZ.offset(-y_wall), sketch x = lib X",
 }
 
 
 @component(
-    id="patterns.pi5_port_cutouts", version="1.0.0",
+    id="patterns.pi5_port_cutouts", version="1.1.0",
     summary="Raspberry Pi 5 connector windows for one board edge as a wall-plane sketch (x along the edge, y = height above PCB top).",
-    tags=["raspberry pi", "pi5", "pi 5", "ports", "cutout", "usb-c", "hdmi", "ethernet", "usb-a", "microsd", "connector", "window"],
+    tags=["raspberry pi", "pi5", "pi 5", "ports", "cutout", "usb-c", "hdmi", "ethernet", "usb-a", "microsd", "gpio", "ribbon", "connector", "window"],
     units={"edge": "enum", "clearance": "mm", "plug_envelope": "bool", "ports": "-"},
     descriptions={
-        "edge": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window)",
+        "edge": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window), gpio (+Y: ribbon-cable window, v1.1.0)",
         "clearance": "added on every side of the connector/plug envelope",
         "plug_envelope": "size windows for the mating plug overmold (True) or just the connector body (False, flush panels)",
         "ports": "optional subset of port names to include, e.g. ['usb_c']; default = every port on that edge",
@@ -199,11 +204,14 @@ def pi5_port_cutouts(edge: str = "power", clearance: float = 0.75, plug_envelope
     Sketch frame: x runs along the board edge in hole-pattern coordinates
     (lib X for ``power``, lib Y for ``usb``/``sd``), y is height above the PCB
     top surface.  Place it with ``Pos(x_of_pi_origin, z_of_pcb_top)`` on the
-    wall plane and extrude through the wall with ``both=True``.
+    wall plane and extrude through the wall with ``both=True``.  ``gpio`` (v1.1.0) is
+    a window for a 40-way IDC socket and its ribbon on the +Y (header) edge.
 
     Example:
         win = pi5_port_cutouts("power")
         body = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)
+        gpio = pi5_port_cutouts("gpio")
+        body = body - extrude(Plane.XZ.offset(-outer_w / 2) * Pos(pi_x, pcb_top_z) * gpio, amount=wall, both=True)
     """
     if edge not in PI5_PORT_EDGES:
         raise ValueError(f"unknown edge {edge!r}; known: {sorted(PI5_PORT_EDGES)}")

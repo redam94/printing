@@ -1630,6 +1630,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "build123d" },
+    { name = "manifold3d" },
     { name = "matplotlib", version = "3.10.9", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "matplotlib", version = "3.11.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -1643,6 +1644,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "build123d", specifier = ">=0.8" },
+    { name = "manifold3d", specifier = ">=3.5.2" },
     { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "numpy" },
     { name = "ocp-vscode" },

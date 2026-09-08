@@ -1,0 +1,23 @@
+{
+  "skill_name": "design-inspiration",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "here's a photo of a lamp base I like (attached at ~/Downloads/lamp.jpg). I want to print something with that vibe for the desk, not sure what yet",
+      "expected_output": "Does not Read the image itself. Files it with `scripts/inspiration.py add ~/Downloads/lamp.jpg --new \"...\"` (asks or picks a title), spawns one Haiku subagent with the prompt from `inspiration.py prompt` to write the brief JSON, attaches it with `set-brief`, then reads the sidecar and proposes 2-3 directions quoting the brief's features-to-borrow with build123d operations from references/brief_to_geometry.md and print cautions. Mentions the idea file created and regenerates/republishes the Inspiration and Studio pages.",
+      "files": ["lamp.jpg"]
+    },
+    {
+      "id": 1,
+      "prompt": "check the inspiration page, I uploaded a few pictures from my phone last night",
+      "expected_output": "Reads inspiration.json, runs read_db on collection `inspiration` where status == inbox, writes .sync/inspiration.json, runs `inspiration.py ingest` (dry run then real), reports per photo: target (model/idea/new idea created), whether the brief came from the page or is pending; runs the Haiku pass for pending ones; applies the write_db `filed` updates; republishes the page with url. Never opens a photo with Read.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "make the ribbed desk vase idea into a real model, about 180mm tall",
+      "expected_output": "Reads ideas/ribbed_desk_vase/inspiration/*.md (the brief) rather than the jpg, names the borrowed features (bulging shoulder, vertical ribs, wide mouth), flags the shoulder overhang from the print notes and states the change (angle ≤ 45° or split), scales the brief's ratios from 180 mm, sketches with scripts/sketch.py or goes to the printable-parts workflow with a reuse map, and logs the borrowed features in the sidecar's Log.",
+      "files": []
+    }
+  ]
+}

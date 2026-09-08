@@ -6,7 +6,8 @@
     uv run python scripts/sketch.py <slug> --stl        # also write STLs
     uv run python scripts/sketch.py --new <slug>        # write a starter sketch.py
 
-The script must define ``build() -> Part | dict[str, Part]`` in print orientation.
+The script must define ``build() -> Part | dict[str, Part]`` in print orientation
+(a value may also be a trimesh.Trimesh from lib.form.mesh).
 Outputs land in ideas/<slug>/exports/ (gitignored): renders/<part>.png (open with
 Read), view.html (orbit + section plane), and STLs with --stl.  No golden, no lint,
 no index: this is the fast loop for form exploration BEFORE a model exists.  When a
@@ -22,10 +23,19 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import ROOT, STL_ANGULAR_TOLERANCE, STL_TOLERANCE, metrics, to_trimesh  # noqa: E402
+from scripts._common import ROOT, bbox_of, metrics, to_trimesh, write_stl  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.ideas import IDEAS_DIR  # noqa: E402
 from scripts.render import render_mesh  # noqa: E402
+
+
+def rel(p: Path) -> Path:
+    """Path relative to the repo when inside it, else as-is (sketches may live anywhere)."""
+    try:
+        return p.relative_to(ROOT)
+    except ValueError:
+        return p
+
 
 STARTER = '''"""Sketch for ideas/{slug}: throwaway geometry, print orientation, bed at z=0.
 
@@ -77,6 +87,7 @@ def main() -> int:
     ap.add_argument("--stl", action="store_true", help="also export STL per part")
     ap.add_argument("--no-render", action="store_true")
     ap.add_argument("--nozzle", type=float, default=0.4)
+    ap.add_argument("--vase", action="store_true", help="check every part with the spiral / vase-mode rules")
     a = ap.parse_args()
 
     if a.new:
@@ -84,9 +95,9 @@ def main() -> int:
         d.mkdir(parents=True, exist_ok=True)
         s = d / "sketch.py"
         if s.exists():
-            raise SystemExit(f"{s.relative_to(ROOT)} already exists")
+            raise SystemExit(f"{rel(s)} already exists")
         s.write_text(STARTER.format(slug=a.new), encoding="utf-8")
-        print(f"wrote {s.relative_to(ROOT)}  — edit it, then: uv run python scripts/sketch.py {a.new}")
+        print(f"wrote {rel(s)}  — edit it, then: uv run python scripts/sketch.py {a.new}")
         return 0
     if not a.target:
         ap.error("give a slug or a .py path (or --new SLUG)")
@@ -107,22 +118,20 @@ def main() -> int:
         if m.bbox_min[2] < -1e-3:
             print("      note: part sits below z=0 — wrap it in lib.component.on_bed() for print orientation")
         mesh = to_trimesh(shape)
-        rep = check_mesh(mesh, a.nozzle)
+        rep = check_mesh(mesh, a.nozzle, mode="vase" if a.vase else "normal")
         print(format_report(name, rep))
         ok &= rep["ok"] and m.valid
         entry = {"name": name, "metrics": m.to_dict() | {"wall_min_mm": rep.get("wall_min_mm")}}
         if not a.no_render:
             png = out / "renders" / f"{name}.png"
             render_mesh(mesh, png, f"{label} / {name}")
-            print(f"      rendered {png.relative_to(ROOT)}   <- open this with Read")
+            print(f"      rendered {rel(png)}   <- open this with Read")
         if a.stl or not a.no_render:
-            from build123d import export_stl
             out.mkdir(parents=True, exist_ok=True)
-            stl = out / f"{name}.stl"
-            export_stl(shape, str(stl), tolerance=STL_TOLERANCE, angular_tolerance=STL_ANGULAR_TOLERANCE)
+            stl = write_stl(shape, out / f"{name}.stl")
             entry["stl"] = str(stl)
             if a.stl:
-                print(f"      exported {stl.relative_to(ROOT)}")
+                print(f"      exported {rel(stl)}")
         viewer_parts.append(entry)
         print()
 
@@ -132,7 +141,7 @@ def main() -> int:
                "report": {"project": label, "docstring": (load_build(script).__doc__ or "").strip(), "components": [], "params": [],
                           "parts": {p["name"]: {"metrics": p["metrics"]} for p in viewer_parts}, "fit_checks": {}, "golden_changes": [], "review": {}}}
         html_out = write_viewer([run], out / "view.html", f"sketch {label}", label)
-        print(f"viewer {html_out.relative_to(ROOT)}")
+        print(f"viewer {rel(html_out)}")
         if not a.stl:
             for p in viewer_parts:
                 Path(p["stl"]).unlink(missing_ok=True)

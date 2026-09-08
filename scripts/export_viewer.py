@@ -50,11 +50,13 @@ def project_run(project: str) -> dict:
     exports = MODELS_DIR / project / "exports"
     golden = load_golden(project) or {}
     gparts = golden.get("parts", {})
-    stls = sorted(exports.glob("*.stl"))
-    if not stls:
-        raise SystemExit(f"no STLs in {exports} — run scripts/build.py {project} first")
     report_path = exports / "build_report.json"
     report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else ""
+    # the report's part list is the truth: a renamed / removed part leaves a stale STL behind
+    stls = [exports / f"{n}.stl" for n in report["parts"]] if report else sorted(exports.glob("*.stl"))
+    stls = [s for s in stls if s.exists()]
+    if not stls:
+        raise SystemExit(f"no STLs in {exports} — run scripts/build.py {project} first")
     parts = []
     for s in stls:
         m = dict(gparts.get(s.stem, {}))

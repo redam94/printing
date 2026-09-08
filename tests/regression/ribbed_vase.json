@@ -1,0 +1,35 @@
+{
+  "project": "ribbed_vase",
+  "generated": "2026-09-07",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "vase": {
+      "bbox_min": [
+        -46.234,
+        -46.234,
+        -0.0
+      ],
+      "bbox_max": [
+        46.234,
+        46.234,
+        150.0
+      ],
+      "bbox_size": [
+        92.468,
+        92.468,
+        150.0
+      ],
+      "volume": 55897.393,
+      "surface_area": 81852.797,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "7e6141c63e2ed6a6",
+      "triangles": 19476,
+      "kind": "brep"
+    }
+  }
+}

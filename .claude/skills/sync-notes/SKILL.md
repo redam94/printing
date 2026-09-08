@@ -31,6 +31,10 @@ for each models/<p>/review.json:
 if studio.json exists:
   Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "ideas"
   -> Write .sync/studio/ideas.json the same way
+if inspiration.json exists:
+  Artifact action: "read_db", url: <artifact_url>, db_op: "query", collection: "inspiration",
+                   query: {"where": [["status", "==", "inbox"]]}
+  -> Write .sync/inspiration.json the same way (documents carry a data-URI image; copy it verbatim)
 ```
 
 Copy documents verbatim (id, text, part, status, kind, material, outcome, created, build_id,
@@ -46,7 +50,14 @@ report and continue with the others.
 ```
 uv run python scripts/sync_notes.py ingest --dry-run    # preview
 uv run python scripts/sync_notes.py ingest              # write
+uv run python scripts/inspiration.py ingest             # photos from the Inspiration page (if any were dumped)
 ```
+
+`inspiration.py ingest` files each inbox photo under `models/<p>/inspiration/` or
+`ideas/<slug>/inspiration/` with its `.md` brief sidecar, creates inbox ideas for `new` targets,
+and writes `.sync/inspiration_actions.json`. Photos whose brief is still pending are listed; an
+interactive session runs the Haiku pass from the `design-inspiration` skill, a routine leaves
+them pending (the Studio overview flags them).
 
 What it writes, and what the writes mean:
 
@@ -94,12 +105,14 @@ review page report with the print log, component validation chips and the notes 
 
 ## 4. Push state back to the pages
 
-- Republish each model's `models/<p>/exports/view.html` with `url` = its review.json URL, and
-  `exports/studio.html` with `url` = the studio.json URL. Never publish without `url`. If a
+- Republish each model's `models/<p>/exports/view.html` with `url` = its review.json URL,
+  `exports/studio.html` with `url` = the studio.json URL, and (when photos were filed or a model
+  or idea was added) `exports/inspiration.html` from `uv run python scripts/inspiration.py --html`
+  with `url` = the inspiration.json URL. Never publish without `url`. If a
   publish is refused because the live version was not viewed in this session, run
   `Artifact action: "read"` on that URL and publish again; never pass `force`.
-- `.sync/actions.json` lists optional `write_db` updates (stamp notes `synced`, mark inbox ideas
-  `filed` with their path). **Interactive sessions apply them**
+- `.sync/actions.json` and `.sync/inspiration_actions.json` list optional `write_db` updates
+  (stamp notes `synced`, mark inbox ideas and photos `filed` with their path). **Interactive sessions apply them**
   (`Artifact action: "write_db", db_op: "update", collection, doc_id, data`); **a headless routine
   skips them**: writing to an artifact database asks for an approval a routine cannot give, and
   the pages do not depend on it — the Studio page treats an inbox idea as filed when
@@ -112,8 +125,8 @@ review page report with the print log, component validation chips and the notes 
 ## 5. Commit
 
 Commit everything the sync produced in one commit: `notes.json`, `prints.json`,
-`lib/validation.json`, `PARTS.md`, `parts.json`, new idea files. Message:
-`sync notes: <n> print report(s), <n> idea(s) filed, <components> validated in <materials>`.
+`lib/validation.json`, `PARTS.md`, `parts.json`, new idea files, filed photos and their sidecars. Message:
+`sync notes: <n> print report(s), <n> idea(s) filed, <n> photo(s) filed, <components> validated in <materials>`.
 The pre-commit hook checks the index is fresh. If running as a routine with push access, push
 to the branch you were given (main unless told otherwise); if tests failed, commit nothing and
 report what failed.

@@ -28,6 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts._common import GOLDEN_DIR, MODELS_DIR, ROOT, Metrics, diff_golden, list_projects, load_golden, prints_info, review_info  # noqa: E402
 from scripts.ideas import STATUSES, list_ideas, validate  # noqa: E402
+from scripts.inspiration import INSPIRATION_JSON, list_records as list_inspiration, thumb_data_uri  # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "studio_template.html"
 STUDIO_JSON = ROOT / "studio.json"
@@ -55,6 +56,16 @@ def collect(with_images: bool = False) -> dict:
     idx = json.loads((ROOT / "parts.json").read_text(encoding="utf-8")) if (ROOT / "parts.json").exists() else {"components": {}, "models": {}}
     comps = idx.get("components", {})
     projects = list_projects()
+
+    insp: dict[tuple[str, str], list[dict]] = {}
+    for r in list_inspiration():
+        d = {k: r[k] for k in ("id", "caption", "subject", "tags", "pending", "brief_model", "path", "created", "image")}
+        if with_images and r["image"]:
+            try:
+                d["thumb"] = thumb_data_uri(ROOT / r["image"])
+            except Exception:  # noqa: BLE001
+                d["thumb"] = ""
+        insp.setdefault((r["kind"], r["target"]), []).append(d)
 
     models = []
     for p in projects:
@@ -104,6 +115,7 @@ def collect(with_images: bool = False) -> dict:
             "stale": stale, "golden": (GOLDEN_DIR / f"{p}.json").exists(), "golden_changes": golden_diff,
             "fit_checks": report.get("fit_checks", {}), "plate": report.get("plate", {}),
             "review_url": rv.get("artifact_url", ""), "params": len(report.get("params", [])),
+            "inspiration": insp.get(("model", p), []),
         })
 
     ideas = list_ideas()
@@ -115,6 +127,7 @@ def collect(with_images: bool = False) -> dict:
         if with_images and i.renders:
             d["render"] = "data:image/png;base64," + base64.b64encode(i.renders[0].read_bytes()).decode("ascii")
         d["has_render"] = bool(i.renders)
+        d["inspiration"] = insp.get(("idea", i.slug), [])
         idea_dicts.append(d)
 
     comp_rows = []
@@ -170,6 +183,10 @@ def collect(with_images: bool = False) -> dict:
     for i in idea_dicts:
         for pr in i["problems"]:
             attention.append({"kind": "idea", "ref": i["slug"], "text": pr, "fix": f"edit {i['path']}"})
+    for recs in insp.values():
+        for r in recs:
+            if r["pending"]:
+                attention.append({"kind": "photo", "ref": r["path"], "text": "inspiration photo has no brief yet", "fix": "design-inspiration skill: Haiku subagent reads it, then inspiration.py set-brief"})
 
     cats: dict[str, int] = {}
     for c in comp_rows:
@@ -179,12 +196,21 @@ def collect(with_images: bool = False) -> dict:
     return {
         "generated": time.strftime("%Y-%m-%d %H:%M"), "git": git_head(), "repo": ROOT.name,
         "studio": json.loads(STUDIO_JSON.read_text(encoding="utf-8")) if STUDIO_JSON.exists() else {},
+        "inspiration_page": json.loads(INSPIRATION_JSON.read_text(encoding="utf-8")) if INSPIRATION_JSON.exists() else {},
         "stats": {"components": len(comp_rows), "categories": cats, "models": len(models), "parts": sum(len(m["parts"]) for m in models),
                   "ideas": len(idea_dicts), "ideas_by_status": by_status, "unused_components": len(unused), "unvalidated": sum(c["unvalidated"] for c in comp_rows),
-                  "gaps": len(gaps)},
+                  "gaps": len(gaps), "inspiration": sum(len(v) for v in insp.values()),
+                  "inspiration_pending": sum(1 for v in insp.values() for r in v if r["pending"])},
         "components": comp_rows, "unused": unused, "gaps": gaps, "models": models, "ideas": idea_dicts, "attention": attention,
         "statuses": list(STATUSES),
     }
+
+
+def _insp_lines(lines: list[str], recs: list[dict], indent: str = "    ") -> None:
+    for r in recs:
+        what = r["subject"] or r["caption"] or "-"
+        flag = "BRIEF PENDING  " if r["pending"] else ""
+        lines.append(f"{indent}inspiration {r['path']}  {flag}{what[:90]}" + (f"  [{', '.join(r['tags'][:6])}]" if r["tags"] else ""))
 
 
 def format_text(d: dict) -> str:
@@ -194,6 +220,8 @@ def format_text(d: dict) -> str:
              f"   HEAD {g.get('hash', '?')} {g.get('date', '')}{' (dirty)' if g.get('dirty') else ''}   generated {d['generated']}"]
     if d["studio"].get("artifact_url"):
         lines.append(f"studio page: {d['studio']['artifact_url']}   (read the inbox: Artifact read_db collection 'ideas' where status == inbox)")
+    if d.get("inspiration_page", {}).get("artifact_url"):
+        lines.append(f"inspiration page: {d['inspiration_page']['artifact_url']}   (photos: Artifact read_db collection 'inspiration' where status == inbox; {s.get('inspiration', 0)} filed, {s.get('inspiration_pending', 0)} brief(s) pending)")
     lines += ["", "LIBRARY"]
     cur = None
     for c in d["components"]:
@@ -231,6 +259,7 @@ def format_text(d: dict) -> str:
             lines.append(f"    printed {pr.get('date')} {', '.join(pr.get('parts') or []) or 'whole model'} in {pr.get('material') or '?'}: {pr.get('outcome')}{' (inferred)' if pr.get('inferred') else ''}  {(pr.get('text') or '')[:100]}")
         for n in m["open_critiques"]:
             lines.append(f"    open critique [{n['part'] or 'whole model'}] {n['created']}: {n['text'][:120]}")
+        _insp_lines(lines, m.get("inspiration", []))
     lines += ["", "IDEAS"]
     if not d["ideas"]:
         lines.append("  (none yet — ideas/README.md explains the format; the Studio page inbox captures new ones)")
@@ -248,6 +277,7 @@ def format_text(d: dict) -> str:
             lines.append(f"      model: models/{i['model']}")
         for pr in i["problems"]:
             lines.append(f"      ! {pr}")
+        _insp_lines(lines, i.get("inspiration", []), indent="      ")
     lines += ["", f"ATTENTION ({len(d['attention'])})"]
     for a in d["attention"]:
         fix = f"   -> {a['fix']}" if a["fix"] else ""

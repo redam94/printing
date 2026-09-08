@@ -37,6 +37,16 @@ If the user asks *what they already have* ("what compliant mechanisms do I have?
 `PARTS.md`: list id, version, summary, validated materials and orientation, grouped by category.
 Do not guess or pad with things that are not there.
 
+If the part is about a look rather than a fit (a vase, a lamp, a planter, "like this photo"),
+`models/<p>/inspiration/` or `ideas/<slug>/inspiration/` may hold reference photos with `.md`
+briefs; read the briefs (never the jpg, the `design-inspiration` skill explains why) and name
+the borrowed features before writing geometry.  The **`form` category** is the organic /
+decorative toolbox for exactly this (see "Form + function" below): spline bodies of revolution,
+open-top shells, flutes and ribs, twisted extrusions, wavy sections, blob and cloud outlines,
+drain holes, and the mesh branch (noise / ripple textures, SDF solids such as gyroids).  Reach for
+it before freehanding a loft or a spline; the functional categories still supply every hole
+pattern, boss and fit that goes with the look.
+
 ## Workflow for a new part
 
 1. **Search and report reuse.** Say which existing components you will use, by id, and which parts
@@ -89,6 +99,34 @@ Do not guess or pad with things that are not there.
 8. **Publish the review page** (see "Review page and critique loop" below) and give the user the
    link. This is how they inspect the part and leave critiques; a build without it is not reviewable.
 9. **Tests:** `uv run python -m pytest -q` before you call the work done.
+
+## Form + function (organic / artistic parts)
+
+`lib/form/` (category `form`) exists so a vase, a planter, a lamp shade or a cloud-shaped Pi tray
+goes through the library like a box does.  Rules that only apply here:
+
+- **Order of operations.** Build the exact functional geometry first (outline, rim, bosses, pockets,
+  holes: all B-rep), then shell, then flutes / ribs (`form.flutes` with the un-shelled solid as
+  `reference`), and only LAST the mesh step (`form.textured`, `form.sdf_solid`, `mesh_boolean`).
+  Offsetting an already-fluted body is slow and often invalid; nothing in build123d can take a mesh
+  back.  `models/ribbed_vase` and `models/cloud_pi_holder` are the two worked examples.
+- **Mesh parts.** `build()` may return a `trimesh.Trimesh` for a part.  The pipeline handles it
+  (STL, 3MF, render, printability, golden with looser tolerances, fit checks via manifold3d
+  intersection) but writes no STEP.  `form.textured` keeps the bed face, every z level, cavities,
+  bosses and holes exact (exterior-only, horizontal displacement), so fits designed in B-rep survive
+  the texture.  Keep amplitude <= 0.4 mm at a 0.4 nozzle.
+- **Vase / spiral mode.** Declare `PRINT_MODES = {"<part>": "vase"}` in `model.py` when a part is
+  meant to print as a single continuous perimeter.  `check_printable.py` then enforces the
+  spiral-mode rules (exactly one outer contour per layer above the floor, overhang limit 60 deg with
+  no support possible, no flat ceilings) and demotes wall thickness to informational.  In vase mode
+  the geometric wall is irrelevant to the slicer; keep it >= 0.8 under flutes anyway so the part
+  can also print as a normal shell.  `scripts/sketch.py --vase` and `check_printable.py --stl x --vase`
+  apply the same rules to loose geometry.
+- **Profiles are parameters.** A `PROFILE = ((r, z), ...)` tuple in `params.py` is the right home
+  for a spline profile; the lint only checks `model.py`, and the build report lists it.
+- **Thin-wall check is crease-robust** (a sample only counts when the inward ray exits through a
+  roughly parallel face), so rib roots, fillets and textures no longer read as phantom thin walls.
+  A reported thin wall on an organic part is therefore real; look at where it is.
 
 ## Review page and critique loop
 
@@ -144,7 +182,7 @@ section) instead of working around it in the model.
   `Cylinder`/`Circle` calls in models.
 - **Every component** is a function decorated with `@component(...)` from `lib.component` and has a
   docstring with an `Example:` block. The decorator records:
-  `id` (`<category>.<name>`, category in patterns / mechanisms / fasteners / primitives), `version`
+  `id` (`<category>.<name>`, category in patterns / mechanisms / fasteners / primitives / form), `version`
   (semver, per component), `summary` (one line), `params` (derived from the signature; you pass
   `units={...}` for every parameter and optional `descriptions`), `tags`, and `material_notes`
   (`MaterialNotes(validated=[...], orientation="...", notes="...")`). Import-time validation fails
@@ -192,7 +230,7 @@ side, not a golden update.
 | build, check, export STL/STEP/3MF, render, review page, golden | `uv run python scripts/build.py <project> [--update-golden]` |
 | render only | `uv run python scripts/render.py <project>` |
 | review page only (3D + report + notes) | `uv run python scripts/export_viewer.py <project>` |
-| printability only | `uv run python scripts/check_printable.py <project>` or `--stl file.stl` |
+| printability only | `uv run python scripts/check_printable.py <project>` or `--stl file.stl [--vase]` |
 | regenerate catalogue | `uv run python scripts/reindex.py` (`--check` to verify) |
 | impact of a component change | `uv run python scripts/impact.py <component-id> [--accept]` |
 | lint models for magic numbers / inlined patterns | `uv run python scripts/lint_models.py` |

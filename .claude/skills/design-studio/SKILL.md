@@ -46,7 +46,9 @@ collection: "ideas", query: {"where": [["status", "==", "inbox"]]}
 
 Each inbox document carries `title`, `text`, `kind` (part / library / modification), `hardware`,
 `created`. File every one of them (next section) before doing anything else the user asked, and
-tell the user what you filed. The inbox is how they hand you ideas from the browser or their
+tell the user what you filed. If the overview lists `inspiration ...` lines or a `brief pending`
+ATTENTION item, or `inspiration.json` exists, the `design-inspiration` skill owns those: photos
+attached to models and ideas with small-model briefs, and their own page inbox to file. The inbox is how they hand you ideas from the browser or their
 phone; an idea that sits there is an idea they think you have seen.
 
 ## Filing an idea
@@ -150,6 +152,14 @@ Publish it once with the Artifact tool:
 The page opened as a local file still works (inbox in that browser's localStorage); the published
 page is the one that closes the loop with Claude.
 
+## Photos as design guides
+
+An idea for an artistic part usually starts from a photo. Photos and their briefs live in
+`ideas/<slug>/inspiration/` (and `models/<p>/inspiration/`), are filed by the
+`design-inspiration` skill, and show as thumbnails on the Studio page and as `inspiration` lines
+in the overview. During ideation read the `.md` briefs (never the jpg) and quote their
+"features to borrow" in the idea's Concept.
+
 ## Print reports and the sync loop
 
 The overview's MODELS section lists prints (`models/<p>/prints.json`) and open critiques
@@ -185,5 +195,8 @@ build report says it was never built.
 - `references/ideation_frames.md` — the frames for a brainstorming pass, what a good candidate
   looks like, and the questions worth asking the user before filing.
 - `ideas/README.md` — the IDEA.md format and status meanings (in the repo, works by hand).
+- Organic / decorative ideas: the `form` library category and the mesh branch are documented in the
+  printable-parts skill ("Form + function"); `scripts/sketch.py <slug> --vase` checks a sketch with
+  the spiral-mode rules.
 - The printable-parts skill's `references/design_rules.md` and `hardware_dimensions.md` apply to
   sketches too when you are checking whether a shape can print.

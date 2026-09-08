@@ -19,6 +19,7 @@ GPIO along the top edge; USB-A/Ethernet on the right edge. Library convention di
 | Hole pattern | 58 (X) x 49 (Y); centres (3.5, 3.5) (61.5, 3.5) (3.5, 52.5) (61.5, 52.5) | Verified |
 | Hole diameter | Ø2.7 (M2.5) | Verified |
 | GPIO 2x20 header | top edge, centre x = 32.5 | Verified |
+| 40-way IDC socket on the header (ribbon window) | 58 wide, 8-19 mm above PCB top incl. strain relief; bare ribbon 52 wide at 15-18 | UNVERIFIED — generic 2x20 IDC data |
 | PCB thickness | ~1.6 | UNVERIFIED (not on drawings) |
 | Pi 5 Active Cooler pin holes | Ø3 at (61.5, 9.5) and (61.5, 46.5) | Verified Ø and 6 mm offset from M2.5 holes |
 | Pi 5 USB-C | centre x = 11.2, bottom edge | Verified |

@@ -53,6 +53,10 @@ def test_compliant_mechanisms_declare_material(cid):
 @pytest.mark.parametrize("cid", IDS)
 def test_builds_valid_at_defaults(cid):
     shape = FUNCTIONS[cid]()
+    if REGISTRY[cid].returns == "Trimesh":
+        assert shape.is_watertight and shape.is_winding_consistent, "mesh component must return a watertight mesh"
+        assert shape.volume > 0.05
+        return
     assert shape.is_valid
     bb = shape.bounding_box().size
     assert bb.X > 0 and bb.Y > 0

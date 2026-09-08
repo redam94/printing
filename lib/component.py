@@ -42,7 +42,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from typing import Any, Callable
 
-CATEGORIES = ("patterns", "mechanisms", "fasteners", "primitives")
+CATEGORIES = ("patterns", "mechanisms", "fasteners", "primitives", "form")
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 KNOWN_UNITS = {"mm", "deg", "count", "ratio", "bool", "str", "enum", "mm/mm", "-"}
 
@@ -103,7 +103,7 @@ def _type_name(annotation: Any) -> str:
     if annotation is inspect.Parameter.empty:
         return "Any"
     if isinstance(annotation, str):
-        return annotation
+        return annotation.strip("'\"")   # forward references under `from __future__ import annotations`
     return getattr(annotation, "__name__", repr(annotation).replace("typing.", ""))
 
 
@@ -226,7 +226,14 @@ def on_bed(shape):
     to flip a lid and then ``on_bed(...)`` to drop it onto the bed::
 
         lid = on_bed(Rot(180, 0, 0) * box_lid(...))
+
+    Works on build123d shapes and on ``trimesh.Trimesh`` meshes (the mesh branch
+    of the pipeline, see ``lib.form.mesh``).
     """
+    if type(shape).__name__ == "Trimesh":
+        out = shape.copy()
+        out.apply_translation([0.0, 0.0, -float(shape.bounds[0][2])])
+        return out
     from build123d import Pos
 
     return Pos(0, 0, -shape.bounding_box().min.Z) * shape

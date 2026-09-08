@@ -3,9 +3,16 @@
 Model convention
 ----------------
 ``models/<project>/model.py`` defines ``build() -> dict[str, Shape]`` mapping a
-print-part name to a build123d solid (Part or Compound) in PRINT orientation.
-``params.py`` beside it holds every dimension.  Exports land in
-``models/<project>/exports/``.
+print-part name to a build123d solid (Part or Compound) in PRINT orientation,
+or to a ``trimesh.Trimesh`` for parts that went through the mesh branch
+(``lib.form.mesh``: textures, SDF solids).  Mesh parts get STL / 3MF / render /
+printability / golden metrics like any other; no STEP is written for them and
+their golden volume tolerance is looser.  ``params.py`` beside it holds every
+dimension.  Exports land in ``models/<project>/exports/``.
+
+Optionally ``PRINT_MODES = {"<part>": "vase"}`` declares parts that print in
+spiral / vase mode; the printability check then enforces the single-wall rules
+(one contour per layer, no unsupportable overhangs) instead of wall thickness.
 
 Optionally ``fit_checks(parts) -> dict[str, tuple[Shape, Shape]]`` returns
 pairs of shapes that must NOT intersect once assembled (lid placed on body,
@@ -59,6 +66,37 @@ def build_parts(project: str) -> dict:
     return result
 
 
+def print_modes(project: str) -> dict[str, str]:
+    """``PRINT_MODES`` from the model module: {part name: "vase" | "normal"}; missing = normal."""
+    mod = load_model(project)
+    modes = getattr(mod, "PRINT_MODES", {}) or {}
+    return {k: str(v) for k, v in modes.items()}
+
+
+def is_mesh(obj) -> bool:
+    """True for trimesh.Trimesh parts (the mesh branch), False for build123d shapes."""
+    return type(obj).__name__ == "Trimesh"
+
+
+def bbox_of(shape) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    """((xmin, ymin, zmin), (xmax, ymax, zmax)) for a shape or a mesh."""
+    if is_mesh(shape):
+        lo, hi = shape.bounds
+        return (float(lo[0]), float(lo[1]), float(lo[2])), (float(hi[0]), float(hi[1]), float(hi[2]))
+    bb = shape.bounding_box()
+    return (bb.min.X, bb.min.Y, bb.min.Z), (bb.max.X, bb.max.Y, bb.max.Z)
+
+
+def translate(shape, dx: float, dy: float, dz: float):
+    if is_mesh(shape):
+        out = shape.copy()
+        out.apply_translation([dx, dy, dz])
+        return out
+    from build123d import Pos
+
+    return Pos(dx, dy, dz) * shape
+
+
 @dataclass
 class Metrics:
     bbox_min: list[float]
@@ -71,15 +109,18 @@ class Metrics:
     watertight: bool
     mesh_hash: str
     triangles: int
+    kind: str = "brep"   # "brep" (build123d) or "mesh" (trimesh part from lib.form.mesh)
 
     def to_dict(self) -> dict:
         return asdict(self)
 
 
 def tessellate(shape, tolerance: float = STL_TOLERANCE, angular_tolerance: float = STL_ANGULAR_TOLERANCE):
-    """Return (vertices ndarray (n,3), faces ndarray (m,3))."""
+    """Return (vertices ndarray (n,3), faces ndarray (m,3)); a mesh part returns its own arrays."""
     import numpy as np
 
+    if is_mesh(shape):
+        return np.asarray(shape.vertices, dtype=float), np.asarray(shape.faces, dtype=int)
     verts, tris = shape.tessellate(tolerance, angular_tolerance)
     v = np.array([[p.X, p.Y, p.Z] for p in verts], dtype=float)
     f = np.array(tris, dtype=int).reshape(-1, 3)
@@ -89,6 +130,8 @@ def tessellate(shape, tolerance: float = STL_TOLERANCE, angular_tolerance: float
 def to_trimesh(shape):
     import trimesh
 
+    if is_mesh(shape):
+        return shape
     v, f = tessellate(shape)
     mesh = trimesh.Trimesh(vertices=v, faces=f, process=True)
     return mesh
@@ -108,8 +151,17 @@ def mesh_hash(shape) -> str:
 
 
 def metrics(shape) -> Metrics:
-    bb = shape.bounding_box()
     mesh = to_trimesh(shape)
+    if is_mesh(shape):
+        lo, hi = bbox_of(shape)
+        return Metrics(
+            bbox_min=[round(x, 3) for x in lo], bbox_max=[round(x, 3) for x in hi],
+            bbox_size=[round(h - l, 3) for l, h in zip(lo, hi)],
+            volume=round(float(mesh.volume), 3), surface_area=round(float(mesh.area), 3),
+            solids=int(len(mesh.split(only_watertight=False))), valid=bool(mesh.is_watertight and mesh.is_winding_consistent),
+            watertight=bool(mesh.is_watertight), mesh_hash=mesh_hash(shape), triangles=int(len(mesh.faces)), kind="mesh",
+        )
+    bb = shape.bounding_box()
     return Metrics(
         bbox_min=[round(bb.min.X, 3), round(bb.min.Y, 3), round(bb.min.Z, 3)],
         bbox_max=[round(bb.max.X, 3), round(bb.max.Y, 3), round(bb.max.Z, 3)],
@@ -124,14 +176,27 @@ def metrics(shape) -> Metrics:
     )
 
 
-def export(shape, project: str, name: str) -> tuple[Path, Path]:
-    from build123d import export_step, export_stl
+def write_stl(shape, path: Path) -> Path:
+    """STL for a shape (fixed tessellation) or a mesh part."""
+    if is_mesh(shape):
+        shape.export(str(path))
+    else:
+        from build123d import export_stl
 
+        export_stl(shape, str(path), tolerance=STL_TOLERANCE, angular_tolerance=STL_ANGULAR_TOLERANCE)
+    return path
+
+
+def export(shape, project: str, name: str) -> tuple[Path, Path | None]:
+    """Write <name>.stl and, for B-rep parts, <name>.step (None for mesh parts)."""
     out = MODELS_DIR / project / "exports"
     out.mkdir(parents=True, exist_ok=True)
-    stl = out / f"{name}.stl"
+    stl = write_stl(shape, out / f"{name}.stl")
+    if is_mesh(shape):
+        return stl, None
+    from build123d import export_step
+
     step = out / f"{name}.step"
-    export_stl(shape, str(stl), tolerance=STL_TOLERANCE, angular_tolerance=STL_ANGULAR_TOLERANCE)
     export_step(shape, str(step))
     return stl, step
 
@@ -160,6 +225,9 @@ def write_golden(project: str, part_metrics: dict[str, Metrics]) -> Path:
 
 VOLUME_RTOL = 1e-4
 BBOX_ATOL = 1e-3
+# mesh parts: the texture is sampled on a platform-dependent tessellation, so volume and bbox wobble slightly
+VOLUME_RTOL_MESH = 5e-3
+BBOX_ATOL_MESH = 0.05
 
 
 def diff_golden(golden: dict | None, current: dict[str, Metrics]) -> list[dict]:
@@ -173,11 +241,13 @@ def diff_golden(golden: dict | None, current: dict[str, Metrics]) -> list[dict]:
         if g is None:
             changes.append({"part": name, "field": "part", "old": None, "new": "added", "kind": "added"})
             continue
-        if abs(m.volume - g["volume"]) > VOLUME_RTOL * max(abs(g["volume"]), 1e-9):
+        meshy = m.kind == "mesh" or g.get("kind") == "mesh"
+        v_rtol, b_atol = (VOLUME_RTOL_MESH, BBOX_ATOL_MESH) if meshy else (VOLUME_RTOL, BBOX_ATOL)
+        if abs(m.volume - g["volume"]) > v_rtol * max(abs(g["volume"]), 1e-9):
             pct = 100.0 * (m.volume - g["volume"]) / g["volume"] if g["volume"] else float("inf")
             changes.append({"part": name, "field": "volume", "old": g["volume"], "new": m.volume, "kind": "geometry", "delta": f"{pct:+.3f}%"})
         for i, ax in enumerate("xyz"):
-            if abs(m.bbox_size[i] - g["bbox_size"][i]) > BBOX_ATOL:
+            if abs(m.bbox_size[i] - g["bbox_size"][i]) > b_atol:
                 changes.append({"part": name, "field": f"bbox_{ax}", "old": g["bbox_size"][i], "new": m.bbox_size[i], "kind": "geometry",
                                 "delta": f"{m.bbox_size[i] - g['bbox_size'][i]:+.3f} mm"})
         if m.watertight != g["watertight"]:
@@ -212,8 +282,14 @@ def run_fit_checks(project: str, parts: dict) -> dict[str, float]:
     out = {}
     for name, (a, b) in fn(parts).items():
         try:
-            inter = a & b
-            vol = float(inter.volume) if inter is not None and inter.wrapped is not None else 0.0
+            if is_mesh(a) or is_mesh(b):
+                from lib.form.mesh import mesh_boolean
+
+                inter = mesh_boolean(a, b, "intersection")
+                vol = float(inter.volume) if len(inter.faces) else 0.0
+            else:
+                inter = a & b
+                vol = float(inter.volume) if inter is not None and inter.wrapped is not None else 0.0
         except Exception:
             vol = 0.0
         out[name] = round(vol, 3)
@@ -292,6 +368,7 @@ def write_build_report(project: str, parts: dict, part_metrics: dict, checks: di
 
     mod = load_model(project)
     doc = inspect.getdoc(mod) or ""
+    modes = print_modes(project)
     build_id = time.strftime("%Y%m%d-%H%M%S")
     report = {
         "project": project,
@@ -301,8 +378,9 @@ def write_build_report(project: str, parts: dict, part_metrics: dict, checks: di
         "components": components_used(project),
         "params": params_snapshot(project),
         "parts": {name: {"metrics": part_metrics[name].to_dict(), "printability": checks.get(name, {}),
-                         "stl": f"models/{project}/exports/{name}.stl", "step": f"models/{project}/exports/{name}.step",
-                         "threemf": f"models/{project}/exports/{name}.3mf"}
+                         "stl": f"models/{project}/exports/{name}.stl",
+                         "step": None if is_mesh(parts[name]) else f"models/{project}/exports/{name}.step",
+                         "threemf": f"models/{project}/exports/{name}.3mf", "print_mode": modes.get(name, "normal")}
                   for name in parts},
         "plate": ({"threemf": f"models/{project}/exports/{project}.3mf", "extent": list(threemf["plate_extent"]),
                    "fits_bed": threemf["fits_bed"], "printer": threemf["printer"], "bed": list(threemf["bed"])} if threemf else {}),
@@ -337,24 +415,24 @@ def plate_layout(parts: dict, bed_x: float | None = None) -> dict[str, tuple[flo
     rows stacked along Y, PLATE_GAP between parts, the whole arrangement centred on the origin,
     every part on z=0.  Returns {name: (dx, dy, dz)} translations."""
     bed_x = (PRINTER["bed"][0] if bed_x is None else bed_x) - 2 * PLATE_GAP
-    boxes = sorted(((n, s.bounding_box()) for n, s in parts.items()), key=lambda nb: -nb[1].size.Y)
+    boxes = sorted(((n, bbox_of(s)) for n, s in parts.items()), key=lambda nb: -(nb[1][1][1] - nb[1][0][1]))
     rows: list[list] = [[]]
     row_w = 0.0
-    for n, b in boxes:
-        w = b.size.X
+    for n, (lo, hi) in boxes:
+        w = hi[0] - lo[0]
         if rows[-1] and row_w + PLATE_GAP + w > bed_x:
             rows.append([]); row_w = 0.0
-        rows[-1].append((n, b)); row_w += (PLATE_GAP if len(rows[-1]) > 1 else 0) + w
-    row_h = [max(b.size.Y for _, b in r) for r in rows]
+        rows[-1].append((n, (lo, hi))); row_w += (PLATE_GAP if len(rows[-1]) > 1 else 0) + w
+    row_h = [max(hi[1] - lo[1] for _, (lo, hi) in r) for r in rows]
     total_h = sum(row_h) + PLATE_GAP * (len(rows) - 1)
     out = {}
     y = -total_h / 2
     for r, h in zip(rows, row_h):
-        total_w = sum(b.size.X for _, b in r) + PLATE_GAP * (len(r) - 1)
+        total_w = sum(hi[0] - lo[0] for _, (lo, hi) in r) + PLATE_GAP * (len(r) - 1)
         x = -total_w / 2
-        for n, b in r:
-            out[n] = (x - b.min.X, y + h / 2 - (b.min.Y + b.max.Y) / 2, -b.min.Z)
-            x += b.size.X + PLATE_GAP
+        for n, (lo, hi) in r:
+            out[n] = (x - lo[0], y + h / 2 - (lo[1] + hi[1]) / 2, -lo[2])
+            x += hi[0] - lo[0] + PLATE_GAP
         y += h + PLATE_GAP
     return out
 
@@ -362,11 +440,13 @@ def plate_layout(parts: dict, bed_x: float | None = None) -> dict[str, tuple[flo
 def export_3mf(project: str, parts: dict, build_id: str = "") -> dict:
     """Write <part>.3mf for each part and <project>.3mf with all parts arranged on the plate.
     Returns {"files": [...], "plate_extent": (x, y, z), "fits_bed": bool}."""
-    from build123d import Mesher, Pos
+    from build123d import Mesher
 
     out_dir = MODELS_DIR / project / "exports"
     out_dir.mkdir(parents=True, exist_ok=True)
     files = []
+    if any(is_mesh(s) for s in parts.values()):
+        return _export_3mf_meshes(project, parts, out_dir)
 
     def meta(m: Mesher, title: str):
         m.add_meta_data("", "Title", title, "xs:string", True)
@@ -382,7 +462,7 @@ def export_3mf(project: str, parts: dict, build_id: str = "") -> dict:
         files.append(p)
 
     layout = plate_layout(parts)
-    placed = {n: Pos(*layout[n]) * s for n, s in parts.items()}
+    placed = {n: translate(s, *layout[n]) for n, s in parts.items()}
     m = Mesher()
     for name, shape in placed.items():
         m.add_shape(shape, linear_deflection=STL_TOLERANCE, angular_deflection=STL_ANGULAR_TOLERANCE, part_number=name)
@@ -391,9 +471,37 @@ def export_3mf(project: str, parts: dict, build_id: str = "") -> dict:
     m.write(str(plate))
     files.append(plate)
 
-    xs = [b for s in placed.values() for b in (s.bounding_box().min.X, s.bounding_box().max.X)]
-    ys = [b for s in placed.values() for b in (s.bounding_box().min.Y, s.bounding_box().max.Y)]
-    zmax = max(s.bounding_box().max.Z for s in placed.values())
+    return {"files": files, **_plate_extent(placed)}
+
+
+def _plate_extent(placed: dict) -> dict:
+    boxes = [bbox_of(s) for s in placed.values()]
+    xs = [b for lo, hi in boxes for b in (lo[0], hi[0])]
+    ys = [b for lo, hi in boxes for b in (lo[1], hi[1])]
+    zmax = max(hi[2] for _, hi in boxes)
     extent = (round(max(xs) - min(xs), 1), round(max(ys) - min(ys), 1), round(zmax, 1))
     fits = all(e <= b for e, b in zip(extent, PRINTER["bed"]))
-    return {"files": files, "plate_extent": extent, "fits_bed": fits, "printer": PRINTER["name"], "bed": PRINTER["bed"]}
+    return {"plate_extent": extent, "fits_bed": fits, "printer": PRINTER["name"], "bed": PRINTER["bed"]}
+
+
+def _export_3mf_meshes(project: str, parts: dict, out_dir: Path) -> dict:
+    """3MF via trimesh when any part is a mesh (build123d's Mesher only takes shapes)."""
+    import trimesh
+
+    files = []
+    meshes = {n: to_trimesh(s) for n, s in parts.items()}
+    for name, m in meshes.items():
+        p = out_dir / f"{name}.3mf"
+        scene = trimesh.Scene()
+        scene.add_geometry(m, node_name=name, geom_name=name)
+        scene.export(str(p))
+        files.append(p)
+    layout = plate_layout(parts)
+    placed = {n: translate(m, *layout[n]) for n, m in meshes.items()}
+    scene = trimesh.Scene()
+    for name, m in placed.items():
+        scene.add_geometry(m, node_name=name, geom_name=name)
+    plate = out_dir / f"{project}.3mf"
+    scene.export(str(plate))
+    files.append(plate)
+    return {"files": files, **_plate_extent(placed)}

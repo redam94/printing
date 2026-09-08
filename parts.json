@@ -266,6 +266,7 @@
       "docstring": "Boss standing on z=0 with an insert pocket opening at the top.\n\nThe boss is centred on the origin so it can be placed with a Location::\n\nExample:\n    from lib.component import locations_of\n    from lib.patterns.pi import pi5_mount\n    bosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\n    floor = floor + bosses",
       "example": "from lib.component import locations_of\nfrom lib.patterns.pi import pi5_mount\nbosses = Part() + [loc * heat_set_boss(\"M2.5\", height=6) for loc in locations_of(pi5_mount())]\nfloor = floor + bosses",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/esp32_devkit_case/model.py",
         "models/pi5_fan_case/model.py"
       ],
@@ -413,6 +414,760 @@
       "example": "boss = screw_boss(\"M3\", height=10)\nbody = body + Pos(20, 10, floor_t) * boss",
       "used_by": [],
       "import": "from lib.fasteners.screw_boss import screw_boss"
+    },
+    "form.blob_outline": {
+      "id": "form.blob_outline",
+      "version": "1.0.0",
+      "summary": "Smoothed union of circles as a sketch (blob / pebble / organic plate outline).",
+      "params": [
+        {
+          "name": "circles",
+          "type": "Sequence[tuple[float, float, float]]",
+          "units": "mm",
+          "default": [
+            [
+              0.0,
+              0.0,
+              20.0
+            ],
+            [
+              18.0,
+              6.0,
+              15.0
+            ],
+            [
+              -16.0,
+              4.0,
+              14.0
+            ],
+            [
+              4.0,
+              -14.0,
+              12.0
+            ]
+          ],
+          "description": "sequence of (x, y, r); neighbours must overlap"
+        },
+        {
+          "name": "smooth_r",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "fillet radius at every junction (0 = none)"
+        }
+      ],
+      "tags": [
+        "blob",
+        "form",
+        "organic",
+        "outline",
+        "pebble",
+        "plate",
+        "sketch",
+        "tray",
+        "union"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D outline)",
+        "notes": "UNVALIDATED",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.outline",
+      "qualname": "blob_outline",
+      "file": "lib/form/outline.py",
+      "line": 80,
+      "returns": "Sketch",
+      "docstring": "Example:\nplate = extrude(blob_outline(((0, 0, 30), (25, 10, 20), (-20, 15, 18)), smooth_r=6), amount=3)",
+      "example": "plate = extrude(blob_outline(((0, 0, 30), (25, 10, 20), (-20, 15, 18)), smooth_r=6), amount=3)",
+      "used_by": [],
+      "import": "from lib.form.outline import blob_outline"
+    },
+    "form.cloud_outline": {
+      "id": "form.cloud_outline",
+      "version": "1.0.0",
+      "summary": "Cloud silhouette sketch: flat edge at -Y, round lobes bulging toward +Y; centred on the origin.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 120.0,
+          "description": "X extent"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 80.0,
+          "description": "Y extent, flat edge (y = -width/2) to the tallest lobe (y = +width/2)"
+        },
+        {
+          "name": "lobes",
+          "type": "Sequence[float]",
+          "units": "-",
+          "default": [
+            0.72,
+            0.9,
+            1.0,
+            0.85,
+            0.68
+          ],
+          "description": "relative lobe radii left to right, e.g. (0.7, 0.9, 1.0, 0.85, 0.7); 1.0 = lobe_r"
+        },
+        {
+          "name": "lobe_r",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "largest lobe radius; None = 0.22 * length"
+        },
+        {
+          "name": "overlap",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.35,
+          "description": "how far lobe centres sink below the base top, as a fraction of their radius"
+        },
+        {
+          "name": "smooth_r",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "fillet radius where lobes meet each other and the base"
+        }
+      ],
+      "tags": [
+        "cloud",
+        "form",
+        "holder",
+        "kids",
+        "lobes",
+        "organic",
+        "outline",
+        "silhouette",
+        "sketch",
+        "tray"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D outline)",
+        "notes": "UNVALIDATED",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.outline",
+      "qualname": "cloud_outline",
+      "file": "lib/form/outline.py",
+      "line": 98,
+      "returns": "Sketch",
+      "docstring": "Base = rounded rectangle from the flat edge up; lobes = circles along the base top, spread so the\nouter lobes are flush with the base sides.  Rotate the sketch to put the flat edge where you need it.\n\nExample:\n    tray = extrude(cloud_outline(130, 95), amount=2) + extrude(cloud_outline(130, 95) - offset(cloud_outline(130, 95), -1.6), amount=8)",
+      "example": "tray = extrude(cloud_outline(130, 95), amount=2) + extrude(cloud_outline(130, 95) - offset(cloud_outline(130, 95), -1.6), amount=8)",
+      "used_by": [
+        "models/cloud_pi_holder/model.py"
+      ],
+      "import": "from lib.form.outline import cloud_outline"
+    },
+    "form.drain_holes": {
+      "id": "form.drain_holes",
+      "version": "1.0.0",
+      "summary": "Planter drainage: one centre hole plus a ring of holes, as a sketch to subtract from a floor.",
+      "params": [
+        {
+          "name": "ring_r",
+          "type": "float",
+          "units": "mm",
+          "default": 15.0,
+          "description": "radius of the hole ring"
+        },
+        {
+          "name": "hole_d",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "hole diameter"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 6,
+          "description": "holes on the ring"
+        },
+        {
+          "name": "centre",
+          "type": "bool",
+          "units": "bool",
+          "default": true,
+          "description": "also cut a centre hole"
+        }
+      ],
+      "tags": [
+        "drain",
+        "drainage",
+        "floor",
+        "form",
+        "holes",
+        "pattern",
+        "planter",
+        "pot"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D pattern)",
+        "notes": "UNVALIDATED",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.revolved",
+      "qualname": "drain_holes",
+      "file": "lib/form/revolved.py",
+      "line": 82,
+      "returns": "Sketch",
+      "docstring": "Example:\nplanter = planter - extrude(drain_holes(ring_r=inner_r * 0.55), amount=floor_t)",
+      "example": "planter = planter - extrude(drain_holes(ring_r=inner_r * 0.55), amount=floor_t)",
+      "used_by": [],
+      "import": "from lib.form.revolved import drain_holes"
+    },
+    "form.flutes": {
+      "id": "form.flutes",
+      "version": "1.0.0",
+      "summary": "Cut vertical flutes into (or raise ribs on) the outer surface of any body, following its profile; polar array about Z.",
+      "params": [
+        {
+          "name": "shape",
+          "type": "Part | None",
+          "units": "-",
+          "default": null,
+          "description": "body to flute (Part); None = revolved_body() default"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 24,
+          "description": "number of flutes around Z"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "flute width (tangential)"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "cut depth into the surface (or rib height when raised)"
+        },
+        {
+          "name": "z_from",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "flutes start height"
+        },
+        {
+          "name": "z_to",
+          "type": "float | None",
+          "units": "mm",
+          "default": null,
+          "description": "flutes end height; None = full height"
+        },
+        {
+          "name": "twist_angle",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotation of the flutes over their height (0 = straight)"
+        },
+        {
+          "name": "raised",
+          "type": "bool",
+          "units": "bool",
+          "default": false,
+          "description": "True: add ribs standing proud of the surface instead of cutting grooves"
+        },
+        {
+          "name": "reference",
+          "type": "Part | None",
+          "units": "-",
+          "default": null,
+          "description": "optional solid used to derive the surface band (pass the un-shelled solid when fluting a shell)"
+        }
+      ],
+      "tags": [
+        "flutes",
+        "fluting",
+        "form",
+        "grooves",
+        "polar",
+        "ribs",
+        "ridges",
+        "texture",
+        "vase"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "axis vertical, base on the bed",
+        "notes": "UNVALIDATED: no test print yet; keep flute depth <= wall - 0.8 unless shelled afterwards",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.surface",
+      "qualname": "flutes",
+      "file": "lib/form/surface.py",
+      "line": 80,
+      "returns": "Part",
+      "docstring": "``count`` radial bars, trimmed to the outer ``depth`` of ``reference`` (or ``shape``), are cut\nfrom the shape, so the flute floor follows the body profile at constant depth.  Sharp-edged: no fillets.  Shell FIRST, then flute the shell with the solid as\n``reference`` (offsetting a fluted solid is slow and often invalid); the wall under a flute is\nthen ``wall - depth``, so keep that >= 0.8 unless the part prints in spiral (vase) mode.\n\nExample:\n    solid = revolved_body(profile)\n    vase = flutes(shell_open_top(solid, wall=2.0), count=20, width=3, depth=1.2, z_from=5, reference=solid)",
+      "example": "solid = revolved_body(profile)\nvase = flutes(shell_open_top(solid, wall=2.0), count=20, width=3, depth=1.2, z_from=5, reference=solid)",
+      "used_by": [
+        "models/ribbed_vase/model.py"
+      ],
+      "import": "from lib.form.surface import flutes"
+    },
+    "form.revolved_body": {
+      "id": "form.revolved_body",
+      "version": "1.0.0",
+      "summary": "Solid of revolution about Z from an (r, z) profile, spline-smoothed by default, base on z=0 (vases, planters, lamps, knobs).",
+      "params": [
+        {
+          "name": "profile",
+          "type": "Sequence[tuple[float, float]]",
+          "units": "mm",
+          "default": [
+            [
+              25.0,
+              0.0
+            ],
+            [
+              26.0,
+              40.0
+            ],
+            [
+              28.0,
+              70.0
+            ],
+            [
+              40.0,
+              95.0
+            ],
+            [
+              38.0,
+              112.0
+            ],
+            [
+              30.0,
+              120.0
+            ]
+          ],
+          "description": "sequence of (radius, z) points from the base rim (z=0) to the top rim; closed along the axis"
+        },
+        {
+          "name": "smooth",
+          "type": "bool",
+          "units": "bool",
+          "default": true,
+          "description": "True: one spline through the points; False: straight segments (facetted / stepped profiles)"
+        },
+        {
+          "name": "tangents",
+          "type": "Sequence[tuple[float, float]] | None",
+          "units": "-",
+          "default": null,
+          "description": "optional start and end tangent directions for the spline, e.g. ((0, 1), (-1, 1)); None = natural"
+        }
+      ],
+      "tags": [
+        "bowl",
+        "form",
+        "lamp",
+        "lathe",
+        "organic",
+        "planter",
+        "profile",
+        "revolve",
+        "spline",
+        "vase"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "axis vertical, base on the bed",
+        "notes": "UNVALIDATED: no test print yet; designed for spiral (vase) mode or 2-4 perimeters",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.revolved",
+      "qualname": "revolved_body",
+      "file": "lib/form/revolved.py",
+      "line": 38,
+      "returns": "Part",
+      "docstring": "The profile's last point is the top rim radius; the top is closed flat.  ``shell_open_top``\nhollows it; ``flutes`` (with this solid as ``reference``) ribs the shell.\n\nExample:\n    solid = revolved_body(((30, 0), (34, 30), (26, 80), (30, 100)))\n    vase = flutes(shell_open_top(solid, wall=2.0), count=20, reference=solid)",
+      "example": "solid = revolved_body(((30, 0), (34, 30), (26, 80), (30, 100)))\nvase = flutes(shell_open_top(solid, wall=2.0), count=20, reference=solid)",
+      "used_by": [
+        "models/ribbed_vase/model.py"
+      ],
+      "import": "from lib.form.revolved import revolved_body"
+    },
+    "form.sdf_solid": {
+      "id": "form.sdf_solid",
+      "version": "1.0.0",
+      "summary": "Mesh a signed-distance function (positive inside) over a box with manifold3d level_set; default is a gyroid block.",
+      "params": [
+        {
+          "name": "sdf",
+          "type": "Callable[[float, float, float], float] | None",
+          "units": "-",
+          "default": null,
+          "description": "callable f(x, y, z) -> float, positive inside; None = gyroid_sdf()"
+        },
+        {
+          "name": "bounds",
+          "type": "tuple[float, float, float, float, float, float]",
+          "units": "mm",
+          "default": [
+            -15.0,
+            -15.0,
+            0.0,
+            15.0,
+            15.0,
+            30.0
+          ],
+          "description": "(xmin, ymin, zmin, xmax, ymax, zmax) of the evaluation box; the solid is clipped to it"
+        },
+        {
+          "name": "edge_length",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "target triangle edge (resolution); 0.5-1.0 mm is plenty for FDM"
+        }
+      ],
+      "tags": [
+        "form",
+        "gyroid",
+        "implicit",
+        "lattice",
+        "marching",
+        "mesh",
+        "metaball",
+        "sdf"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any; check overhangs, gyroids self-support up to ~cell 15 mm",
+        "notes": "UNVALIDATED",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.mesh",
+      "qualname": "sdf_solid",
+      "file": "lib/form/mesh.py",
+      "line": 225,
+      "returns": "Trimesh",
+      "docstring": "Example:\nblock = sdf_solid(gyroid_sdf(cell=12, thickness=1.2), bounds=(-20, -20, 0, 20, 20, 40))\nlamp = mesh_boolean(block, cylinder_shape, \"intersection\")",
+      "example": "block = sdf_solid(gyroid_sdf(cell=12, thickness=1.2), bounds=(-20, -20, 0, 20, 20, 40))\nlamp = mesh_boolean(block, cylinder_shape, \"intersection\")",
+      "used_by": [],
+      "import": "from lib.form.mesh import sdf_solid"
+    },
+    "form.shell_open_top": {
+      "id": "form.shell_open_top",
+      "version": "1.0.0",
+      "summary": "Hollow a solid into an open-top shell of uniform wall (floor included); default hollows the default revolved_body.",
+      "params": [
+        {
+          "name": "shape",
+          "type": "Part | None",
+          "units": "-",
+          "default": null,
+          "description": "solid to hollow (Part); None = revolved_body() default"
+        },
+        {
+          "name": "wall",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "wall and floor thickness (multiple of 0.4)"
+        }
+      ],
+      "tags": [
+        "cup",
+        "form",
+        "hollow",
+        "open top",
+        "planter",
+        "shell",
+        "vase",
+        "wall"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "axis vertical, base on the bed",
+        "notes": "UNVALIDATED: no test print yet; designed for spiral (vase) mode or 2-4 perimeters",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.revolved",
+      "qualname": "shell_open_top",
+      "file": "lib/form/revolved.py",
+      "line": 62,
+      "returns": "Part",
+      "docstring": "The highest planar face becomes the opening; uniform inward offset (wall = floor).  Shell the\nsmooth solid, then add flutes / textures: offsetting an already-fluted body is slow and fragile.\n\nExample:\n    vase = shell_open_top(revolved_body(profile), wall=1.2)",
+      "example": "vase = shell_open_top(revolved_body(profile), wall=1.2)",
+      "used_by": [
+        "models/ribbed_vase/model.py"
+      ],
+      "import": "from lib.form.revolved import shell_open_top"
+    },
+    "form.textured": {
+      "id": "form.textured",
+      "version": "1.0.0",
+      "summary": "Displace a shape's outer surface with Perlin noise or horizontal ripples and return a mesh (organic skin, hammered / wavy look).",
+      "params": [
+        {
+          "name": "shape",
+          "type": "Any",
+          "units": "-",
+          "default": null,
+          "description": "Part or mesh to texture; None = default hollow revolved_body"
+        },
+        {
+          "name": "amplitude",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "peak displacement along the normal"
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "feature size (noise wavelength / ripple pitch)"
+        },
+        {
+          "name": "kind",
+          "type": "str",
+          "units": "enum",
+          "default": "noise",
+          "description": "noise | ripple"
+        },
+        {
+          "name": "mask",
+          "type": "str",
+          "units": "enum",
+          "default": "exterior",
+          "description": "exterior (outer skin only, cavities and bosses untouched) | sides (|normal z| < 0.5) | all"
+        },
+        {
+          "name": "seed",
+          "type": "int",
+          "units": "count",
+          "default": 0,
+          "description": "noise seed"
+        },
+        {
+          "name": "edge_length",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "mesh refinement before displacing (smaller = finer texture, more triangles)"
+        },
+        {
+          "name": "bed_margin",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "height above the bed left undisplaced (elephant-foot chamfer zone)"
+        },
+        {
+          "name": "octaves",
+          "type": "int",
+          "units": "count",
+          "default": 2,
+          "description": "noise detail levels"
+        }
+      ],
+      "tags": [
+        "displacement",
+        "form",
+        "mesh",
+        "noise",
+        "organic",
+        "perlin",
+        "ripple",
+        "skin",
+        "texture"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "as the source shape; bed face is never displaced",
+        "notes": "UNVALIDATED: texture amplitude <= 0.4 mm prints cleanly with 0.4 mm nozzle; larger needs slower outer walls",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.mesh",
+      "qualname": "textured",
+      "file": "lib/form/mesh.py",
+      "line": 145,
+      "returns": "Trimesh",
+      "docstring": "Refines the mesh to ``edge_length`` with manifold3d, then warps vertices along their normals\n(horizontally only, unless ``mask=\"all\"``, so no height changes).  The bed face and everything\nbelow ``bed_margin`` stay put; ``exterior`` mask also keeps inner walls, bosses and holes exact so\nfits are unchanged.  Returns a ``trimesh.Trimesh``; put it last in build().\n\nExample:\n    tray = textured(tray_part, amplitude=0.35, scale=6, mask=\"exterior\")",
+      "example": "tray = textured(tray_part, amplitude=0.35, scale=6, mask=\"exterior\")",
+      "used_by": [
+        "models/cloud_pi_holder/model.py"
+      ],
+      "import": "from lib.form.mesh import textured"
+    },
+    "form.twist": {
+      "id": "form.twist",
+      "version": "1.0.0",
+      "summary": "Extrude a section along Z while rotating it (spiral / twisted vase body), base on z=0.",
+      "params": [
+        {
+          "name": "section",
+          "type": "Sketch | None",
+          "units": "-",
+          "default": null,
+          "description": "sketch to extrude (one or more faces); None = wavy_circle()"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 100.0,
+          "description": "extrusion height"
+        },
+        {
+          "name": "angle",
+          "type": "float",
+          "units": "deg",
+          "default": 90.0,
+          "description": "total rotation over the height (sign = handedness)"
+        },
+        {
+          "name": "taper",
+          "type": "float",
+          "units": "ratio",
+          "default": 1.0,
+          "description": "top scale relative to the base (1.0 = straight; 0.8 = narrows to 80 %)"
+        }
+      ],
+      "tags": [
+        "column",
+        "extrude",
+        "form",
+        "helix",
+        "spiral",
+        "twist",
+        "vase"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "axis vertical, base on the bed",
+        "notes": "UNVALIDATED; keep the surface slope (angle * radius / height) under ~50 deg from vertical",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.surface",
+      "qualname": "twist",
+      "file": "lib/form/surface.py",
+      "line": 41,
+      "returns": "Part",
+      "docstring": "Twist about the Z axis through the sketch origin.  ``taper`` != 1 is done by lofting rotated,\nscaled copies of the section (slower, still exact enough at 2 deg per step).\n\nExample:\n    body = twist(wavy_circle(30, 3, 8), height=120, angle=90)\n    vase = shell_open_top(body, wall=1.2)",
+      "example": "body = twist(wavy_circle(30, 3, 8), height=120, angle=90)\nvase = shell_open_top(body, wall=1.2)",
+      "used_by": [],
+      "import": "from lib.form.surface import twist"
+    },
+    "form.wavy_circle": {
+      "id": "form.wavy_circle",
+      "version": "1.0.0",
+      "summary": "Circle with a sinusoidal radius (lobed / scalloped section) as a sketch, for twisted vases and lamp shades.",
+      "params": [
+        {
+          "name": "radius",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "mean radius"
+        },
+        {
+          "name": "amplitude",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "radial wave amplitude (peak = radius + amplitude)"
+        },
+        {
+          "name": "lobes",
+          "type": "int",
+          "units": "count",
+          "default": 8,
+          "description": "number of waves around the circumference"
+        },
+        {
+          "name": "phase",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotates the pattern"
+        },
+        {
+          "name": "samples_per_lobe",
+          "type": "int",
+          "units": "count",
+          "default": 8,
+          "description": "spline control points per wave (>= 6 keeps the curve faithful)"
+        }
+      ],
+      "tags": [
+        "form",
+        "lobes",
+        "petal",
+        "scallop",
+        "section",
+        "sketch",
+        "spiral vase",
+        "wave"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D section)",
+        "notes": "UNVALIDATED",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.surface",
+      "qualname": "wavy_circle",
+      "file": "lib/form/surface.py",
+      "line": 14,
+      "returns": "Sketch",
+      "docstring": "Periodic spline through ``lobes * samples_per_lobe`` points of r(t) = radius + amplitude sin(lobes t).\n\nExample:\n    vase = twist(wavy_circle(35, 4, 10), height=150, angle=120)",
+      "example": "vase = twist(wavy_circle(35, 4, 10), height=150, angle=120)",
+      "used_by": [],
+      "import": "from lib.form.surface import wavy_circle"
     },
     "mechanisms.cantilever_latch": {
       "id": "mechanisms.cantilever_latch",
@@ -1003,6 +1758,7 @@
       "docstring": "Four circles at ``(+/-(length/2 - inset), +/-(width/2 - inset))``.\n\nPass the box *inner* cavity size and the boss inset to get the corner-boss\ncentres of a ``rounded_box``; ``locations_of()`` turns them into boss\nplacements, and the same call with the lid gives the matching screw holes.\n\nExample:\n    holes = corner_holes(inner_l, inner_w, inset=3.4)\n    bosses = [loc * heat_set_boss(\"M3\", height=h) for loc in locations_of(holes)]",
       "example": "holes = corner_holes(inner_l, inner_w, inset=3.4)\nbosses = [loc * heat_set_boss(\"M3\", height=h) for loc in locations_of(holes)]",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.patterns.corners import corner_holes"
@@ -1358,13 +2114,14 @@
       "docstring": "Four circles at the Pi 5 hole positions; subtract from a floor, or use\n``locations_of()`` to place bosses.  ``active_cooler_holes`` adds the two\n3 mm push-pin holes of the official Active Cooler (x=+29, y=+/-18.5).\n\nExample:\n    floor = Rectangle(95, 66) - pi5_mount()\n    bosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
       "example": "floor = Rectangle(95, 66) - pi5_mount()\nbosses = [loc * heat_set_boss(\"M2.5\") for loc in locations_of(pi5_mount())]",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.patterns.pi import pi5_mount"
     },
     "patterns.pi5_port_cutouts": {
       "id": "patterns.pi5_port_cutouts",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "summary": "Raspberry Pi 5 connector windows for one board edge as a wall-plane sketch (x along the edge, y = height above PCB top).",
       "params": [
         {
@@ -1372,7 +2129,7 @@
           "type": "str",
           "units": "enum",
           "default": "power",
-          "description": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window)"
+          "description": "power (-Y: USB-C + 2x micro-HDMI), usb (+X: Ethernet + 2x USB-A), sd (-X: microSD window), gpio (+Y: ribbon-cable window, v1.1.0)"
         },
         {
           "name": "clearance",
@@ -1400,12 +2157,14 @@
         "connector",
         "cutout",
         "ethernet",
+        "gpio",
         "hdmi",
         "microsd",
         "pi 5",
         "pi5",
         "ports",
         "raspberry pi",
+        "ribbon",
         "usb-a",
         "usb-c",
         "window"
@@ -1422,11 +2181,12 @@
       "module": "lib.patterns.pi",
       "qualname": "pi5_port_cutouts",
       "file": "lib/patterns/pi.py",
-      "line": 179,
+      "line": 184,
       "returns": "Sketch",
-      "docstring": "Rectangles to subtract from an enclosure wall so the Pi 5 connectors are reachable.\n\nSketch frame: x runs along the board edge in hole-pattern coordinates\n(lib X for ``power``, lib Y for ``usb``/``sd``), y is height above the PCB\ntop surface.  Place it with ``Pos(x_of_pi_origin, z_of_pcb_top)`` on the\nwall plane and extrude through the wall with ``both=True``.\n\nExample:\n    win = pi5_port_cutouts(\"power\")\n    body = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)",
-      "example": "win = pi5_port_cutouts(\"power\")\nbody = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)",
+      "docstring": "Rectangles to subtract from an enclosure wall so the Pi 5 connectors are reachable.\n\nSketch frame: x runs along the board edge in hole-pattern coordinates\n(lib X for ``power``, lib Y for ``usb``/``sd``), y is height above the PCB\ntop surface.  Place it with ``Pos(x_of_pi_origin, z_of_pcb_top)`` on the\nwall plane and extrude through the wall with ``both=True``.  ``gpio`` (v1.1.0) is\na window for a 40-way IDC socket and its ribbon on the +Y (header) edge.\n\nExample:\n    win = pi5_port_cutouts(\"power\")\n    body = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)\n    gpio = pi5_port_cutouts(\"gpio\")\n    body = body - extrude(Plane.XZ.offset(-outer_w / 2) * Pos(pi_x, pcb_top_z) * gpio, amount=wall, both=True)",
+      "example": "win = pi5_port_cutouts(\"power\")\nbody = body - extrude(Plane.XZ.offset(outer_w / 2) * Pos(pi_x, pcb_top_z) * win, amount=wall, both=True)\ngpio = pi5_port_cutouts(\"gpio\")\nbody = body - extrude(Plane.XZ.offset(-outer_w / 2) * Pos(pi_x, pcb_top_z) * gpio, amount=wall, both=True)",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.patterns.pi import pi5_port_cutouts"
@@ -1481,6 +2241,7 @@
       "docstring": "Board outline sketch sharing the mount pattern's origin, so\n``pi_board_outline() - pi5_mount()`` is the drilled PCB footprint.\n\nExample:\n    pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
       "example": "pocket = extrude(pi_board_outline(\"pi5\", clearance=1.0), amount=pcb_t)",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.patterns.pi import pi_board_outline"
@@ -2201,6 +2962,7 @@
       "docstring": "Example:\nbody = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
       "example": "body = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.primitives.feet import rubber_foot_recess"
@@ -2345,6 +3107,7 @@
       "docstring": "Example:\nside = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
       "example": "side = side - extrude(Plane.XZ * vent_slots(40, 16), amount=wall, both=True)",
       "used_by": [
+        "models/cloud_pi_holder/model.py",
         "models/esp32_devkit_case/model.py",
         "models/pi5_fan_case/model.py"
       ],
@@ -2352,6 +3115,21 @@
     }
   },
   "models": {
+    "cloud_pi_holder": {
+      "path": "models/cloud_pi_holder",
+      "components": [
+        "fasteners.heat_set_boss",
+        "form.cloud_outline",
+        "form.textured",
+        "patterns.corner_holes",
+        "patterns.pi5_mount",
+        "patterns.pi5_port_cutouts",
+        "patterns.pi_board_outline",
+        "primitives.rubber_foot_recess",
+        "primitives.vent_slots"
+      ],
+      "golden": true
+    },
     "esp32_devkit_case": {
       "path": "models/esp32_devkit_case",
       "components": [
@@ -2389,6 +3167,15 @@
         "primitives.rounded_box",
         "primitives.rubber_foot_recess",
         "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "ribbed_vase": {
+      "path": "models/ribbed_vase",
+      "components": [
+        "form.flutes",
+        "form.revolved_body",
+        "form.shell_open_top"
       ],
       "golden": true
     }

@@ -1,7 +1,7 @@
 """Every model builds, is printable, passes lint, and matches its committed golden metrics."""
 import pytest
 
-from scripts._common import FIT_TOL_MM3, build_parts, diff_golden, list_projects, load_golden, metrics, run_fit_checks
+from scripts._common import FIT_TOL_MM3, bbox_of, build_parts, diff_golden, list_projects, load_golden, metrics, print_modes, run_fit_checks
 from scripts.check_printable import check_mesh
 from scripts._common import to_trimesh
 from scripts.lint_models import lint_file, MODELS_DIR
@@ -36,10 +36,11 @@ def test_model_matches_golden(project, built):
 
 @pytest.mark.parametrize("project", PROJECTS)
 def test_model_is_printable(project, built):
+    modes = print_modes(project)
     for name, shape in built[project].items():
-        rep = check_mesh(to_trimesh(shape))
+        rep = check_mesh(to_trimesh(shape), mode=modes.get(name, "normal"))
         assert rep["ok"], f"{project}/{name}: {rep['problems']}"
-        assert abs(shape.bounding_box().min.Z) < 1e-6, f"{project}/{name} not sitting on the bed (z_min != 0) — return parts in print orientation"
+        assert abs(bbox_of(shape)[0][2]) < 1e-6, f"{project}/{name} not sitting on the bed (z_min != 0) — return parts in print orientation"
 
 
 @pytest.mark.parametrize("project", PROJECTS)

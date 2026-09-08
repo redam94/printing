@@ -1,0 +1,60 @@
+{
+  "project": "cloud_pi_holder",
+  "generated": "2026-09-07",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "body": {
+      "bbox_min": [
+        -40.794,
+        -33.817,
+        -0.0
+      ],
+      "bbox_max": [
+        57.826,
+        55.849,
+        29.6
+      ],
+      "bbox_size": [
+        98.621,
+        89.666,
+        29.6
+      ],
+      "volume": 34420.045,
+      "surface_area": 36963.38,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "26c08b71f5c8e271",
+      "triangles": 108258,
+      "kind": "mesh"
+    },
+    "lid": {
+      "bbox_min": [
+        -40.5,
+        -55.7,
+        0.0
+      ],
+      "bbox_max": [
+        57.5,
+        33.5,
+        5.0
+      ],
+      "bbox_size": [
+        98.0,
+        89.2,
+        5.0
+      ],
+      "volume": 16864.74,
+      "surface_area": 19277.685,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "c7a8a901a95cf10d",
+      "triangles": 6438,
+      "kind": "brep"
+    }
+  }
+}

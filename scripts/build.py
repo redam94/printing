@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, run_fit_checks, write_golden, write_build_report, review_info, export_3mf, FIT_TOL_MM3  # noqa: E402
+from scripts._common import MODELS_DIR, ROOT, build_parts, diff_golden, export, format_changes, load_golden, metrics, print_modes, run_fit_checks, write_golden, write_build_report, review_info, export_3mf, FIT_TOL_MM3  # noqa: E402
 from scripts.check_printable import check_mesh, format_report  # noqa: E402
 from scripts.render import render_project  # noqa: E402
 from scripts._common import to_trimesh  # noqa: E402
@@ -49,19 +49,20 @@ def main() -> int:
     print(f"built {a.project}: {len(parts)} part(s) in {time.time()-t0:.1f}s\n")
 
     current, checks, ok = {}, {}, True
+    modes = print_modes(a.project)
     for name, shape in parts.items():
         m = metrics(shape)
         current[name] = m
         print(f"{name}: bbox {m.bbox_size[0]} x {m.bbox_size[1]} x {m.bbox_size[2]} mm  "
               f"(min {m.bbox_min}, max {m.bbox_max})  volume {m.volume:.1f} mm³ = {m.volume/1000:.2f} cm³  "
-              f"solids={m.solids} valid={m.valid}")
-        rep = check_mesh(to_trimesh(shape), a.nozzle)
+              f"solids={m.solids} valid={m.valid}" + ("  [mesh part]" if m.kind == "mesh" else ""))
+        rep = check_mesh(to_trimesh(shape), a.nozzle, mode=modes.get(name, "normal"))
         checks[name] = rep
         print(format_report(name, rep))
         ok &= rep["ok"] and m.valid
         if not a.no_export:
             stl, step = export(shape, a.project, name)
-            print(f"      exported {stl.relative_to(ROOT)}  {step.relative_to(ROOT)}")
+            print(f"      exported {stl.relative_to(ROOT)}  " + (f"{step.relative_to(ROOT)}" if step else "(mesh part: no STEP)"))
         print()
 
     fits = run_fit_checks(a.project, parts)

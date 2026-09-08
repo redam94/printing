@@ -42,6 +42,19 @@ this when writing geometry the library does not cover.
   `MaterialNotes.orientation` when promoting to the library.
 - **Threads:** don't model them below M6; use inserts or nuts.
 
+## Organic forms, textures, spiral (vase) mode
+- **Spiral / vase mode** prints one continuous perimeter per layer: exactly one outer contour per
+  layer above the solid floor (no islands, no handles, no separate bosses), no flat ceilings, and a
+  single wall self-supports to ~60° from vertical (0.2 mm layers, 0.45 mm line). Declare it with
+  `PRINT_MODES` so the checker applies these rules. Not watertight for liquids without sealing.
+- **Flutes / ribs:** width ≥ 2 mm and depth ≤ wall − 0.8 when the part prints as a normal shell;
+  in vase mode any depth works. Sharp edges are fine (each layer is a closed loop).
+- **Surface texture** (noise, ripple): amplitude ≤ 0.4 mm and feature size ≥ 5 mm print cleanly
+  at a 0.4 nozzle; never on the bed face, never in a fit (exterior-only mask), keep height levels.
+- **Overhangs on curved bodies:** a spline shoulder is fine while its slope stays under 45°
+  (normal shell) / 60° (vase mode); the checker reports the region bbox when it is not.
+- **Gyroid / SDF lattices:** cells ≥ 10 mm self-support; wall (level-set thickness) ≥ 1.2 mm.
+
 ## Enclosure defaults
 - Cavity = hardware envelope + 1.0 per side (PCB) or + 2.0 (cables, connectors).
 - Standoff height ≥ 3 mm so solder joints clear the floor; ≥ 6 with through-hole leads.

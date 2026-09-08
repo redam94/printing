@@ -4,7 +4,7 @@
 :root{
   --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8; --line-2:#E8EBE6;
   --accent:#E8791D; --accent-ink:#FFFFFF; --accent-soft:#FBE9DA; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F; --focus:#2F6FE8;
-  --c-patterns:#2F6FE8; --c-mechanisms:#2E9E5B; --c-fasteners:#8A4FD3; --c-primitives:#5E6771;
+  --c-patterns:#2F6FE8; --c-mechanisms:#2E9E5B; --c-fasteners:#8A4FD3; --c-primitives:#5E6771; --c-form:#C2408A;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
@@ -38,7 +38,7 @@ h3{font-size:14px;margin:0;font-weight:600}
 .mono{font-family:var(--mono);font-size:12.5px}
 .chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);background:var(--panel-2);white-space:nowrap;vertical-align:middle}
 .chip.cat{border-color:transparent;color:#fff}
-.chip.patterns{background:var(--c-patterns)} .chip.mechanisms{background:var(--c-mechanisms)} .chip.fasteners{background:var(--c-fasteners)} .chip.primitives{background:var(--c-primitives)}
+.chip.patterns{background:var(--c-patterns)} .chip.mechanisms{background:var(--c-mechanisms)} .chip.fasteners{background:var(--c-fasteners)} .chip.primitives{background:var(--c-primitives)} .chip.form{background:var(--c-form)}
 .chip.gap{border-style:dashed;border-color:var(--bad);color:var(--bad);background:transparent}
 .chip.ok{color:var(--ok);border-color:var(--ok)} .chip.bad{color:var(--bad);border-color:var(--bad)} .chip.warn{color:var(--warn);border-color:var(--warn)}
 .pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
@@ -124,6 +124,11 @@ td.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 .howto{border:1px dashed var(--line);border-radius:6px;padding:10px 12px;color:var(--muted);font-size:12.5px;max-width:80ch;margin-top:14px}
 .howto code{font-family:var(--mono);font-size:12px;background:var(--panel-2);padding:0 4px;border-radius:3px}
 @media (prefers-reduced-motion:no-preference){.comp summary,.btn{transition:border-color .12s}}
+.insp{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.insp figure{margin:0;width:132px}
+.insp img{width:132px;height:99px;object-fit:cover;border-radius:4px;display:block;background:var(--panel-2)}
+.insp figcaption{font-size:11px;color:var(--muted);line-height:1.3;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.insp .pend{color:var(--warn)}
 </style>
 
 <header class="top">
@@ -262,10 +267,16 @@ document.getElementById('models').innerHTML=D.models.length?D.models.map(m=>{
   return `<article class="model"><div class="head"><h3>${esc(m.project)}</h3><span class="meta">${m.parts.length} part${m.parts.length===1?'':'s'}${m.built_at?' · built '+esc(m.built_at):''}${m.params?' · '+m.params+' parameters':''}</span><span class="spacer"></span>${status}${golden}${plate}${fits}${m.review_url?`<a href="${esc(m.review_url)}" target="_blank" rel="noopener">review page ↗</a>`:'<span class="chip warn">unpublished</span>'}</div>
     ${m.summary?`<div class="doc">${esc(m.summary)}</div>`:''}
     ${renders?`<div class="renders">${renders}</div>`:''}
+    ${inspHtml(m.inspiration)}
     ${parts}
     <div class="chips"><span class="muted" style="margin-right:4px">uses</span>${m.components.length?m.components.map(c=>compChip(c,m.components_versions)).join(''):'<span class="muted">no library components</span>'}</div>
     ${m.docstring&&m.docstring.length>m.summary.length+20?`<details><summary class="muted" style="cursor:pointer">full model notes</summary><div class="doc full">${esc(m.docstring)}</div></details>`:''}
   </article>`;}).join(''):'<div class="empty">No models yet.</div>';
+
+function inspHtml(xs){
+  if(!xs||!xs.length) return '';
+  return `<div class="insp" title="inspiration photos filed under this ${xs[0].path.split('/')[0]}">${xs.map(r=>`<figure>${r.thumb?`<img src="${r.thumb}" alt="${esc(r.caption||r.subject||'inspiration photo')}" loading="lazy">`:''}<figcaption>${r.pending?'<span class="pend">brief pending</span> · ':''}${esc(r.subject||r.caption||r.id)}</figcaption></figure>`).join('')}</div>`;
+}
 
 // ---------- ideas board ----------
 let inbox=[]; let dbRef=null; let storeKind='local';
@@ -303,6 +314,7 @@ function ideaCard(i){
   const secs=['Problem','Concept','Constraints','Gaps','Open questions'].filter(s=>i.sections[s]).map(s=>`<div class="sec"><b>${esc(s)}</b>\n${esc(i.sections[s])}</div>`).join('');
   return `<div class="card"><div class="t">${esc(i.title)}</div><div class="k">${esc(i.kind)} · <span class="mono">${esc(i.slug)}</span>${i.updated?' · '+esc(i.updated):''}${i.model?' · models/'+esc(i.model):''}${i.has_sketch?' · has sketch':''}</div>
     ${i.render?`<img src="${i.render}" alt="sketch render for ${esc(i.title)}">`:''}
+    ${inspHtml(i.inspiration)}
     ${i.hardware.length?`<div class="k">fits: ${esc(i.hardware.join(', '))}</div>`:''}
     ${chips?`<div class="chips">${chips}</div>`:''}
     ${i.sections.Problem?`<div class="txt">${esc(i.sections.Problem.slice(0,240))}${i.sections.Problem.length>240?'…':''}</div>`:''}
