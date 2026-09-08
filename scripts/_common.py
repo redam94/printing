@@ -231,7 +231,15 @@ BBOX_ATOL_MESH = 0.05
 
 
 def diff_golden(golden: dict | None, current: dict[str, Metrics]) -> list[dict]:
-    """Compare current metrics to a golden file. Returns a list of change records."""
+    """Compare current metrics to a golden file. Returns a list of change records.
+
+    ``mesh_hash`` is recorded in the golden but deliberately NOT compared. It is exact
+    and reproducible on one machine, but OCCT tessellates slightly differently between
+    platforms and OCP builds, so a hash mismatch is what you get every time a model is
+    rebuilt anywhere other than where its golden was written — noise, not a signal.
+    The fields compared here are all platform-independent to their tolerance: volume,
+    surface area, bbox size AND position, and watertightness.
+    """
     changes: list[dict] = []
     if golden is None:
         return [{"part": n, "field": "golden", "old": None, "new": "missing", "kind": "new"} for n in current]
@@ -246,14 +254,21 @@ def diff_golden(golden: dict | None, current: dict[str, Metrics]) -> list[dict]:
         if abs(m.volume - g["volume"]) > v_rtol * max(abs(g["volume"]), 1e-9):
             pct = 100.0 * (m.volume - g["volume"]) / g["volume"] if g["volume"] else float("inf")
             changes.append({"part": name, "field": "volume", "old": g["volume"], "new": m.volume, "kind": "geometry", "delta": f"{pct:+.3f}%"})
+        if abs(m.surface_area - g["surface_area"]) > v_rtol * max(abs(g["surface_area"]), 1e-9):
+            pct = 100.0 * (m.surface_area - g["surface_area"]) / g["surface_area"] if g["surface_area"] else float("inf")
+            changes.append({"part": name, "field": "surface_area", "old": g["surface_area"], "new": m.surface_area, "kind": "geometry", "delta": f"{pct:+.3f}%"})
         for i, ax in enumerate("xyz"):
             if abs(m.bbox_size[i] - g["bbox_size"][i]) > b_atol:
                 changes.append({"part": name, "field": f"bbox_{ax}", "old": g["bbox_size"][i], "new": m.bbox_size[i], "kind": "geometry",
                                 "delta": f"{m.bbox_size[i] - g['bbox_size'][i]:+.3f} mm"})
+        # position, not just size: a part that moved keeps its bbox_size and its volume
+        for field, cur, ref in (("bbox_min", m.bbox_min, g["bbox_min"]), ("bbox_max", m.bbox_max, g["bbox_max"])):
+            for i, ax in enumerate("xyz"):
+                if abs(cur[i] - ref[i]) > b_atol:
+                    changes.append({"part": name, "field": f"{field}_{ax}", "old": ref[i], "new": cur[i], "kind": "geometry",
+                                    "delta": f"{cur[i] - ref[i]:+.3f} mm"})
         if m.watertight != g["watertight"]:
             changes.append({"part": name, "field": "watertight", "old": g["watertight"], "new": m.watertight, "kind": "integrity"})
-        if m.mesh_hash != g["mesh_hash"]:
-            changes.append({"part": name, "field": "mesh_hash", "old": g["mesh_hash"], "new": m.mesh_hash, "kind": "mesh"})
     for name in gparts:
         if name not in current:
             changes.append({"part": name, "field": "part", "old": "present", "new": None, "kind": "removed"})

@@ -96,7 +96,7 @@ def collect(with_images: bool = False) -> dict:
         if report and golden:
             try:
                 cur = {n: Metrics(**rp["metrics"]) for n, rp in report.get("parts", {}).items() if rp.get("metrics")}
-                golden_diff = [c for c in diff_golden(golden, cur) if c["kind"] != "mesh"]
+                golden_diff = diff_golden(golden, cur)
             except TypeError:
                 golden_diff = []
         rv = review_info(p)
@@ -159,7 +159,7 @@ def collect(with_images: bool = False) -> dict:
             attention.append({"kind": "model", "ref": m["project"], "text": "source changed since last build", "fix": f"uv run python scripts/build.py {m['project']}"})
         if m["built"] and not m["review_url"]:
             attention.append({"kind": "model", "ref": m["project"], "text": "review page not published", "fix": "publish exports/view.html with the Artifact tool, record models/<p>/review.json"})
-        if any(c["kind"] != "mesh" for c in m["golden_changes"]):
+        if m["golden_changes"]:
             attention.append({"kind": "model", "ref": m["project"], "text": "last build differed from its golden", "fix": "review the diff; --update-golden only if intended"})
         if m["open_critiques"]:
             n = len(m["open_critiques"])

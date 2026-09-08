@@ -73,11 +73,7 @@ def main() -> int:
     changed = [p for p, c in results.items() if c]
     print()
     if changed:
-        kinds = {c["kind"] for p in changed for c in results[p]}
-        if kinds <= {"mesh"}:
-            print(f"{len(changed)} model(s) changed at mesh level only (tessellation/hash) — volume and bbox unchanged.")
-        else:
-            print(f"{len(changed)} model(s) CHANGED: {', '.join(changed)}" + ("" if a.accept else "  — review, then rerun with --accept if intended"))
+        print(f"{len(changed)} model(s) CHANGED: {', '.join(changed)}" + ("" if a.accept else "  — review, then rerun with --accept if intended"))
         return 0 if a.accept else 2
     print("all affected models match their goldens")
     return 0

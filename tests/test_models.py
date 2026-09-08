@@ -30,8 +30,7 @@ def test_model_matches_golden(project, built):
     assert golden is not None, f"no golden for {project}: run scripts/build.py {project}"
     current = {n: metrics(s) for n, s in built[project].items()}
     changes = diff_golden(golden, current)
-    real = [c for c in changes if c["kind"] != "mesh"]
-    assert not real, f"{project} geometry changed vs golden: {real}\nIf intended: scripts/build.py {project} --update-golden"
+    assert not changes, f"{project} geometry changed vs golden: {changes}\nIf intended: scripts/build.py {project} --update-golden"
 
 
 @pytest.mark.parametrize("project", PROJECTS)
