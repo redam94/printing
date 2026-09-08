@@ -1,13 +1,13 @@
 ---
-title: Snap-together draining tiles with a spout tile
-status: idea
+title: Snap-together draining tiles feeding the drip rail
+status: sketching
 kind: part
 created: 2026-09-07
-updated: 2026-09-07
+updated: 2026-09-08
 tags: [kitchen, drying, tiles, modular, drainage, snap, petg]
 hardware: []
-reuse: [primitives.vent_slots, mechanisms.snap_ridge, mechanisms.snap_groove, primitives.rounded_box, primitives.foot, primitives.rubber_foot_recess]
-gaps: [primitives.sloped_floor, primitives.drip_spout]
+reuse: [mechanisms.snap_ridge, mechanisms.snap_groove]
+gaps: [primitives.groove_field]
 model:
 ---
 
@@ -18,62 +18,88 @@ rack you can buy — it wants to be a different width in every kitchen, and a ra
 worst case wastes counter the rest of the time.
 
 ## Concept
-A field of 90 x 90 mm tiles, roughly 12 mm tall, that snap edge to edge into whatever footprint
-the counter allows. Each tile is a shallow tray whose floor is pitched a few degrees toward one
-edge, with a coarse slot grid over it so dishes stand on slots and water falls through to the
-sloped floor beneath and runs to the low edge. Tiles pass water to their downhill neighbour
-through a notch in the shared wall; the last tile in the run is a spout variant whose floor
-narrows into a lip that overhangs the countertop cutout and pours into the basin.
+A row of tiles, `TILE_X` = 90 mm each, that snap edge to edge along the counter so the field is
+whatever width the counter allows. Each tile is a deck pitched 4 degrees toward the sink with
+trapezoidal grooves running down it: dishes stand on the ribs between grooves, water runs in the
+grooves to the outboard edge and off a drip nose. Two side walls carry the deck, sit flat on the
+counter and hold the snap joint — one wall has a bead, the other a matching groove, so a run of
+tiles is one continuous deck with the joint hidden under the seam.
 
-Bed side is the tile's underside; the slot grid is the top surface. The tray under the slots is
-**open at the bottom** — it is a pitched shelf standing on feet, not a sealed void. A closed
-cavity in a permanently wet part cannot be scrubbed and will grow mould, which is the failure mode
-that kills most printed dish racks.
+The tile does not reach the sink itself. Its deck cantilevers past its walls (`WALL_SETBACK`) and
+overhangs the rim of [[sink_edge_drip_rail]], dripping into the rail's pan, which carries the
+water across the counter edge into the basin. That is what removes the spout tile from this idea
+entirely: the rail is the spout, for the whole row at once.
 
-If the counter run cannot reach the basin, the spout tile hands off to [[sink_edge_drip_rail]]
-instead of overhanging by itself.
+Nothing is enclosed. The whole underside is open front to back, and a brush reaches every face.
 
 ## Constraints
 - PETG. Splash zone; PLA creeps and the snap joints relax.
-- One tile is well under the 270 mm bed; a six-tile field is six identical prints plus one spout.
-- Floor pitch >= 3 degrees so water actually moves at low volume; slot webs >= 1.2 mm.
-- Slots sized for dish feet, not for ventilation: `slot_w` 5-6 mm at ~9 mm pitch, so a mug rim
-  bridges but water leaves immediately.
-- Feet lift the field ~4 mm; the counter under the rack must dry.
+- One tile is well under the 270 mm bed: 90.6 x 140.4 x 24.9 mm printed.
+- Deck pitch >= 3 degrees so water moves at low volume (sketch uses 4).
+- Grooves 5 mm wide at 9 mm pitch, 1.2 deep, walls 30 degrees off vertical so they self-support
+  when the deck is printed face down. Ribs between them are 4 mm — a mug rim bridges, water leaves.
+- No enclosed volume: no second level, no tray under the deck.
+- `FOOT_H` must clear the drip rail's pan rim where the deck overhangs it (see Log).
 - Snap joints must survive being pulled apart for washing repeatedly — not a one-time assembly.
 
 ## Reuse map
 | need | component | notes |
 |---|---|---|
-| drain grid | primitives.vent_slots | as is, run coarse (slot_w ~5.5, pitch ~9, several rows) |
-| tile tray body | primitives.rounded_box | as the shell; its flat floor is then replaced (see Gaps) |
-| tile-to-tile joint | mechanisms.snap_ridge | bead on two edges of every tile |
-| matching joint | mechanisms.snap_groove | groove on the opposite two edges; check clearance survives repeated cycles |
-| feet | primitives.foot | TPU on a second toolhead so the field does not slide when loaded |
-| foot seat | primitives.rubber_foot_recess | if using stick-on feet instead |
+| tile-to-tile joint | mechanisms.snap_ridge | bead on the +X wall face, 0.6 r |
+| matching joint | mechanisms.snap_groove | groove in the -X wall face, 0.1 clearance; verified to mate with zero interference |
+| groove field | — | see Gaps; the sketch freehands it |
 
 ## Gaps
-`primitives.sloped_floor` — replace a shell's flat floor with one pitched by `angle` toward a named
-edge, keeping the wall heights and the floor thickness constant. Parameters: `length`, `width`,
-`angle`, `floor_t`, `toward` (+X/-X/+Y/-Y), optional `channel` (a shallow gutter along the low
-edge). Library-shaped: every tray, planter saucer, soap dish, drip channel and battery tray wants
-it, and it composes with `primitives.rounded_box` rather than replacing it.
+`primitives.groove_field` — a field of blind, self-supporting drain grooves in a surface:
+`area_l`, `area_w`, `pitch`, `width`, `depth`, `wall_deg` (groove wall angle off vertical),
+`rotation`. Library-shaped because the rule it encodes is not obvious and is easy to get wrong:
+a groove cut into a face that will be printed *face down* has its wall angle as the overhang
+angle, so square-walled grooves become flat ceilings and 45-degree walls sit exactly on the
+limit. Any drying tray, soap dish, drainer or draining shelf wants the same thing.
+`primitives.vent_slots` is the near neighbour but not the same component: it cuts *through* a wall
+for airflow, this one cuts *into* a surface for liquid.
 
-`primitives.drip_spout` — a channel that narrows into a pour lip with a drip-break undercut so the
-stream separates instead of wicking back along the underside. Parameters: `width_in`, `width_out`,
-`length`, `drop`, `wall`, `break_depth`. Used by this tile and by [[sink_edge_drip_rail]]'s
-outfall, which is the second use that makes it library rather than model geometry.
+Dropped by the sketch, recorded so they are not re-proposed:
+- `primitives.drip_spout` — not needed. [[sink_edge_drip_rail]] is the spout for the whole row.
+- `primitives.sloped_floor` — not needed *here*. The tile is a tilted slab on two walls, not a
+  shell with a pitched floor. Still a reasonable component for trays and saucers, but nothing in
+  the current ideas wants it, so it should not sit on the roadmap as if something does.
 
 ## Open questions
-- Counter run available beside the sink: length and depth, which fixes the tile count and whether
-  90 mm is the right module.
-- Does the field need to reach the basin at all, or does it hand off to the drip rail?
-- Countertop thickness at the cutout, for the spout tile's overhang (same measurement
-  [[sink_edge_drip_rail]] needs).
-- Does anything need to sit flat on the field (a cutting board, a pan), which would argue for a
-  solid-topped tile variant in the same snap module?
+- Counter run available beside the sink: length and depth. Length fixes the tile count, depth
+  fixes `TILE_Y` (sketch uses 140 mm).
+- Does anything need to sit flat on the field (a cutting board, a pan)? That would argue for a
+  solid-topped tile variant sharing the same snap module.
+- Anti-slip: the side walls are the feet, so `primitives.foot` no longer applies. A TPU bottom
+  strip on a second toolhead is the natural answer on this printer — worth trying on the first
+  print.
 
 ## Log
 - 2026-09-07 captured in a drying-rack ideation session; picked by the user alongside
   [[pot_fin_rack]] and [[sink_edge_drip_rail]]. Ranked last of the three on cost (two gaps) but
   it is the one that fits an undermount sink with no rim to hang from.
+- 2026-09-08 sketch round 1 (`uv run python scripts/sketch.py drain_tiles`). The design changed
+  substantially, and so did the reuse map — it is now two components, not six.
+  - **The idea contradicted itself.** It asked for a slot grid over a sloped floor *and* an open
+    bottom. With nothing under the slots the water lands on the counter; with a floor under them
+    there is a cavity that cannot be scrubbed. Resolved as ONE surface: a pitched deck with
+    grooves down it. Dishes on the ribs, water in the grooves. That drops
+    `primitives.vent_slots` (nothing is cut through) and `primitives.rounded_box` (there is no box).
+  - **The field is one row deep, not a 2D grid.** Tiles stacked in Y would each have to sit lower
+    than the one behind by the tile's own drop, so identical tiles cannot tile in the flow
+    direction. The field grows along the counter edge only; `TILE_Y` is the counter depth used.
+  - **The tiles feed the rail rather than reaching the sink.** Verified as a placed assembly, not
+    by eye: with the rail's `RIM_H` at its old 10 mm the tile fouls the rim by 1231 mm3. Lowering
+    the rail's rim to 4 mm and setting `WALL_SETBACK` 14 mm (so the deck cantilevers over the rim
+    while the walls stop short of it) gives **zero interference** at tile `FOOT_H` 10 / 14 / 16.
+    The rail's default `RIM_H` was changed to 4 for this reason; see that idea's log.
+  - Two tiles side by side: **zero interference**, bead reaches x=45.60 into a neighbour groove
+    that starts at x=45.00, decks butt at the tile boundary with no gap.
+  - Groove walls at 45 degrees read as a 14 % overhang flag; at 30 degrees they are comfortable.
+    The checker still reports ~13.8 % "overhang" either way, because it counts the groove
+    *ceilings* — 3.6 mm bridges sitting 1.2 mm off the bed. Those are routine, and this is worth
+    remembering: on a face-down grooved deck the headline overhang number is not the useful one.
+  - Checker: 90.6 x 140.4 x 24.9 mm, 44.2 cm3, watertight, one body, 5600 mm2 bed contact,
+    min wall 1.7 mm, no problems.
+  Next: measure the counter run, then write `primitives.groove_field` and build the model against
+  it together with `primitives.edge_clip` from [[sink_edge_drip_rail]].

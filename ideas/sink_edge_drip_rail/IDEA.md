@@ -99,3 +99,17 @@ was set aside only because this sink is undermount, not because the geometry was
     exactly with thickness, all fit the bed.
   Next: measure the real counter and the reveal, then promote the section to
   `primitives.edge_clip` and build the model against it.
+- 2026-09-08 changed by the [[drain_tiles]] sketch round, which feeds this rail:
+  - `RIM_H` 10 -> 4. The tiles cantilever their deck over this rim to drip into the pan; at 10 mm
+    the tile fouled the rim by 1231 mm3, at 4 mm the assembly has zero interference. Raise it back
+    to ~10 if the rail is ever used on its own.
+  - Added `RIM_TOP_W` (1.6 mm flat on the rim crest). Without it the ramp met the outer face in a
+    knife edge, which is where **every** sub-0.8 mm sample in this part was coming from — the
+    0.4 % noted in round 1 was not spread over the relief arcs at all, it was all one feature.
+    Located by re-running the checker's own sampler and printing where the thin samples land:
+    108 of 108 sat at the crest. With the flat top the rail reads **min wall 1.2 mm, 0.0 % under
+    0.8 and under 1.2**, so round 1's only outstanding defect is closed.
+  - Drip break is now a round-bottomed groove whose centre sits 0.4 mm outboard of the face
+    (`DRIP_GROOVE_OUT`) instead of a V-notch. The V's mouth met the bed face at a tangent and left
+    knife edges there; the offset circle meets it at 66 degrees. Overhang 2.0 % -> 1.5 %.
+  - Checker after the changes: 180 x 41.8 x 58 mm, 61.4 cm3, watertight, one body, no problems.

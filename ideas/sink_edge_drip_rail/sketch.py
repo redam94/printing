@@ -41,19 +41,26 @@ RAIL_LEN = 180.0        # along the counter edge
 PAN_REACH = 55.0        # how far inland the pan sits on the counter
 FLOOR_T = 2.4           # pan floor thickness at the outboard edge
 PITCH_DEG = 3.0         # floor pitch toward the sink
-RIM_H = 10.0            # rim height above the floor at the inland end
+RIM_H = 4.0             # rim height above the floor at the inland end.  Low because
+                        #     drain_tiles cantilever their deck over this rim to drip
+                        #     into the pan; raise it to ~10 if the rail is used alone.
 RAMP_RATIO = 1.15       # rim ramp run / rise; >= 1.0 keeps it self-supporting
+RIM_TOP_W = 1.6         # flat on top of the rim. Without it the ramp meets the outer
+                        #     face in a knife edge that prints as a wispy single wall
 END_WALL_T = 2.4        # end walls closing the pan at both ends
 
 DRIP_GROOVE_R = 1.0     # drip break cut into the outboard face below the pan
 DRIP_GROOVE_Z = 2.0     # how far below the counter top surface it sits
+DRIP_GROOVE_OUT = 0.4   # groove centre sits this far OUTBOARD of the face, so the arc
+                        #     meets it at an angle instead of tangentially (a tangential
+                        #     or V-shaped groove leaves knife edges on the bed face)
 CORNER_RELIEF = 1.2     # relief radius at both counter corners so the printed
                         # inside corners cannot hold the clip off the stone
 
 THROAT = COUNTER_T + THROAT_CLEAR
 _TP = tan(radians(PITCH_DEG))
 _RAMP = RIM_H * RAMP_RATIO
-_Y_RAMP = -PAN_REACH + _RAMP
+_Y_RAMP = -PAN_REACH + RIM_TOP_W + _RAMP
 
 
 def floor_top(y: float) -> float:
@@ -70,7 +77,8 @@ def section() -> Sketch:
         (JAW_T, -THROAT - LIP_T),          # bed plane, bottom of the return lip
         (JAW_T, floor_top(JAW_T)),         # up the outboard face (jaw + pan end)
         (_Y_RAMP, floor_top(_Y_RAMP)),     # pitched interior floor, inland
-        (-PAN_REACH, ZTOP),                # rim ramp
+        (-PAN_REACH + RIM_TOP_W, ZTOP),    # rim ramp
+        (-PAN_REACH, ZTOP),                # flat rim top
         (-PAN_REACH, 0.0),                 # inland face down to the counter
         (0.0, 0.0),                        # counter contact face out to the edge
         (0.0, -THROAT),                    # down the cut face
@@ -80,12 +88,7 @@ def section() -> Sketch:
     sk = Polygon(*pts, align=None)
     sk -= Pos(0, 0) * Circle(CORNER_RELIEF)            # top counter corner
     sk -= Pos(0, -THROAT) * Circle(CORNER_RELIEF)      # bottom counter corner
-    sk -= Polygon(                                     # drip break, V-notch
-        (JAW_T, -DRIP_GROOVE_Z + DRIP_GROOVE_R),
-        (JAW_T - DRIP_GROOVE_R, -DRIP_GROOVE_Z),
-        (JAW_T, -DRIP_GROOVE_Z - DRIP_GROOVE_R),
-        align=None,
-    )
+    sk -= Pos(JAW_T + DRIP_GROOVE_OUT, -DRIP_GROOVE_Z) * Circle(DRIP_GROOVE_R)  # drip break
     return sk
 
 
