@@ -1,14 +1,14 @@
 ---
 title: Snap-together draining tiles feeding the drip rail
-status: sketching
+status: prototyping
 kind: part
 created: 2026-09-07
 updated: 2026-09-09
 tags: [kitchen, drying, tiles, modular, drainage, snap, shingle, petg]
 hardware: []
-reuse: [mechanisms.snap_ridge, mechanisms.snap_groove]
-gaps: [primitives.groove_field, primitives.tenon_socket]
-model:
+reuse: [mechanisms.snap_ridge, mechanisms.snap_groove, primitives.groove_field]
+gaps: []
+model: drain_system
 ---
 
 ## Problem
@@ -70,10 +70,14 @@ The field still ends at [[sink_edge_drip_rail]], and the same edge language is w
 |---|---|---|
 | tile-to-tile joint | mechanisms.snap_ridge | bead on the +X wall face, 0.6 r |
 | matching joint | mechanisms.snap_groove | groove in the -X wall face, 0.1 clearance; verified to mate with zero interference |
-| groove field | — | see Gaps; the sketch freehands it |
-| four-edge tile key | — | see Gaps, `primitives.tenon_socket`; supersedes the two rows above if it works |
+| groove field | primitives.groove_field | written 2026-09-09; the deck prints face down so the groove wall angle IS the overhang angle |
+| row-to-row joint | — | a lap, not a component: the deck overhangs its own walls by LAP and the legs carry the drop |
 
 ## Gaps
+None left. **`primitives.groove_field` was written 2026-09-09** (with the explicit `lanes`
+parameter [[pot_fin_rack]] asked for) and the model builds against it. `primitives.tenon_socket` is
+no longer wanted here — see the 2026-09-09 log entry — but [[mawile_headphone_stand]] still wants it.
+
 `primitives.groove_field` — a field of blind, self-supporting drain grooves in a surface:
 `area_l`, `area_w`, `pitch`, `width`, `depth`, `wall_deg` (groove wall angle off vertical),
 `rotation`. Library-shaped because the rule it encodes is not obvious and is easy to get wrong:
@@ -159,3 +163,19 @@ Dropped by the sketch, recorded so they are not re-proposed:
   [[mawile_headphone_stand]]). Filed here rather than as a separate idea because it is the same
   object: the brief calls the existing tiles "the current part". Open: PLA vs PETG, and a
   success test. Next sketch round should try the shingle field before anything is promoted.
+- 2026-09-09 built as part of `models/drain_system` (rail + tile field + rack in one model). What the
+  build settled, beyond the brief:
+  - **The four-edge symmetric key does not survive the geometry.** `primitives.tenon_socket` is out
+    of this idea (it stays a gap for [[mawile_headphone_stand]], which still wants it). X and Y are
+    different joints: X is the existing snap bead/groove pair, Y is a lap plus a step in leg height.
+    That is not a preference — a lap seam in the flow direction cannot be a coplanar key.
+  - `ROW_DROP` = 11.1 mm per row back, derived rather than chosen: (TILE_Y - LAP) x tan(pitch) +
+    DECK_T + NOSE_D + LAP_CLEAR. It is why the field stops at 2-3 rows however deep the counter is.
+  - `primitives.groove_field` written and used by both the tile deck and the rack base.
+  - Module is 70 x 70 (the brief's number), 6 tiles per row across the measured 420 mm run.
+  - Checker per tile: 70.6 x 70.2 x 21.1 mm (row 1) / 32.1 mm (row 2), 21.9 / 26.7 cm3, watertight,
+    one body, min wall 1.65 mm, no problems. Groove ceilings read as 5 % overhang; they are 3.6 mm
+    bridges 1.2 mm off the bed, which is the same routine finding as sketch round 1.
+  - Fit checks in the model: rail vs front row, front row vs back row, tile-to-tile snap, rack on
+    the deck. All zero interference.
+  Next: measure the reveal under the counter, print one tile and one rail, check the snap fit in PLA.

@@ -1,14 +1,14 @@
 ---
 title: Pot, pan and lid fin rack
-status: sketching
+status: prototyping
 kind: part
 created: 2026-09-07
-updated: 2026-09-08
+updated: 2026-09-09
 tags: [kitchen, drying, rack, fins, sink, petg]
 hardware: []
-reuse: []
-gaps: [primitives.slot_rack, primitives.groove_field]
-model:
+reuse: [primitives.slot_rack, primitives.groove_field]
+gaps: []
+model: drain_system
 ---
 
 ## Problem
@@ -36,20 +36,26 @@ rotated**, so every root stays flat on the base and the lean is the only overhan
 part.
 
 ## Constraints
-- PETG. Splash zone, and it may take a hot pan.
+- PLA, at the user's decision 2026-09-09, and this is where that risk actually lives: PETG was
+  specified because a hot pan straight off the hob can land on this part. PLA softens around 60 C.
 - Blades >= 2.4 mm thick (sketch uses 2.6) so a wet 3 kg dutch oven leaning on one does not splay
   it; min wall in the sketch is 2.0 mm.
 - Lean angle is the print overhang angle. 12 degrees is comfortable; keep it well under 40.
-- Fits the bed, but only just: 253 x 60 x 88 mm against a 270 mm bed. The lean adds ~19 mm to the
-  X envelope on top of the blade span, which is easy to forget when adding a bay.
+- Fits the bed with room now: 205 x 60 x 88 mm at 2 pot bays against a 270 mm bed (253 at 3 bays).
+  The lean adds ~19 mm to the X envelope on top of the blade span, easy to forget when adding a bay.
 - Base grooves must sit in the bays, never under a blade (see Log).
 - Nothing enclosed; the whole base is reachable with a brush.
 
 ## Reuse map
-Nothing. This idea uses no existing library component — see Gaps for why that is a correction
-rather than an oversight.
+| need | component | notes |
+|---|---|---|
+| pot zone and lid zone combs | primitives.slot_rack | written 2026-09-09; used TWICE in this one part, which is what made it library-shaped |
+| base drain grooves | primitives.groove_field | shared with [[drain_tiles]]; `lanes` is the parameter this idea asked for, so a groove never lands under a blade |
 
 ## Gaps
+None left. **Both were written 2026-09-09** and the model builds against them; the specs below are
+kept as the record of what each had to do.
+
 `primitives.slot_rack` — a row of leaning blades with the slots between them, standing on z=0 and
 centred in X. Signature as the sketch settled it: `count`, `pitch`, `fin_t`, `fin_h` (height at
 the back edge), `depth`, `tilt_deg` (shear off vertical, and the print overhang angle),
@@ -103,3 +109,12 @@ and this idea's cost is a whole afternoon more than the original write-up implie
   - Placed on a three-tile field with the rail: rests on the deck, contact only (51 mm3 of boolean
     sliver between coincident faces).
   Next: pot and lid dimensions, then write `primitives.slot_rack` and build the model against it.
+- 2026-09-09 built as part of `models/drain_system`. `primitives.slot_rack` and
+  `primitives.groove_field` are both written, so this idea's reuse map went from nothing to two
+  components and no gaps. The rack is 2 pot bays rather than 3 (the user's call): 205 x 60 x 88 mm,
+  126.9 cm3, watertight, one body, min wall 2.0 mm, **0.0 % overhang and zero flat ceilings** — the
+  shear still buys the whole part support-free. That is 50 mm and 20 cm3 off the three-bay sketch.
+  `groove_field(lanes=...)` carries the per-bay lane placement; nothing severs a blade.
+  Fit-checked standing on the back tile row, and against the row in front of it: no interference.
+  Still open, and only a print answers it: whether a big pot rim-down sits stably across a 48 mm bay
+  or wants a concave blade top.

@@ -1,0 +1,110 @@
+{
+  "project": "drain_system",
+  "generated": "2026-09-09",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "rail": {
+      "bbox_min": [
+        -70.0,
+        -32.8,
+        0.0
+      ],
+      "bbox_max": [
+        70.0,
+        9.115,
+        58.0
+      ],
+      "bbox_size": [
+        140.0,
+        41.915,
+        58.0
+      ],
+      "volume": 49307.187,
+      "surface_area": 31211.059,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "63665dd66abe81f6",
+      "triangles": 996,
+      "kind": "brep"
+    },
+    "tile_row1": {
+      "bbox_min": [
+        -35.0,
+        0.907,
+        0.0
+      ],
+      "bbox_max": [
+        35.6,
+        71.148,
+        21.051
+      ],
+      "bbox_size": [
+        70.6,
+        70.241,
+        21.051
+      ],
+      "volume": 21939.925,
+      "surface_area": 17542.57,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "324627df313a3c81",
+      "triangles": 676,
+      "kind": "brep"
+    },
+    "tile_row2": {
+      "bbox_min": [
+        -35.0,
+        1.682,
+        0.0
+      ],
+      "bbox_max": [
+        35.6,
+        71.923,
+        32.14
+      ],
+      "bbox_size": [
+        70.6,
+        70.241,
+        32.14
+      ],
+      "volume": 26667.296,
+      "surface_area": 21535.401,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "68e9e1148b263ce8",
+      "triangles": 676,
+      "kind": "brep"
+    },
+    "rack": {
+      "bbox_min": [
+        -99.3,
+        -30.0,
+        0.0
+      ],
+      "bbox_max": [
+        105.671,
+        30.0,
+        88.2
+      ],
+      "bbox_size": [
+        204.971,
+        60.0,
+        88.2
+      ],
+      "volume": 126928.045,
+      "surface_area": 101245.42,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "25cb79852d1a8b50",
+      "triangles": 316,
+      "kind": "brep"
+    }
+  }
+}

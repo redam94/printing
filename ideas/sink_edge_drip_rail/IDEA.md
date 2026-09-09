@@ -1,14 +1,14 @@
 ---
 title: Countertop edge drip rail for an undermount sink
-status: sketching
+status: prototyping
 kind: part
 created: 2026-09-07
-updated: 2026-09-08
+updated: 2026-09-09
 tags: [kitchen, drying, sink, drainage, clip, petg, parametric]
 hardware: []
-reuse: [primitives.foot, primitives.rubber_foot_recess]
-gaps: [primitives.edge_clip]
-model:
+reuse: [primitives.edge_clip]
+gaps: []
+model: drain_system
 ---
 
 ## Problem
@@ -40,11 +40,15 @@ This is the smallest of the drying-rack candidates and also the enabler under th
 instead of overhanging the edge itself if the counter run is too shallow.
 
 ## Constraints
-- PETG. Splash zone, and PLA creeps when a hot pan drains into it.
+- PLA, at the user's decision 2026-09-09. The write-up specified PETG (splash zone, and PLA
+  creeps when a hot pan drains into it); the rail carries no standing load and nothing hot lands
+  in it, so this is the mildest place in the system to accept that risk.
 - Pan floor pitched >= 2 degrees toward the basin (sketch uses 3), with a V drip break cut into the
   outboard face 2 mm below the counter surface so water separates instead of wicking back under.
 - No enclosed volume anywhere: the pan is open along its whole length and washable.
-- Printed lying on the jaw's outboard face (see Concept). Sketched at 180 x 47.5 x 58 mm.
+- Printed lying on the jaw's outboard face (see Concept). Built at 140 x 41.9 x 58 mm per
+  segment; 420 mm of counter run is three segments butted end to end, because 420 does not fit a
+  270 mm bed.
 - Must not rely on adhesive or on drilling the counter.
 - Relief at both counter corners so the printed inside corners cannot hold the clip off the stone
   (a printed 90-degree inside corner always carries a small radius; a square stone arris does not).
@@ -52,10 +56,13 @@ instead of overhanging the edge itself if the counter run is too shallow.
 ## Reuse map
 | need | component | notes |
 |---|---|---|
-| soft jaw pad | primitives.foot | in TPU on a second toolhead, as the pad on each jaw face |
-| pad seat | primitives.rubber_foot_recess | if using stick-on pads instead of printed TPU |
+| the whole C-section | primitives.edge_clip | written 2026-09-09; jaw, throat, return lip, corner reliefs and the drip break, with the pan grown off its saddle |
+| pad seat | primitives.edge_clip `pad_recess` | a parameter on the clip rather than a separate component: the seat belongs to the gripping face |
 
 ## Gaps
+None left. **`primitives.edge_clip` was written 2026-09-09** and the model builds against it; the
+spec below is kept as the record of what it had to do.
+
 `primitives.edge_clip` — a C-profile clip that grips a panel or counter edge. Parameters as the
 sketch settled them: `thickness` (the edge it grips; 30 default = 3 cm stone slab),
 `throat_clearance` (0.4, added to thickness so it slides onto a square edge), `jaw_t` (3.0),
@@ -113,3 +120,16 @@ was set aside only because this sink is undermount, not because the geometry was
     (`DRIP_GROOVE_OUT`) instead of a V-notch. The V's mouth met the bed face at a tangent and left
     knife edges there; the offset circle meets it at 66 degrees. Overhang 2.0 % -> 1.5 %.
   - Checker after the changes: 180 x 41.8 x 58 mm, 61.4 cm3, watertight, one body, no problems.
+- 2026-09-09 built as part of `models/drain_system`. The section is now
+  `primitives.edge_clip` (thickness, throat_clearance, jaw_t, under_reach, lip_t, saddle_t,
+  saddle_reach, corner_relief, drip groove, pad_recess) with the pan, rim ramp and end walls grown
+  on its saddle by the model. Counter measured at 30 mm, so `COUNTER_T` is no longer a guess.
+  - **420 mm of run does not fit a 270 mm bed.** The rail is now a 140 mm SEGMENT printed three
+    times and butted end to end. The seam is safe because it runs across the pan and the water runs
+    along it toward the basin, never over it.
+  - `primitives.foot` / `primitives.rubber_foot_recess` are out of the reuse map: the pad seat is a
+    parameter on the clip's gripping faces, not a separate foot component.
+  - Checker: 140 x 41.9 x 58 mm, 49.3 cm3, watertight, one body, min wall 1.2 mm, 1.5 % overhang
+    (the rim ramp, held at ~41 deg), no problems.
+  Still open and now the ONLY unmeasured number in the system: the reveal under the counter at the
+  cutout, which sets `UNDER_REACH`.

@@ -2291,7 +2291,9 @@
       "returns": "Part",
       "docstring": "Example:\nbody = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
       "example": "body = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
-      "used_by": [],
+      "used_by": [
+        "models/drain_system/model.py"
+      ],
       "import": "from lib.mechanisms.snap_fit import snap_groove"
     },
     "mechanisms.snap_ridge": {
@@ -2349,7 +2351,9 @@
       "returns": "Part",
       "docstring": "Example:\nlip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
       "example": "lip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
-      "used_by": [],
+      "used_by": [
+        "models/drain_system/model.py"
+      ],
       "import": "from lib.mechanisms.snap_fit import snap_ridge"
     },
     "patterns.corner_holes": {
@@ -3192,6 +3196,134 @@
       ],
       "import": "from lib.primitives.cable_grommet import cable_grommet"
     },
+    "primitives.edge_clip": {
+      "id": "primitives.edge_clip",
+      "version": "1.0.0",
+      "summary": "C-profile clip that grips a square panel or countertop edge: saddle over the top, jaw down the cut face, return lip under.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 180.0,
+          "description": "clip length along the edge (X)"
+        },
+        {
+          "name": "thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "thickness of the panel it grips (30 = a 3 cm stone slab; measure it)"
+        },
+        {
+          "name": "throat_clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "added to thickness so the clip slides onto a square edge"
+        },
+        {
+          "name": "jaw_t",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "thickness of the jaw hanging down the cut face"
+        },
+        {
+          "name": "under_reach",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "how far the return lip tucks under the panel; 0 degenerates to a plain saddle"
+        },
+        {
+          "name": "lip_t",
+          "type": "float",
+          "units": "mm",
+          "default": 2.4,
+          "description": "return lip thickness"
+        },
+        {
+          "name": "saddle_t",
+          "type": "float",
+          "units": "mm",
+          "default": 2.4,
+          "description": "thickness of the flange lying on top of the panel (the floor of whatever is grown on it)"
+        },
+        {
+          "name": "saddle_reach",
+          "type": "float",
+          "units": "mm",
+          "default": 55.0,
+          "description": "how far inland the top flange runs"
+        },
+        {
+          "name": "corner_relief",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "relief radius at both panel corners so printed inside corners cannot hold the clip off the panel"
+        },
+        {
+          "name": "drip_groove_r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "radius of the drip break cut into the outboard face; 0 = none"
+        },
+        {
+          "name": "drip_groove_z",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "how far below the panel top surface the drip break sits"
+        },
+        {
+          "name": "drip_groove_out",
+          "type": "float",
+          "units": "mm",
+          "default": 0.4,
+          "description": "how far outboard of the face the groove centre sits, so the arc meets the face at an angle instead of tangentially"
+        },
+        {
+          "name": "pad_recess",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "depth of a seat for a stick-on or printed pad on both gripping faces; 0 = none"
+        }
+      ],
+      "tags": [
+        "clip",
+        "counter",
+        "edge",
+        "hook",
+        "kitchen",
+        "no-fastener",
+        "saddle",
+        "shelf"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "print lying on the jaw's OUTBOARD face (Rot(0, 90, 0) then on_bed): that face and anything grown flush with it become the bed face, and the only downward surfaces left are whatever the caller adds",
+        "notes": "UNVALIDATED \u2014 no test print yet. Relies on friction and the return lip, not on a spring, so PLA is acceptable here; the throat does not flex, so measure the panel and set thickness rather than counting on give. A printed inside corner always carries a small radius and a stone arris does not: keep corner_relief > 0 or the clip rocks.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.edge_clip",
+      "qualname": "edge_clip",
+      "file": "lib/primitives/edge_clip.py",
+      "line": 9,
+      "returns": "Part",
+      "docstring": "A C-section that hangs on a square edge, in USE orientation:\n\n    +X along the edge, +Y outboard past the cut face, +Z up.\n    The panel's top surface is z=0 and its cut face is y=0, so the panel\n    occupies y < 0, z in [-thickness, 0] and the clip wraps around it.\n\nGrow the payload (a pan, a hook, a shelf) off the top of the saddle at z=saddle_t;\nthe caller's geometry and the jaw's outboard face at y=jaw_t are what decide the\nprint orientation.\n\nExample:\n    rail = edge_clip(180, thickness=COUNTER_T, saddle_reach=PAN_REACH) + pan\n    rail = on_bed(Rot(0, 90, 0) * rail)          # jaw's outboard face onto the bed",
+      "example": "rail = edge_clip(180, thickness=COUNTER_T, saddle_reach=PAN_REACH) + pan\nrail = on_bed(Rot(0, 90, 0) * rail)          # jaw's outboard face onto the bed",
+      "used_by": [
+        "models/drain_system/model.py"
+      ],
+      "import": "from lib.primitives.edge_clip import edge_clip"
+    },
     "primitives.foot": {
       "id": "primitives.foot",
       "version": "1.0.0",
@@ -3248,6 +3380,98 @@
       "example": "body = body + [loc * foot() for loc in GridLocations(80, 50, 2, 2)]",
       "used_by": [],
       "import": "from lib.primitives.feet import foot"
+    },
+    "primitives.groove_field": {
+      "id": "primitives.groove_field",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) field of self-supporting drain grooves running along Y; groove mouths at z=0, cutting down.",
+      "params": [
+        {
+          "name": "area_l",
+          "type": "float",
+          "units": "mm",
+          "default": 90.0,
+          "description": "width of the grooved area across the grooves (X); ignored when lanes are given"
+        },
+        {
+          "name": "area_w",
+          "type": "float",
+          "units": "mm",
+          "default": 140.0,
+          "description": "length of each groove along Y; oversize it to cut clean through both ends"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 9.0,
+          "description": "centre-to-centre across the grooves"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 5.0,
+          "description": "groove width at the mouth (the surface)"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "groove depth below the surface"
+        },
+        {
+          "name": "wall_deg",
+          "type": "float",
+          "units": "deg",
+          "default": 30.0,
+          "description": "groove wall angle off vertical; on a surface printed FACE DOWN this is the overhang angle"
+        },
+        {
+          "name": "lanes",
+          "type": "list[float] | None",
+          "units": "mm",
+          "default": null,
+          "description": "explicit groove centres in X; overrides the uniform pitch (keeps a groove off a feature it would sever)"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotate the whole field about Z"
+        }
+      ],
+      "tags": [
+        "deck",
+        "drain",
+        "drying",
+        "grooves",
+        "kitchen",
+        "negative",
+        "water"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "the grooved face goes on the bed; the grooves then narrow going up, so wall_deg IS the overhang angle (45 is the limit, 30 is comfortable)",
+        "notes": "UNVALIDATED \u2014 no test print yet. Square-walled grooves in a face-down surface print as flat ceilings; keep wall_deg >= 25. Groove ceilings read as overhang area in the printability check even when they are short, self-supporting bridges.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.groove_field",
+      "qualname": "groove_field",
+      "file": "lib/primitives/groove_field.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "A field of trapezoidal grooves to subtract from a deck, tray or base plate.\n\nThe grooves run along Y with their mouths in the z=0 plane, cutting downward, so\n``Pos(0, 0, deck_top) * groove_field(...)`` reads naturally.  Water runs in the grooves\nand whatever is being dried stands on the ribs between them.\n\nPass ``lanes`` when something on the surface must not be cut: a groove parallel to a\nstanding blade or wall that lands under it severs it from its base.\n\nExample:\n    deck = deck - Pos(0, 0, DECK_T) * groove_field(TILE_X, TILE_Y + 2, 9.0, 5.0, 1.2, 30.0)",
+      "example": "deck = deck - Pos(0, 0, DECK_T) * groove_field(TILE_X, TILE_Y + 2, 9.0, 5.0, 1.2, 30.0)",
+      "used_by": [
+        "models/drain_system/model.py"
+      ],
+      "import": "from lib.primitives.groove_field import groove_field"
     },
     "primitives.l_bracket": {
       "id": "primitives.l_bracket",
@@ -3648,6 +3872,92 @@
       ],
       "import": "from lib.primitives.feet import rubber_foot_recess"
     },
+    "primitives.slot_rack": {
+      "id": "primitives.slot_rack",
+      "version": "1.0.0",
+      "summary": "Row of leaning blades with the slots between them, standing on z=0 and centred on the origin in X.",
+      "params": [
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 7,
+          "description": "number of blades; the slots are the count-1 gaps between them"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 12.0,
+          "description": "blade centre-to-centre"
+        },
+        {
+          "name": "fin_t",
+          "type": "float",
+          "units": "mm",
+          "default": 2.6,
+          "description": "blade thickness (>= 2.4 mm before a wet pan leans on one)"
+        },
+        {
+          "name": "fin_h",
+          "type": "float",
+          "units": "mm",
+          "default": 55.0,
+          "description": "blade height at the back edge (-Y), measured from z=0"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 60.0,
+          "description": "blade depth along Y, centred on the origin"
+        },
+        {
+          "name": "tilt_deg",
+          "type": "float",
+          "units": "deg",
+          "default": 12.0,
+          "description": "blade lean off vertical; blades are SHEARED, so this is also the print overhang angle"
+        },
+        {
+          "name": "top_slope_deg",
+          "type": "float",
+          "units": "deg",
+          "default": 10.0,
+          "description": "blade tops slope down toward +Y so nothing resting across them sits level"
+        }
+      ],
+      "tags": [
+        "blades",
+        "comb",
+        "drying",
+        "fins",
+        "holder",
+        "kitchen",
+        "rack",
+        "slots"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "blade roots on the bed, blades up. The blades are sheared rather than rotated, so every root stays flat and the lean is the only overhang in the part; keep tilt_deg well under 45",
+        "notes": "UNVALIDATED \u2014 no test print yet. A blade is a cantilever loaded sideways by whatever leans on it: PLA is stiffer but brittle at the root, PETG survives a knock. Blades must run from z=0 through whatever carries them, not merely sit on its top face \u2014 a blade that only shares a face with a base fuses as a separate body.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.slot_rack",
+      "qualname": "slot_rack",
+      "file": "lib/primitives/slot_rack.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Blades stand on z=0, run along Y and are arrayed along X.\n\nItems go in on edge between the blades: plates, lids, chopping boards, pot rims.\n``top_slope_deg`` is what stops a rim resting across two blade tops from sitting level\nand holding a ring of water, so it is not decoration.\n\nExample:\n    rack = base + Pos(lid_x, 0, 0) * slot_rack(7, 12.0, 2.6, BASE_T + LID_FIN_H, DEPTH, 12.0, 10.0)",
+      "example": "rack = base + Pos(lid_x, 0, 0) * slot_rack(7, 12.0, 2.6, BASE_T + LID_FIN_H, DEPTH, 12.0, 10.0)",
+      "used_by": [
+        "models/drain_system/model.py"
+      ],
+      "import": "from lib.primitives.slot_rack import slot_rack"
+    },
     "primitives.socket_array": {
       "id": "primitives.socket_array",
       "version": "1.0.0",
@@ -3931,6 +4241,17 @@
         "patterns.pi_board_outline",
         "primitives.rubber_foot_recess",
         "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "drain_system": {
+      "path": "models/drain_system",
+      "components": [
+        "mechanisms.snap_groove",
+        "mechanisms.snap_ridge",
+        "primitives.edge_clip",
+        "primitives.groove_field",
+        "primitives.slot_rack"
       ],
       "golden": true
     },
