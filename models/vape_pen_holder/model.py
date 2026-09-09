@@ -15,63 +15,66 @@ mouthpiece up: mushroom A swallows 40 mm of a 55 mm cartridge (15 mm shows), the
 29 mm (26 mm shows, so one is easy to grab and one is properly hidden).
 
 Everything that reaches up to the rim is sized by ONE constraint, and it is the reason the neck
-tapers rather than hugging the pot: the pot's wall narrows from r 17.8 to r 9.5 as it rises but the
-Ø13.6 bore does not, so a neck that follows the wall walks straight into the parked battery.  Neck
-balls, head and arms all keep their nearest point at least 7.2 mm off the axis against a 6.5 mm
-pen; ``fit_checks`` is what proves it, and it caught 45 mm3 of exactly that mistake.
+tapers rather than hugging the pot: the pot's wall narrows from r 19.3 to r 11.0 as it rises but the
+Ø16.6 bore does not, so a neck that follows the wall walks straight into the parked battery.  Neck
+balls, head and arms all keep their nearest point at least 8.8 mm off the axis against an 8.0 mm
+pen; ``fit_checks`` is what proves it, and it caught 45 mm3 of exactly that mistake at the smaller
+pen diameter this started from.
 
-Surface work, in the lib/form order — bores, then flutes, then the lattice, then the studs, then
-the mesh skin LAST:
+The pen and the cartridges were re-measured at Ø16 after the first version was drawn around Ø13 and
+Ø11.  That is not a one-line change: the bore went up 3 mm in radius while the stem and the stalks
+still needed 2.7 mm of wall, so every profile radius grew, both toadstools moved out to stop their
+Ø33.6 caps fouling each other and the Ø39 belly, the caterpillar's back arc moved out with them,
+and the whole neck moved out again to clear the fatter pen.
 
-* **Voronoi openwork** (``form.voronoi_shell``) through the hookah's bowl and both mushroom stalks,
-  cut to the axis so it goes clean through into the bore: the battery shows through the bowl and a
-  cartridge through each stalk.  Every cell is roofed at 48 degrees, so no window needs support.
-  The cutters FAN from the axis rather than cutting straight in; a flat prism through a wall this
-  thick pinches its own webs to nothing before it reaches the bore.
-* **Flutes** (``form.flutes``) down the hookah's waist, 0.6 mm deep on a 2.7 mm wall.
+Surface work, in the lib/form order — bores first, then the flutes, then the studs.  All B-rep:
+there is no mesh step, so the part is one exact solid and exports STEP as well as STL and 3MF.
+
+* **A diamond lattice** (``form.flutes``, twice) on all three turned bodies: the same flute band cut
+  once each way, so the two helices cross and leave faceted diamonds standing between them.  Both
+  passes measure against the same un-cut solid — reference the already-fluted body and the second
+  pass sinks to twice the depth wherever it crosses the first.  Depth is 0.7 mm, set by the THINNEST
+  wall the band crosses (the 2.7 mm stem and stalks, not the 9 mm belly), which leaves five
+  extrusions under the deepest part of a groove.  The twist is given as a rate, 3.5 deg per mm, so
+  that the 42, 23 and 12 mm bands all come out with the same helix angle.
 * **Studs** (``form.surface_studs``): toadstool spots on both caps, tubercles down the caterpillar's
   back and up its neck, and the two eyes, each seated on whatever surface a ray finds and tilted
   with it.
-* **Noise skin** (``form.textured``, 0.28 mm) over the whole exterior.  This is the mesh step, so
-  the part exports STL and 3MF but NO STEP.  It displaces horizontally and exterior-only, so every
-  bore, every cell and every z level stays exactly where the B-rep put it and the fit checks hold.
 
-The bores are otherwise blind, and the lattice bands start above each bore floor, leaving a sealed
-sump (2 mm under the bowl, 3.5 mm under each stalk) so a cartridge that leaks pools instead of
-running out of a window onto the desk.  Opening the bores at all was the user's call, made with
-that trade-off in front of them.
+Straight flutes on the stalks were tried first and read as scratches beside the hookah's diamonds;
+one pattern over all three bodies is what makes it look designed rather than decorated.
 
-``PRINT_MODES`` declares this part **openwork**: the inward-ray wall metric samples by area, and in
-a perforated part most of the surface is the inside of a hole, so it reports thin walls that are
-not there.  See the note above ``PRINT_MODES`` for the measurements, and check_printable --opening
-for the honest number.
+All three bores are blind: a vent under a cartridge would drip a leaky cart onto the desk.
 
-Print orientation: as returned.  An upper half-ellipsoid has no down-facing surface at all, so every
-body segment, stud and eye is self-supporting; the mushroom caps and the hookah's belly never flare
-faster than 37 degrees from vertical; every bore floor is an up-facing floor; and every Voronoi cell
-carries a 48-degree roof.  The neck is the one thing here that COULD print as unsupported nonsense —
-a rearing chain of balls is a 90-degree overhang all down its underside — so every ball is half sunk
-into the pot and sits on the one below it, and the head leans back out over the rim by only 25
-degrees from vertical.  Material: PLA.
+Print orientation: as returned, no supports.  An upper half-ellipsoid has no down-facing surface at
+all, so every body segment, stud and eye is self-supporting; the mushroom caps and the hookah's
+belly never flare faster than 37 degrees from vertical; every bore floor is an up-facing floor.  The
+build reports ~1000 mm2 of >45 deg overhang and all of it is accepted: 580 mm2 is the foot recesses
+and the bed chamfer, in the first 6 mm off the plate, and most of the rest is the down-facing side
+of a 0.7 mm decorative groove, which needs no more support than a chamfer does.  The neck is the one
+thing here that COULD print as unsupported nonsense — a rearing chain of balls is a 90-degree
+overhang all down its underside — so every ball is half sunk into the pot and sits on the one below
+it, and the head leans back out over the rim by only 25 degrees from vertical.  Material: PLA.
 
 Stability is the governing constraint, not fit: with a cartridge screwed on, ~150 mm of pen stands
 above a socket floor 6 mm off the desk.  ``stability()`` reports three cases; the governing one is
 loaded, standing on its rubber feet, because fitted feet REPLACE the ground as the support polygon.
 Five of the six feet sit under a body segment — wrapping the caterpillar around the outside makes
 it the perimeter of the part, and standing on it is worth a couple of degrees of tip angle over the
-old stance even after the lattice took 6 cm3 out of the bowl and the reared neck put 5 cm3 back up
-at rim height.
+old stance even after the reared neck put 5 cm3 up at rim height.
 
 Three things this shape taught, all recorded where they belong: a surface of revolution that closes
 to a POINT tessellates into a loose degenerate triangle and reads as a non-watertight part (see
 ``lib.form.blobs.dome``, which stops at a 0.4 mm flat instead); Z-SCALING a body scales its slopes,
 so mushroom B has its own profile rather than being the tall one squashed (see params); and cutting
-openwork into a spline surface of revolution reliably leaves OCC a needle of uncut skin (see
-``lib.component.drop_debris``).
+detail into a spline surface of revolution reliably leaves OCC a needle of uncut skin and a
+collapsed shell or two in the tessellation (see ``lib.component.drop_debris`` and
+``scripts/_common._without_debris``).
 
-Assumptions (user not available for every number): pen battery 90 mm long and ~12 mm across, socket
-sized 13.0 nominal at the user's request for room; cartridges 11 x 55 mm; pen 30 g and a cartridge
-10 g for the stability sum.  All single constants in params.py.
+Assumptions: the pen and the cartridges are Ø16 as the user measured them, and the socket is sized
+from that.  Still assumed, and still worth checking against the real thing: the battery is 90 mm
+long, a cartridge is 55 mm, and the two weigh 30 g and 10 g for the stability sum.  All single
+constants in params.py.
 """
 from math import atan2, cos, degrees, radians, sin, tau
 
@@ -79,8 +82,6 @@ from build123d import Axis, CenterOf, Cylinder, Part, Plane, Pos, Rot, chamfer, 
 
 from lib.component import drop_debris, on_bed
 from lib.form.blobs import ball, ball_chain, dome_chain, surface_studs
-from lib.form.lattice import voronoi_shell
-from lib.form.mesh import textured
 from lib.form.outline import blob_outline
 from lib.form.revolved import revolved_body
 from lib.form.surface import flutes
@@ -96,35 +97,30 @@ def _ground() -> Part:
     return extrude(blob_outline(P.BASE_BLOB, smooth_r=P.BASE_SMOOTH_R), amount=P.BASE_T)
 
 
-def _cells(radius: float, band: tuple[float, float], count: int, seed: int, web: float,
-           inner: float) -> Part:
-    """The Voronoi cutter for one band, in the body's OWN frame (its axis on Z).
-
-    Cut per body, before the scene is unioned.  Cut afterwards, the bowl's cutters — which start
-    outside the bowl and run to the axis — would also punch cells through the caterpillar's arms
-    where they wrap it, and mushroom A's would reach across into mushroom B.
-    """
-    z0, z1 = band
-    return Pos(0, 0, (z0 + z1) / 2) * voronoi_shell(
-        radius=radius, height=z1 - z0, count=count, seed=seed, web=web, inner=inner,
-        corner_r=P.VORONOI_CORNER_R, roof_angle=P.VORONOI_ROOF, relax=P.VORONOI_RELAX,
-        over=P.VORONOI_OVER)
-
-
 def _hookah() -> Part:
-    """Bowl and stem, bored for the pen, fluted down the waist, then opened up with Voronoi cells.
+    """Bowl and stem, bored for the pen, then cut with the diamond lattice.
 
-    The bore is cut FIRST and in this body's own frame.  Cut afterwards, every cell cutter runs on
-    through solid material to the axis, twenty of them pile up in the core, and the union of that
-    pile leaves slivers of leftover wall just outside the bore.  Against an already-hollow body the
-    same cutters simply run out into the void.
+    The bore is cut FIRST and in this body's own frame, and the UN-bored solid is what the flutes
+    are measured against: ``form.flutes`` trims its bars to the outer ``depth`` of the reference, so
+    handing it a hollow body would let a groove reach through into the bore.
     """
     solid = revolved_body(P.HOOKAH_PROFILE)
     body = solid - Pos(0, 0, P.HOOKAH_H) * _socket(P.PEN_D, P.PEN_DEPTH)
-    body = flutes(body, count=P.STEM_FLUTE_N, width=P.STEM_FLUTE_W, depth=P.STEM_FLUTE_D,
-                  z_from=P.STEM_FLUTE_Z[0], z_to=P.STEM_FLUTE_Z[1], reference=solid)
-    return body - _cells(P.BOWL_CELL_R, P.BOWL_CELL_Z, P.BOWL_CELL_N, P.BOWL_CELL_SEED,
-                         P.BOWL_WEB, P.BOWL_CELL_IN)
+    return _diamonds(body, solid, P.HOOKAH_FLUTE_N, P.HOOKAH_FLUTE_Z)
+
+
+def _diamonds(body: Part, solid: Part, count: int, band: tuple[float, float]) -> Part:
+    """The diamond lattice: one flute band cut twice, once each way, so the helices cross.
+
+    Both cuts measure against the same UN-cut ``solid``: ``form.flutes`` trims its bars to the outer
+    ``depth`` of the reference, so handing it the already-fluted body would let the second pass sink
+    to twice the depth wherever it crossed the first.
+    """
+    z0, z1 = band
+    for hand in (1, -1):
+        body = flutes(body, count=count, width=P.FLUTE_W, depth=P.FLUTE_D, z_from=z0, z_to=z1,
+                      twist_angle=hand * P.FLUTE_TWIST_RATE * (z1 - z0), reference=solid)
+    return body
 
 
 def _cap_spots(mushroom: Part, top_z: float) -> Part:
@@ -134,17 +130,17 @@ def _cap_spots(mushroom: Part, top_z: float) -> Part:
                          embed=P.CAP_SPOT_EMBED)
 
 
-def _mushroom(profile, top_z: float, depth: float, radius: float, band: tuple[float, float],
-              count: int, seed: int) -> Part:
-    """One toadstool: spotted cap, openwork stalk, the cartridge showing through the cells.
+def _mushroom(profile, top_z: float, depth: float, band: tuple[float, float]) -> Part:
+    """One toadstool: a diamond-cut column under a spotted cap.
 
-    Bored before it is decorated, for the reason given in ``_hookah``.  The spots are seated against
-    the un-bored solid so a ray still finds a surface where the bore has since opened.
+    Bored before it is decorated, and fluted against the un-bored solid, both for the reason given
+    in ``_hookah``.  The spots are seated against that solid too, so a ray still finds a surface
+    where the bore has since opened.
     """
     solid = revolved_body(profile)
     body = solid - Pos(0, 0, top_z) * _socket(P.CART_D, depth)
-    body += _cap_spots(solid, top_z)
-    return body - _cells(radius, band, count, seed, P.STALK_WEB, P.STALK_CELL_IN)
+    body = _diamonds(body, solid, P.STALK_FLUTE_N, band)
+    return body + _cap_spots(solid, top_z)
 
 
 def _dome_base_z() -> float:
@@ -204,18 +200,31 @@ def _eyes() -> Part:
                          embed=P.EYE_EMBED)
 
 
+def _bed_edges(solid: Part) -> list:
+    """The bed-contact outline, inner gaps included, minus anything too short to chamfer.
+
+    Two of the caterpillar's segments meet the garden almost tangentially, and where they do the
+    footprint outline picks up a 0.3 mm edge.  OCC will not put a 0.5 mm chamfer on a 0.3 mm edge —
+    it fails the whole operation rather than skipping it — and an unchamfered third of a millimetre
+    is not an elephant foot worth having.  The bed face also has inner wires now: the caterpillar
+    wraps round the garden and touches it in two places, so the footprint has two gaps in it, and
+    those edges want the same chamfer as the outside.
+    """
+    face = solid.faces().sort_by(Axis.Z)[0]
+    wires = [face.outer_wire()] + list(face.inner_wires())
+    return [e for w in wires for e in w.edges() if e.length > 2 * P.BED_CHAMFER]
+
+
 def _scene() -> Part:
     """Everything unioned, before a single bore is cut."""
     solid = _ground() + _hookah()
     solid += Pos(*P.MUSH_A_XY) * _mushroom(P.MUSHROOM_PROFILE, P.MUSH_A_H, P.CART_A_DEPTH,
-                                           P.STALK_CELL_R, P.STALK_A_CELL_Z, P.STALK_A_CELL_N,
-                                           P.STALK_A_CELL_SEED)
+                                           P.STALK_A_FLUTE_Z)
     solid += Pos(*P.MUSH_B_XY) * _mushroom(P.MUSHROOM_B_PROFILE, P.MUSH_B_H, P.CART_B_DEPTH,
-                                           P.STALK_B_CELL_R, P.STALK_B_CELL_Z, P.STALK_B_CELL_N,
-                                           P.STALK_B_CELL_SEED)
+                                           P.STALK_B_FLUTE_Z)
     solid += _caterpillar()
     solid += _eyes()
-    return chamfer(solid.faces().sort_by(Axis.Z)[0].outer_wire().edges(), P.BED_CHAMFER)
+    return chamfer(_bed_edges(solid), P.BED_CHAMFER)
 
 
 def _socket(bore_d: float, depth: float):
@@ -236,21 +245,16 @@ def holder() -> Part:
     return drop_debris(body)
 
 
-# The lattice makes this a perforated part, and the inward-ray wall metric cannot measure one: it
-# samples by area, and most of an openwork surface is the inside of a hole, so a fifth of the samples
-# land within a nozzle width of a rim and report walls that are not there.  Measured on this part
-# with the honest measure (check_printable --opening, a morphological opening): 0.42% of volume is
-# out of reach of a 0.8 mm ball, against 0.66% for a PLAIN tube with no holes in it at all.  So the
-# webs are sound and the metric is not; "openwork" keeps it reported and stops it gating.
-PRINT_MODES = {"holder": "openwork"}
+# ~130 small revolved bodies go into this part (18 body segments, 68 tubercles, 14 spots, the neck,
+# the eyes) and OCC tessellates every one of them to the default 0.01 mm, which is five times finer
+# than a 0.4 mm nozzle can print and exported a 72 MB STL for a 100 mm ornament. 0.02 mm and 0.25
+# rad is still an eighth of a layer and takes it to about a fifth of that.
+EXPORT_TOLERANCE = 0.02             # mm
+EXPORT_ANGULAR_TOLERANCE = 0.25     # rad
 
 
-def build() -> dict:
-    """The printed part: the B-rep solid with a noise skin displaced onto it, so this returns a mesh."""
-    return {"holder": on_bed(textured(holder(), amplitude=P.TEXTURE_AMP, scale=P.TEXTURE_SCALE,
-                                      kind="noise", mask="exterior", seed=P.TEXTURE_SEED,
-                                      edge_length=P.TEXTURE_EDGE, tolerance=P.TEXTURE_TOL,
-                                      angular_tolerance=P.TEXTURE_ANG))}
+def build() -> dict[str, Part]:
+    return {"holder": on_bed(holder())}
 
 
 # --- envelopes of the hardware, in the assembled position --------------------
@@ -334,7 +338,7 @@ def stability() -> dict:
     * ``empty_on_feet`` — nothing in it.  This is the case that matters while you are PLACING the
       pen, because until you let go the pen's mass is in your hand, not on the holder.
     """
-    body = on_bed(holder())     # the B-rep solid: the skin is a mesh and has no faces() or centre
+    body = build()["holder"]
     base, feet = _base_points(body), _feet_points()
     out = {}
     for tag, loaded, pts in (("loaded_on_feet", True, feet), ("loaded_on_base", True, base),
@@ -348,8 +352,8 @@ def stability() -> dict:
 
 if __name__ == "__main__":
     for name, part in build().items():
-        print(name, part.bounds, round(part.volume, 1),
-              "watertight" if part.is_watertight else "NOT WATERTIGHT", part.body_count, "body(s)")
+        print(name, part.bounding_box().size, round(part.volume, 1),
+              "valid" if part.is_valid else "INVALID", len(part.solids()), "solid(s)")
     for tag, r in stability().items():
         ok = "" if tag != "loaded_on_feet" else (
             "  <- governing, target {} -> {}".format(

@@ -1409,8 +1409,7 @@
       "docstring": "Refines the mesh to ``edge_length`` with manifold3d, then warps vertices along their normals\n(horizontally only, unless ``mask=\"all\"``, so no height changes).  The bed face and everything\nbelow ``bed_margin`` stay put; ``exterior`` mask also keeps inner walls, bosses and holes exact so\nfits are unchanged.  Returns a ``trimesh.Trimesh``; put it last in build().\n\nExample:\n    tray = textured(tray_part, amplitude=0.35, scale=6, mask=\"exterior\")",
       "example": "tray = textured(tray_part, amplitude=0.35, scale=6, mask=\"exterior\")",
       "used_by": [
-        "models/cloud_pi_holder/model.py",
-        "models/vape_pen_holder/model.py"
+        "models/cloud_pi_holder/model.py"
       ],
       "import": "from lib.form.mesh import textured"
     },
@@ -1672,9 +1671,7 @@
       "returns": "Part",
       "docstring": "The lattice as a solid to subtract, band centred on z=0 and the body's axis on Z.\n\nEach cell is lofted between a copy of itself at ``radius + over`` and a tangentially narrowed\ncopy at ``inner``, both at the same heights: the cell fans in like a wedge of an orange, which\nkeeps the webs, and only the height stays true so the roof keeps the angle it was cut at.\n\nExample:\n    stalk = revolved_body(profile) - Cylinder(5.8, 40)\n    stalk -= Pos(0, 0, 16) * voronoi_shell(radius=9.4, height=14, count=18, web=2.2, inner=3.5)",
       "example": "stalk = revolved_body(profile) - Cylinder(5.8, 40)\nstalk -= Pos(0, 0, 16) * voronoi_shell(radius=9.4, height=14, count=18, web=2.2, inner=3.5)",
-      "used_by": [
-        "models/vape_pen_holder/model.py"
-      ],
+      "used_by": [],
       "import": "from lib.form.lattice import voronoi_shell"
     },
     "form.wavy_circle": {
@@ -3875,8 +3872,6 @@
         "form.flutes",
         "form.revolved_body",
         "form.surface_studs",
-        "form.textured",
-        "form.voronoi_shell",
         "primitives.rubber_foot_recess",
         "primitives.socket_array"
       ],

@@ -1064,7 +1064,7 @@ Displace a shape's outer surface with Perlin noise or horizontal ripples and ret
 - **validated in:** UNVALIDATED  
 - **orientation:** as the source shape; bed face is never displaced  
 - **notes:** UNVALIDATED: texture amplitude <= 0.4 mm prints cleanly with 0.4 mm nozzle; larger needs slower outer walls  
-- **used by:** models/cloud_pi_holder/model.py, models/vape_pen_holder/model.py  
+- **used by:** models/cloud_pi_holder/model.py  
 
 | param | type | units | default | description |
 |---|---|---|---|---|
@@ -1144,7 +1144,6 @@ NEGATIVE component: Voronoi cells wrapped around a cylinder as radial prisms, to
 - **validated in:** UNVALIDATED  
 - **orientation:** body axis vertical, base on the bed  
 - **notes:** UNVALIDATED. Each cell sits on the tangent plane at its own centre and fans in tangentially toward the axis, so the wrap is faceted: keep cells under about a third of the radius or the cut edges visibly skew. Check the web at the INNER radius, not at the layout radius — that is where it is narrowest and where a lattice fails.  
-- **used by:** models/vape_pen_holder/model.py  
 
 | param | type | units | default | description |
 |---|---|---|---|---|
@@ -1196,4 +1195,4 @@ vase = twist(wavy_circle(35, 4, 10), height=150, angle=120)
 | `l_bracket_40` | `primitives.l_bracket` | yes |
 | `pi5_fan_case` | `fasteners.clearance_hole`, `fasteners.heat_set_boss`, `mechanisms.cantilever_latch`, `mechanisms.latch_window`, `patterns.corner_holes`, `patterns.fan_mount`, `patterns.pi5_mount`, `patterns.pi5_port_cutouts`, `patterns.pi_board_outline`, `primitives.box_lid`, `primitives.rounded_box`, `primitives.rubber_foot_recess`, `primitives.vent_slots` | yes |
 | `ribbed_vase` | `form.flutes`, `form.revolved_body`, `form.shell_open_top` | yes |
-| `vape_pen_holder` | `form.ball_chain`, `form.blob_outline`, `form.dome_chain`, `form.flutes`, `form.revolved_body`, `form.surface_studs`, `form.textured`, `form.voronoi_shell`, `primitives.rubber_foot_recess`, `primitives.socket_array` | yes |
+| `vape_pen_holder` | `form.ball_chain`, `form.blob_outline`, `form.dome_chain`, `form.flutes`, `form.revolved_body`, `form.surface_studs`, `primitives.rubber_foot_recess`, `primitives.socket_array` | yes |

@@ -2,34 +2,34 @@
   "project": "vape_pen_holder",
   "generated": "2026-09-08",
   "tessellation": {
-    "tolerance": 0.01,
-    "angular_tolerance": 0.1
+    "tolerance": 0.02,
+    "angular_tolerance": 0.25
   },
   "parts": {
     "holder": {
       "bbox_min": [
-        -35.956,
-        -39.104,
-        -0.0
+        -36.729,
+        -41.126,
+        0.0
       ],
       "bbox_max": [
-        60.337,
-        45.431,
+        65.312,
+        50.466,
         54.188
       ],
       "bbox_size": [
-        96.293,
-        84.535,
+        102.042,
+        91.592,
         54.188
       ],
-      "volume": 96288.343,
-      "surface_area": 32089.528,
+      "volume": 107055.295,
+      "surface_area": 36497.711,
       "solids": 1,
       "valid": true,
       "watertight": true,
-      "mesh_hash": "7b8236588a926ac1",
-      "triangles": 388832,
-      "kind": "mesh"
+      "mesh_hash": "1c5e4b8df40418ea",
+      "triangles": 343134,
+      "kind": "brep"
     }
   }
 }

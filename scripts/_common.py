@@ -43,6 +43,7 @@ LIB_DIR = ROOT / "lib"
 # changing it changes every golden hash)
 STL_TOLERANCE = 0.01
 STL_ANGULAR_TOLERANCE = 0.1
+TESSELLATION_ATTR = "_export_tolerance"   # (tolerance, angular_tolerance) stamped on each part
 
 
 def list_projects() -> list[str]:
@@ -60,11 +61,29 @@ def load_model(project: str):
 
 
 def build_parts(project: str) -> dict:
-    """Run the model's build() and normalise the result to {name: shape}."""
+    """Run the model's build() and normalise the result to {name: shape}.
+
+    A model may set ``EXPORT_TOLERANCE`` (and ``EXPORT_ANGULAR_TOLERANCE``) to say how finely its
+    B-rep should be tessellated for STL, 3MF, the printability check and the golden.  The default
+    0.01 mm is right for a box; it is wrong for a part assembled from a hundred small revolved
+    bodies, which arrives an order of magnitude finer than a 0.4 mm nozzle can use and exports a
+    70 MB STL.  Everything else keeps the default, so no other model moves.
+
+    The setting is stamped on each part rather than kept in a module global: the test suite builds
+    every project up front and tessellates later, so a global belongs to whichever project happened
+    to build last and one model's tolerance silently becomes another's.
+    """
     mod = load_model(project)
+    tess = (getattr(mod, "EXPORT_TOLERANCE", STL_TOLERANCE),
+            getattr(mod, "EXPORT_ANGULAR_TOLERANCE", STL_ANGULAR_TOLERANCE))
     result = mod.build()
     if not isinstance(result, dict):
         result = {project: result}
+    for shape in result.values():
+        try:
+            setattr(shape, TESSELLATION_ATTR, tess)
+        except AttributeError:      # pragma: no cover - a shape that will not take an attribute
+            pass
     return result
 
 
@@ -117,13 +136,16 @@ class Metrics:
         return asdict(self)
 
 
-def tessellate(shape, tolerance: float = STL_TOLERANCE, angular_tolerance: float = STL_ANGULAR_TOLERANCE):
+def tessellate(shape, tolerance: float | None = None, angular_tolerance: float | None = None):
     """Return (vertices ndarray (n,3), faces ndarray (m,3)); a mesh part returns its own arrays."""
     import numpy as np
 
     if is_mesh(shape):
         return np.asarray(shape.vertices, dtype=float), np.asarray(shape.faces, dtype=int)
-    verts, tris = shape.tessellate(tolerance, angular_tolerance)
+    stamped = getattr(shape, TESSELLATION_ATTR, (STL_TOLERANCE, STL_ANGULAR_TOLERANCE))
+    tol = stamped[0] if tolerance is None else tolerance
+    ang = stamped[1] if angular_tolerance is None else angular_tolerance
+    verts, tris = shape.tessellate(tol, ang)
     v = np.array([[p.X, p.Y, p.Z] for p in verts], dtype=float)
     f = np.array(tris, dtype=int).reshape(-1, 3)
     return v, f
@@ -136,7 +158,34 @@ def to_trimesh(shape):
         return shape
     v, f = tessellate(shape)
     mesh = trimesh.Trimesh(vertices=v, faces=f, process=True)
-    return mesh
+    return _without_debris(mesh)
+
+
+def _without_debris(mesh, max_volume: float = 0.1):
+    """Drop closed shells with no volume in them (same threshold as ``lib.component.drop_debris``).
+
+    Tessellating a spot where two curved surfaces meet almost tangentially — a ball set into the
+    side of a bored, fluted body of revolution — leaves a handful of triangles collapsed onto a
+    point.  It has no volume and cannot print; the only thing it does is report the part as two
+    bodies.  Anything a printer could lay down is orders of magnitude above the threshold, so a
+    genuinely loose piece still shows up in the build report.
+    """
+    import numpy as np
+    import trimesh
+
+    # label first and only build submeshes if there is more than one: split() materialises every
+    # component, and on a 1.5 M triangle part that alone doubled the build time.
+    labels = trimesh.graph.connected_component_labels(mesh.face_adjacency, node_count=len(mesh.faces))
+    if labels.max() == 0:
+        return mesh
+    keep = []
+    for i in range(labels.max() + 1):
+        sub = mesh.submesh([np.where(labels == i)[0]], append=True)
+        if abs(sub.volume) >= max_volume:
+            keep.append(sub)
+    if not keep or len(keep) == labels.max() + 1:
+        return mesh
+    return trimesh.util.concatenate(keep) if len(keep) > 1 else keep[0]
 
 
 def mesh_hash(shape) -> str:
@@ -185,7 +234,8 @@ def write_stl(shape, path: Path) -> Path:
     else:
         from build123d import export_stl
 
-        export_stl(shape, str(path), tolerance=STL_TOLERANCE, angular_tolerance=STL_ANGULAR_TOLERANCE)
+        tol, ang = getattr(shape, TESSELLATION_ATTR, (STL_TOLERANCE, STL_ANGULAR_TOLERANCE))
+        export_stl(shape, str(path), tolerance=tol, angular_tolerance=ang)
     return path
 
 
@@ -214,10 +264,12 @@ def load_golden(project: str) -> dict | None:
 
 def write_golden(project: str, part_metrics: dict[str, Metrics]) -> Path:
     GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
+    mod = load_model(project)
     data = {
         "project": project,
         "generated": time.strftime("%Y-%m-%d"),
-        "tessellation": {"tolerance": STL_TOLERANCE, "angular_tolerance": STL_ANGULAR_TOLERANCE},
+        "tessellation": {"tolerance": getattr(mod, "EXPORT_TOLERANCE", STL_TOLERANCE),
+                         "angular_tolerance": getattr(mod, "EXPORT_ANGULAR_TOLERANCE", STL_ANGULAR_TOLERANCE)},
         "parts": {n: m.to_dict() for n, m in part_metrics.items()},
     }
     p = golden_path(project)
