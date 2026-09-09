@@ -709,6 +709,7 @@ Negative (subtract me) shallow recess to locate a stick-on rubber foot; top face
 - **returns:** `Part`  
 - **tags:** foot, negative, pocket, recess, rubber  
 - **validated in:** PLA  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** any  
 - **used by:** models/cloud_pi_holder/model.py, models/pi5_fan_case/model.py, models/vape_pen_holder/model.py  
 
@@ -730,6 +731,7 @@ Negative (subtract me): row or grid of blind cylindrical sockets with chamfered 
 - **returns:** `Part`  
 - **tags:** bore, cylindrical, holder, negative, pen, pocket, rack, socket, tool  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** bores vertical (axis along Z), rims up: the lead-in cone is a 45 deg overhang and each bore floor is an up-facing floor, so nothing needs support  
 - **notes:** UNVALIDATED: no test print yet. Clearance is added to the DIAMETER, not per side. Leave vent_d at 0 for anything that can leak — a vent under the pocket drips onto the desk.  
 - **used by:** models/vape_pen_holder/model.py  
@@ -806,6 +808,7 @@ Chain of overlapping ellipsoids at given (x, y, z, r): the part of a creature th
 - **returns:** `Part`  
 - **tags:** blob, chain, creature, ellipsoid, form, neck, organic, reared, segments, tentacle, toy  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** a ball floating free is a 90 deg overhang all round its underside: every ball must sit ON something — the one below it, or a body it is half sunk into — and a rearing chain must lean IN as it rises, never out  
 - **notes:** UNVALIDATED. This is the one blob primitive that can print unsupported nonsense, so check the overhang number after using it, not just the fit.  
 - **used by:** models/vape_pen_holder/model.py  
@@ -827,6 +830,7 @@ Smoothed union of circles as a sketch (blob / pebble / organic plate outline).
 - **returns:** `Sketch`  
 - **tags:** blob, form, organic, outline, pebble, plate, sketch, tray, union  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** any (2D outline)  
 - **notes:** UNVALIDATED  
 - **used by:** models/vape_pen_holder/model.py  
@@ -873,6 +877,7 @@ Chain of overlapping domes stepped along a spline path at equal spacing, taperin
 - **returns:** `Part`  
 - **tags:** blob, caterpillar, chain, creature, dome, form, organic, path, segments, snake, taper, toy  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** flat faces down: an upper half-ellipsoid has no down-facing surface, so any squash >= 1 needs no support  
 - **notes:** UNVALIDATED. Neighbours only fuse where they OVERLAP, and the spacing is the path length over count-1: a long path with few segments gives a row of separate beads. Rule of thumb, keep count above path_length / r_tail.  
 - **used by:** models/vape_pen_holder/model.py  
@@ -942,6 +947,7 @@ Cut vertical flutes into (or raise ribs on) the outer surface of any body, follo
 - **returns:** `Part`  
 - **tags:** flutes, fluting, form, grooves, polar, ribs, ridges, texture, vase  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** axis vertical, base on the bed  
 - **notes:** UNVALIDATED: no test print yet; keep flute depth <= wall - 0.8 unless shelled afterwards  
 - **used by:** models/ribbed_vase/model.py, models/vape_pen_holder/model.py  
@@ -971,6 +977,7 @@ Solid of revolution about Z from an (r, z) profile, spline-smoothed by default, 
 - **returns:** `Part`  
 - **tags:** bowl, form, lamp, lathe, organic, planter, profile, revolve, spline, vase  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** axis vertical, base on the bed  
 - **notes:** UNVALIDATED: no test print yet; designed for spiral (vase) mode or 2-4 perimeters  
 - **used by:** models/ribbed_vase/model.py, models/vape_pen_holder/model.py  
@@ -1037,6 +1044,7 @@ Domes seated where each ray first meets a body's surface, aligned with the local
 - **returns:** `Part`  
 - **tags:** blob, bumps, dots, form, organic, rivets, spots, studs, surface, texture  
 - **validated in:** UNVALIDATED  
+- **field-validated:** PLA (vape_pen_holder 2026-09-09)  
 - **orientation:** a stud on a down-facing surface is an unsupported overhang; keep them on upward and sideways faces  
 - **notes:** UNVALIDATED. A ray that misses the body is skipped silently, so check the stud count against the ray count when a spot goes missing.  
 - **used by:** models/vape_pen_holder/model.py  

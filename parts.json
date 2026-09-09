@@ -471,8 +471,23 @@
         "validated": [],
         "orientation": "a ball floating free is a 90 deg overhang all round its underside: every ball must sit ON something \u2014 the one below it, or a body it is half sunk into \u2014 and a rearing chain must lean IN as it rises, never out",
         "notes": "UNVALIDATED. This is the one blob primitive that can print unsupported nonsense, so check the overhang number after using it, not just the fit.",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -544,8 +559,23 @@
         "validated": [],
         "orientation": "any (2D outline)",
         "notes": "UNVALIDATED",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -738,8 +768,23 @@
         "validated": [],
         "orientation": "flat faces down: an upper half-ellipsoid has no down-facing surface, so any squash >= 1 needs no support",
         "notes": "UNVALIDATED. Neighbours only fuse where they OVERLAP, and the spacing is the path length over count-1: a long path with few segments gives a row of separate beads. Rule of thumb, keep count above path_length / r_tail.",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -981,8 +1026,23 @@
         "validated": [],
         "orientation": "axis vertical, base on the bed",
         "notes": "UNVALIDATED: no test print yet; keep flute depth <= wall - 0.8 unless shelled afterwards",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -1067,8 +1127,23 @@
         "validated": [],
         "orientation": "axis vertical, base on the bed",
         "notes": "UNVALIDATED: no test print yet; designed for spiral (vase) mode or 2-4 perimeters",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -1281,8 +1356,23 @@
         "validated": [],
         "orientation": "a stud on a down-facing surface is an unsupported overhang; keep them on upward and sideways faces",
         "notes": "UNVALIDATED. A ray that misses the body is skipped silently, so check the stud count against the ray count when a spot goes missing.",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "form",
@@ -3524,8 +3614,23 @@
         ],
         "orientation": "any",
         "notes": "",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "primitives",
@@ -3634,8 +3739,23 @@
         "validated": [],
         "orientation": "bores vertical (axis along Z), rims up: the lead-in cone is a 45 deg overhang and each bore floor is an up-facing floor, so nothing needs support",
         "notes": "UNVALIDATED: no test print yet. Clearance is added to the DIAMETER, not per side. Leave vent_d at 0 for anything that can leak \u2014 a vent under the pocket drips onto the desk.",
-        "evidence": [],
-        "field_validated": [],
+        "evidence": [
+          {
+            "material": "PLA",
+            "outcome": "ok",
+            "model": "vape_pen_holder",
+            "parts": [
+              "holder"
+            ],
+            "date": "2026-09-09",
+            "note_id": "chat-20260909-1025",
+            "inferred": false,
+            "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "primitives",

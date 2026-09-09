@@ -1,0 +1,17 @@
+{
+  "project": "vape_pen_holder",
+  "prints": [
+    {
+      "note_id": "chat-20260909-1025",
+      "date": "2026-09-09",
+      "parts": [
+        "holder"
+      ],
+      "material": "PLA",
+      "outcome": "ok",
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by the user as this build, in PLA.",
+      "build_id": "20260908-210557",
+      "inferred": false
+    }
+  ]
+}
