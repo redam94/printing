@@ -25,6 +25,7 @@ deserves `params.py`, a golden and a review page. Three surfaces, all generated 
 |---|---|---|
 | text overview | library by category, models with metrics, ideas by status, library gaps, attention list | `uv run python scripts/studio.py` |
 | Studio page | the same as a published page: Overview (attention + usage matrix), Library (searchable), Models (renders, parts, review links), Ideas (board + inbox) | `uv run python scripts/studio.py --html` → `exports/studio.html` |
+| Briefs page | the standard form for handing an idea over: a problem brief or an aesthetic brief, its thread, and a Claude helper on the page | `uv run python scripts/brief.py --html` → `exports/brief.html` |
 | ideas/ | one directory per idea: `IDEA.md` write-up, optional `sketch.py`, gitignored `exports/` | `ideas/README.md` documents the format |
 
 Run everything with `uv run python ...` from the repo root.
@@ -71,6 +72,28 @@ other work (two models writing the same helper). Filing means:
    data: {"status": "filed", "path": "ideas/<slug>/IDEA.md", "slug": "<slug>"}`. Never delete
    inbox documents; the user did not write them for you to discard.
 5. Add a dated line to the idea's `## Log`, bump `updated:`, regenerate and republish the page.
+
+## Briefs (the form the user fills in)
+
+`brief.json` at the repo root means the Briefs page is published. It is the long form the Studio
+inbox is not: two framings — **problem** (what goes wrong today, what it touches, "it works
+if...") and **aesthetic** (the feeling, the form language, what it must not look like, "it's
+right if...") — one thread per brief, and a Claude helper on the page itself that answers from
+the library, the models and the ideas the page was generated with.
+
+`scripts/brief.py` holds `FIELDS`, the one definition of both forms: each field names the
+`IDEA.md` section its answer belongs in, and `idea_text_from_brief` assembles the file. The
+`sync-notes` skill dumps `briefs` and `brief_notes`, files every brief with `status: inbox`, and
+lists what the form left blank. Two habits when you pick one up:
+
+- The blank fields are the ask. The summary names them; do not silently invent a countertop
+  thickness the brief left empty — put it in the thread as a question and write the assumption
+  you are proceeding on into the idea's Open questions.
+- Reply in the thread (`write_db`, collection `brief_notes`, `author: "claude"`), not only in
+  chat. The thread is what the user sees on their phone, and what the next sync carries forward.
+
+Regenerate and republish the page (`url` from `brief.json`) after the library, models or ideas
+change — the page quotes all three to its helper.
 
 ## Ideation sessions
 

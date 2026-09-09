@@ -1,0 +1,605 @@
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8; --line-2:#E8EBE6;
+  --accent:#E8791D; --accent-ink:#FFFFFF; --accent-soft:#FBE9DA; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F; --focus:#2F6FE8;
+  --f-problem:#2F6FE8; --f-aesthetic:#C2408A; --f-problem-soft:#E4EDFC; --f-aesthetic-soft:#F9E6F1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35;
+  --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --f-problem:#7BA6F5; --f-aesthetic:#E27CB6; --f-problem-soft:#1E2A3D; --f-aesthetic-soft:#33202C;
+}}
+:root[data-theme="dark"]{
+  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --line-2:#262D35;
+  --accent-ink:#1A1F25; --accent-soft:#3A2A1C; --f-problem:#7BA6F5; --f-aesthetic:#E27CB6; --f-problem-soft:#1E2A3D; --f-aesthetic-soft:#33202C;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.5;min-height:100vh}
+a{color:var(--focus)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0;font-weight:600}
+
+header.top{position:sticky;top:0;z-index:6;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 18px 9px;
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+header.top h1{font-family:var(--serif);font-size:17px;font-weight:600;margin:0;letter-spacing:.01em}
+header.top .git,header.top .store{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+header.top .spacer{flex:1}
+.tally{display:flex;gap:14px;font-size:11.5px;color:var(--muted);align-items:baseline}
+.tally b{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:5px;vertical-align:middle}
+.dot.db{background:var(--ok)} .dot.local{background:var(--warn)}
+
+.desk{display:grid;grid-template-columns:238px minmax(430px,1.15fr) minmax(340px,.85fr);gap:0;align-items:stretch;
+  max-width:1560px;min-height:calc(100vh - 46px)}
+.rail{border-right:1px solid var(--line);padding:14px 12px 40px;display:flex;flex-direction:column;gap:10px}
+.sheet{padding:18px 26px 60px;min-width:0}
+.talk{border-left:1px solid var(--line);background:var(--panel-2);padding:14px 14px 24px;display:flex;flex-direction:column;gap:14px;min-width:0;
+  position:sticky;top:46px;height:calc(100vh - 46px)}
+@media (max-width:1180px){
+  .desk{grid-template-columns:1fr}
+  .rail{border-right:0;border-bottom:1px solid var(--line)}
+  .talk{border-left:0;border-top:1px solid var(--line);position:static;height:auto}
+}
+
+/* controls */
+.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:5px 10px;font:inherit;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:2px 8px;font-size:12px}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--line)}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 9px;width:100%}
+textarea{resize:vertical;line-height:1.55}
+label.lab{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:3px}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid var(--line);background:var(--panel-2);white-space:nowrap}
+.chip.problem{color:var(--f-problem);border-color:var(--f-problem);background:var(--f-problem-soft)}
+.chip.aesthetic{color:var(--f-aesthetic);border-color:var(--f-aesthetic);background:var(--f-aesthetic-soft)}
+.chip.inbox{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.chip.filed{color:var(--ok);border-color:var(--ok)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* rail */
+.railhead{display:flex;gap:6px;align-items:center}
+.railhead .btn{flex:1}
+.group{display:flex;flex-direction:column;gap:6px}
+.group>h2{margin:6px 0 2px}
+.bcard{text-align:left;width:100%;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--muted);border-radius:0 5px 5px 0;
+  padding:7px 9px;cursor:pointer;font:inherit;color:inherit;display:grid;gap:3px}
+.bcard:hover{border-color:var(--muted);border-left-color:var(--accent)}
+.bcard[aria-current="true"]{background:var(--accent-soft);border-color:var(--accent);border-left-color:var(--accent)}
+.bcard[data-framing="problem"]{border-left-color:var(--f-problem)}
+.bcard[data-framing="aesthetic"]{border-left-color:var(--f-aesthetic)}
+.bcard .t{font-weight:600;line-height:1.3}
+.bcard .m{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.meter{height:3px;background:var(--line-2);border-radius:2px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent)}
+
+/* sheet */
+.sheet .headline{display:grid;gap:8px;margin-bottom:16px}
+.sheet input.title{font-family:var(--serif);font-size:23px;font-weight:600;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:2px 0 6px;background:transparent}
+.sheet input.title::placeholder{color:var(--line)}
+.metarow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.metarow .f{display:grid;gap:2px}
+.metarow .f.grow{flex:1;min-width:170px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:var(--panel)}
+.seg button{background:transparent;border:0;border-right:1px solid var(--line);font:inherit;padding:5px 11px;cursor:pointer;color:var(--muted)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{color:var(--panel);font-weight:500}
+.seg button[data-v="problem"][aria-pressed="true"]{background:var(--f-problem);color:#fff}
+.seg button[data-v="aesthetic"][aria-pressed="true"]{background:var(--f-aesthetic);color:#fff}
+.gauge{display:flex;gap:10px;align-items:center;padding:8px 11px;border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:18px;flex-wrap:wrap}
+.gauge .bar{flex:1;min-width:120px;height:6px;background:var(--line-2);border-radius:3px;overflow:hidden}
+.gauge .bar i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.gauge .n{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.gauge .gaps{font-size:12px;color:var(--muted);flex-basis:100%}
+.fields{display:grid;gap:16px}
+.field{display:grid;gap:4px}
+.field .lh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.field .lh b{font-size:13px;font-weight:600}
+.field .lh .w{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.field .hint{font-size:12px;color:var(--muted);max-width:72ch}
+.field textarea{background:var(--panel)}
+.field.blank textarea{background:var(--panel-2)}
+.sheet .foot{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap;border-top:1px solid var(--line-2);padding-top:14px}
+.sheet .foot .spacer{flex:1}
+.filedline{background:var(--panel);border:1px solid var(--ok);border-left:3px solid var(--ok);border-radius:0 5px 5px 0;padding:8px 11px;margin-bottom:14px;font-size:12.5px}
+
+/* empty state */
+.blankslate{max-width:74ch;display:grid;gap:18px}
+.blankslate h3{font-family:var(--serif);font-size:22px;margin:0;font-weight:600;text-wrap:balance}
+.blankslate p{margin:0;color:var(--muted);max-width:65ch}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.pick{text-align:left;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--muted);border-radius:0 0 6px 6px;padding:12px 14px;cursor:pointer;font:inherit;color:inherit;display:grid;gap:6px}
+.pick[data-v="problem"]{border-top-color:var(--f-problem)} .pick[data-v="aesthetic"]{border-top-color:var(--f-aesthetic)}
+.pick:hover{border-color:var(--muted)}
+.pick b{font-size:14px}
+.pick span{color:var(--muted);font-size:12.5px}
+.pick ul{margin:2px 0 0;padding-left:16px;color:var(--muted);font-size:12px}
+.howto{border:1px dashed var(--line);border-radius:6px;padding:11px 13px;color:var(--muted);font-size:12.5px}
+.howto code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);padding:0 4px;border-radius:3px}
+
+/* thread + chat */
+.talk .pane{display:flex;flex-direction:column;gap:8px;min-height:0}
+.talk .pane.grow{flex:1;min-height:180px}
+.paneheads{display:flex;gap:8px;align-items:baseline}
+.paneheads .spacer{flex:1}
+.scrollbox{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.thread{max-height:34vh}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:7px 9px;display:grid;gap:4px}
+.note[data-author="claude"]{background:var(--accent-soft);border-color:var(--accent)}
+.note[data-status="resolved"]{opacity:.55}
+.note .m{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.note .m .spacer{flex:1}
+.note .txt{white-space:pre-wrap;font-size:12.5px}
+.composer{display:grid;gap:6px}
+.composer textarea{min-height:52px;font-size:12.5px}
+.composer .row{display:flex;gap:6px;align-items:center}
+.composer .row .spacer{flex:1}
+.msgs{flex:1;min-height:120px}
+.msg{border-radius:5px;padding:7px 9px;font-size:12.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{background:var(--panel);border:1px solid var(--line)}
+.msg.assistant{background:transparent;border:1px solid var(--line-2);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;padding-left:10px}
+.msg .acts{display:flex;gap:6px;justify-content:flex-end;margin-top:5px}
+.msg.pending{color:var(--muted);font-style:italic}
+.quick{display:flex;gap:5px;flex-wrap:wrap}
+.quick button{font-size:11.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;font-family:inherit}
+.quick button:hover{color:var(--ink);border-color:var(--muted)}
+.warnline{font-size:12px;color:var(--bad)}
+.empty{color:var(--muted);font-size:12.5px;padding:6px 2px}
+@media (prefers-reduced-motion:no-preference){.btn,.bcard,.pick{transition:border-color .12s,background .12s}}
+</style>
+
+<header class="top">
+  <h1 id="title">Briefs</h1>
+  <span class="git" id="git"></span>
+  <span class="spacer"></span>
+  <div class="tally" id="tally"></div>
+  <span class="store" id="store"><span class="dot"></span><span id="storeMsg">connecting…</span></span>
+</header>
+
+<main class="desk">
+  <aside class="rail">
+    <div class="railhead">
+      <button class="btn primary" id="newProblem">+ Problem</button>
+      <button class="btn" id="newAesthetic">+ Aesthetic</button>
+    </div>
+    <div id="rail"></div>
+  </aside>
+  <section class="sheet" id="sheet"></section>
+  <aside class="talk" id="talk"></aside>
+</main>
+
+<script>
+const D = __DATA__;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const now = () => new Date().toISOString();
+const day = s => String(s || '').slice(0, 10);
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+let briefs = [], notes = [], chat = {}, sel = null, storeKind = 'local';
+let dbRef = null, colBriefs = null, colNotes = null, colChat = null, chatUnsub = null;
+let sample = null, chatCtl = null, chatBusy = false, banner = '';
+const LS = {b: 'briefs:docs', n: 'briefs:notes', c: 'briefs:chat'};
+
+/* ---------- model ---------- */
+const specs = f => D.fields[f] || D.fields.problem;
+function score(b){
+  let have = 0, total = 0; const gaps = [];
+  for (const f of specs(b.framing)) {
+    total += f.weight;
+    if (String((b.fields || {})[f.key] || '').trim()) have += f.weight; else gaps.push(f.label);
+  }
+  return {pct: total ? Math.round(100 * have / total) : 0, gaps};
+}
+function briefMarkdown(b){
+  const out = ['# ' + (b.title || 'untitled'), '_' + b.framing + ' brief · kind ' + (b.kind || 'part') + (b.target ? ' · relates to ' + b.target : '') + '_'];
+  for (const f of specs(b.framing)) out.push('**' + f.label + '**\n' + (String((b.fields || {})[f.key] || '').trim() || '_(blank)_'));
+  if ((b.tags || []).length) out.push('**Tags** ' + b.tags.join(', '));
+  return out.join('\n\n');
+}
+const notesFor = id => notes.filter(n => n.brief === id).sort((a, b) => String(a.created).localeCompare(String(b.created)));
+const isLocal = id => String(id).startsWith('l');
+
+/* ---------- storage ---------- */
+function lsLoad(){
+  try {
+    briefs = JSON.parse(localStorage.getItem(LS.b) || '[]');
+    notes = JSON.parse(localStorage.getItem(LS.n) || '[]');
+    chat = JSON.parse(localStorage.getItem(LS.c) || '{}');
+  } catch (e) { briefs = []; notes = []; chat = {}; }
+}
+function lsSave(){ try { localStorage.setItem(LS.b, JSON.stringify(briefs)); localStorage.setItem(LS.n, JSON.stringify(notes)); localStorage.setItem(LS.c, JSON.stringify(chat)); } catch (e) {} }
+function setStore(kind, msg){ storeKind = kind; $('store').firstElementChild.className = 'dot ' + kind; $('storeMsg').textContent = msg; }
+function say(msg){ banner = msg; renderSheet(); }
+
+async function connect(){
+  lsLoad(); renderAll();
+  setStore('local', 'this browser only');
+  if (!(window.claude && window.claude.use)) return;
+  try {
+    const db = await window.claude.use('db');
+    if (db) {
+      dbRef = db; colBriefs = db.collection('briefs'); colNotes = db.collection('brief_notes'); colChat = db.collection('brief_chat');
+      colBriefs.orderBy('created', 'desc').onSnapshot(
+        snap => {
+          const strays = briefs.filter(b => isLocal(b.id));   // anything typed before the store answered
+          briefs = snap.docs.map(d => Object.assign({id: d.id}, d.data())).concat(strays);
+          if (sel && !briefs.some(b => b.id === sel)) sel = null;
+          renderAll({keepSheet: $('sheet').contains(document.activeElement)});
+        },
+        err => setStore('local', 'shared briefs unavailable (' + ((err && err.code) || 'error') + ')'));
+      colNotes.orderBy('created', 'asc').onSnapshot(
+        snap => {
+          const strays = notes.filter(n => isLocal(n.id));
+          notes = snap.docs.map(d => Object.assign({id: d.id}, d.data())).concat(strays);
+          renderTalk(); renderRail(); renderTally();
+        },
+        () => {});
+      setStore('db', 'shared · Claude reads and answers here');
+    }
+  } catch (e) { setStore('local', 'shared briefs unavailable — this browser only'); }
+  try { sample = await window.claude.use('sample'); } catch (e) { sample = null; }
+  renderTalk();
+}
+
+async function addBrief(framing){
+  const b = {title: '', framing, kind: 'part', target: '', tags: [], fields: {}, status: 'draft',
+             created: now(), updated: now(), source: 'briefs page', text: ''};
+  if (colBriefs) {
+    try { const ref = await colBriefs.add(b); sel = ref.id; renderAll(); return; }
+    catch (e) { say(writeWhy(e) + ' — kept in this browser instead.'); }
+  }
+  b.id = uid('l'); briefs.unshift(b); sel = b.id; lsSave(); renderAll();
+}
+function writeWhy(e){
+  const c = (e && e.code) || 'error';
+  return c === 'quota_exceeded' ? 'The shared store is full' : c === 'invalid_argument' ? 'That is too long for one document' : 'Write failed (' + c + ')';
+}
+async function patchBrief(id, patch){
+  const b = briefs.find(x => x.id === id); if (!b) return;
+  Object.assign(b, patch, {updated: now()});
+  if (colBriefs && !isLocal(id)) { try { await colBriefs.doc(id).update(Object.assign({}, patch, {updated: b.updated})); } catch (e) { say(writeWhy(e)); } }
+  else lsSave();
+  renderRail();
+}
+async function deleteBrief(id){
+  if (colBriefs && !isLocal(id)) { try { await colBriefs.doc(id).delete(); } catch (e) { say(writeWhy(e)); return; } }
+  briefs = briefs.filter(b => b.id !== id); if (sel === id) sel = null; lsSave(); renderAll();
+}
+async function addNote(brief, text, author){
+  const n = {brief, text, author: author || 'me', status: 'open', created: now()};
+  if (colNotes) { try { await colNotes.add(n); return; } catch (e) { say(writeWhy(e) + ' — note kept in this browser.'); } }
+  n.id = uid('l'); notes.push(n); lsSave(); renderTalk(); renderRail();
+}
+async function patchNote(id, patch){
+  if (colNotes && !isLocal(id)) { try { await colNotes.doc(id).update(patch); return; } catch (e) { say(writeWhy(e)); return; } }
+  const n = notes.find(x => x.id === id); if (n) { Object.assign(n, patch); lsSave(); renderTalk(); }
+}
+async function deleteNote(id){
+  if (colNotes && !isLocal(id)) { try { await colNotes.doc(id).delete(); return; } catch (e) { say(writeWhy(e)); return; } }
+  notes = notes.filter(n => n.id !== id); lsSave(); renderTalk();
+}
+async function loadChat(id){
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  if (!colChat || isLocal(id)) { renderChat(); return; }
+  chatUnsub = colChat.doc(id).onSnapshot(
+    s => { chat[id] = (s.exists && s.data().turns) || []; renderChat(); },
+    () => {});
+}
+async function saveChat(id){
+  const turns = (chat[id] || []).slice(-24);
+  chat[id] = turns;
+  if (colChat && !isLocal(id)) { try { await colChat.doc(id).set({brief: id, turns, updated: now()}); return; } catch (e) { say(writeWhy(e)); } }
+  lsSave();
+}
+
+/* ---------- rail ---------- */
+const GROUPS = [['draft', 'Drafts'], ['inbox', 'With Claude'], ['filed', 'Filed']];
+function renderRail(){
+  let h = '';
+  for (const [status, label] of GROUPS) {
+    const mine = briefs.filter(b => (b.status || 'draft') === status);
+    if (!mine.length) continue;
+    h += '<div class="group"><h2>' + label + ' (' + mine.length + ')</h2>';
+    for (const b of mine) {
+      const s = score(b), open = notesFor(b.id).filter(n => n.status !== 'resolved').length;
+      h += '<button class="bcard" data-id="' + esc(b.id) + '" data-framing="' + esc(b.framing) + '" aria-current="' + (sel === b.id) + '">' +
+        '<span class="t">' + esc(b.title || 'Untitled brief') + '</span>' +
+        '<span class="m"><span>' + esc(b.framing) + '</span><span>·</span><span>' + s.pct + '%</span>' +
+        (open ? '<span>·</span><span>' + open + ' note' + (open > 1 ? 's' : '') + '</span>' : '') + '</span>' +
+        '<span class="meter"><i style="width:' + s.pct + '%"></i></span></button>';
+    }
+    h += '</div>';
+  }
+  $('rail').innerHTML = h || '<div class="empty">No briefs yet. Start one above — a brief is how a half-formed idea becomes something Claude can build.</div>';
+  $('rail').querySelectorAll('.bcard').forEach(el => el.addEventListener('click', () => { sel = el.dataset.id; renderAll(); loadChat(sel); }));
+}
+
+/* ---------- sheet ---------- */
+function renderSheet(){
+  const sheet = $('sheet');
+  const b = briefs.find(x => x.id === sel);
+  if (!b) { sheet.innerHTML = blankSlate(); wireBlank(); return; }
+  const s = score(b), status = b.status || 'draft';
+  let h = '';
+  if (banner) h += '<div class="warnline" style="margin-bottom:10px">' + esc(banner) + '</div>';
+  if (status === 'filed') h += '<div class="filedline"><b>Filed</b> — Claude wrote this up as <span class="mono">' + esc(b.path || 'ideas/…/IDEA.md') + '</span>. Keep talking in the thread; edits here still reach the next sync.</div>';
+  else if (status === 'inbox') h += '<div class="filedline" style="border-color:var(--accent);border-left-color:var(--accent)"><b>With Claude</b> — handed over ' + esc(day(b.handed || b.updated)) + '. It becomes <span class="mono">ideas/&lt;slug&gt;/IDEA.md</span> on the next sync.</div>';
+
+  h += '<div class="headline">' +
+    '<input class="title" id="fTitle" type="text" aria-label="Brief title" placeholder="Name the thing" value="' + esc(b.title) + '">' +
+    '<div class="metarow">' +
+      '<div class="f"><label class="lab">Framing</label><div class="seg" id="fFraming">' +
+        D.framings.map(f => '<button data-v="' + f + '" aria-pressed="' + (b.framing === f) + '">' + f + '</button>').join('') + '</div></div>' +
+      '<div class="f"><label class="lab" for="fKind">Kind</label><select id="fKind">' +
+        D.kinds.map(k => '<option value="' + k + '"' + (b.kind === k ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></div>' +
+      '<div class="f grow"><label class="lab" for="fTarget">Relates to</label><select id="fTarget">' +
+        '<option value="">— nothing yet —</option>' +
+        '<optgroup label="models">' + D.models.map(m => '<option value="' + esc(m.project) + '"' + (b.target === m.project ? ' selected' : '') + '>' + esc(m.project) + '</option>').join('') + '</optgroup>' +
+        '<optgroup label="ideas">' + D.ideas.map(i => '<option value="' + esc(i.slug) + '"' + (b.target === i.slug ? ' selected' : '') + '>' + esc(i.slug) + '</option>').join('') + '</optgroup>' +
+      '</select></div>' +
+      '<div class="f grow"><label class="lab" for="fTags">Tags</label><input id="fTags" type="text" placeholder="kitchen, clip, petg" value="' + esc((b.tags || []).join(', ')) + '"></div>' +
+    '</div></div>';
+
+  h += '<div class="gauge"><span class="n">' + s.pct + '% answered</span><span class="bar"><i style="width:' + s.pct + '%"></i></span>' +
+    (s.gaps.length ? '<span class="gaps">Claude will have to guess: ' + esc(s.gaps.join(' · ')) + '</span>'
+                   : '<span class="gaps">Nothing left blank. Hand it over.</span>') + '</div>';
+
+  h += '<div class="fields">';
+  for (const f of specs(b.framing)) {
+    const v = String((b.fields || {})[f.key] || '');
+    h += '<div class="field' + (v.trim() ? '' : ' blank') + '">' +
+      '<div class="lh"><b>' + esc(f.label) + '</b><span class="w">' + (f.weight >= 3 ? 'the point' : f.weight === 2 ? 'matters' : 'nice to have') + '</span></div>' +
+      '<div class="hint">' + esc(f.hint) + '</div>' +
+      '<textarea data-key="' + esc(f.key) + '" aria-label="' + esc(f.label) + '" rows="' + (f.rows || 3) +
+      '" placeholder="' + esc(f.placeholder) + '">' + esc(v) + '</textarea></div>';
+  }
+  h += '</div>';
+
+  h += '<div class="foot">' +
+    (status === 'draft'
+      ? '<button class="btn primary" id="hand">Hand to Claude</button><span class="muted">Puts it in the sync queue as an idea. You can keep editing after.</span>'
+      : '<button class="btn" id="unhand">Pull back to draft</button><span class="muted">' + (status === 'filed' ? 'Already written up in the repo.' : 'Waiting for the next sync.') + '</span>') +
+    '<span class="spacer"></span><button class="btn ghost small" id="copyMd">Copy as markdown</button><button class="btn ghost small" id="del">Delete</button></div>';
+  sheet.innerHTML = h;
+  wireSheet(b);
+}
+
+function blankSlate(){
+  const f = D.fields, n = D.components.length;
+  const card = (v, title, blurb, list) => '<button class="pick" data-v="' + v + '"><b>' + title + '</b><span>' + blurb + '</span><ul>' +
+    list.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></button>';
+  return '<div class="blankslate">' +
+    '<h3>A brief is the shape of an ask</h3>' +
+    '<p>Two framings, because a bracket and a vase fail in different ways. Answer what you know, leave the rest blank — the form tells you what Claude will have to guess, and the thread beside it is where the two of you settle the rest. Handing a brief over files it into <span class="mono">ideas/</span> on the next sync.</p>' +
+    '<div class="picks">' +
+      card('problem', 'Problem brief', 'Something in the house does not work. The part is the fix.', f.problem.slice(0, 4).map(x => x.label)) +
+      card('aesthetic', 'Aesthetic brief', 'You want an object to look and feel a certain way. The function is the excuse.', f.aesthetic.slice(0, 4).map(x => x.label)) +
+    '</div>' +
+    '<div class="howto">Claude here reads your ' + n + '-component library, ' + D.models.length + ' built models and ' + D.ideas.length +
+      ' ideas, and designs for a ' + esc(D.printer.machine) + ' — ' + esc(D.printer.bed) + ' bed, ' + esc(D.printer.nozzle) + ' nozzle, ' +
+      D.printer.toolheads + ' toolheads. Reference photos belong on the Inspiration page' +
+      (D.inspiration_page && D.inspiration_page.artifact_url ? ' (<a href="' + esc(D.inspiration_page.artifact_url) + '">open it</a>)' : '') +
+      '; name them in the brief once they are up.</div>' +
+    '</div>';
+}
+function wireBlank(){ document.querySelectorAll('.pick').forEach(el => el.addEventListener('click', () => addBrief(el.dataset.v))); }
+
+function autogrow(t){ t.style.height = 'auto'; t.style.height = Math.max(t.scrollHeight + 2, 46) + 'px'; }
+let saveTimer = null;
+function wireSheet(b){
+  const sheet = $('sheet');
+  sheet.querySelectorAll('textarea').forEach(t => {
+    autogrow(t);
+    t.addEventListener('input', () => {
+      autogrow(t);
+      const fields = Object.assign({}, b.fields || {}); fields[t.dataset.key] = t.value;
+      b.fields = fields;
+      const g = score(b);
+      const bar = sheet.querySelector('.gauge .bar i'), num = sheet.querySelector('.gauge .n');
+      if (bar) bar.style.width = g.pct + '%';
+      if (num) num.textContent = g.pct + '% answered';
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => patchBrief(b.id, {fields: b.fields, text: briefMarkdown(b)}), 700);
+    });
+  });
+  const t = $('fTitle');
+  t.addEventListener('input', () => { b.title = t.value; clearTimeout(saveTimer); saveTimer = setTimeout(() => patchBrief(b.id, {title: t.value, text: briefMarkdown(b)}), 700); });
+  $('fKind').addEventListener('change', e => patchBrief(b.id, {kind: e.target.value}));
+  $('fTarget').addEventListener('change', e => patchBrief(b.id, {target: e.target.value}));
+  $('fTags').addEventListener('change', e => patchBrief(b.id, {tags: e.target.value.split(',').map(x => x.trim()).filter(Boolean)}));
+  $('fFraming').querySelectorAll('button').forEach(el => el.addEventListener('click', async () => {
+    if (el.dataset.v === b.framing) return;
+    b.framing = el.dataset.v;
+    await patchBrief(b.id, {framing: b.framing, text: briefMarkdown(b)});
+    renderSheet();
+  }));
+  const hand = $('hand'), unhand = $('unhand');
+  if (hand) hand.addEventListener('click', async () => {
+    if (!String(b.title || '').trim()) { say('Give it a name first — the name becomes the idea’s directory.'); return; }
+    banner = '';
+    await patchBrief(b.id, {status: 'inbox', handed: now(), text: briefMarkdown(b), completeness: score(b).pct});
+    renderAll();
+  });
+  if (unhand) unhand.addEventListener('click', async () => { await patchBrief(b.id, {status: 'draft'}); renderAll(); });
+  $('copyMd').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(briefMarkdown(b)); $('copyMd').textContent = 'Copied'; setTimeout(() => { $('copyMd').textContent = 'Copy as markdown'; }, 1400); }
+    catch (e) { say('This browser blocked the clipboard.'); }
+  });
+  $('del').addEventListener('click', () => {
+    if ($('del').dataset.armed) { deleteBrief(b.id); return; }
+    $('del').dataset.armed = '1'; $('del').textContent = 'Delete for good?';
+    setTimeout(() => { const d = $('del'); if (d) { delete d.dataset.armed; d.textContent = 'Delete'; } }, 3000);
+  });
+}
+
+/* ---------- thread + chat ---------- */
+function renderTalk(){
+  const b = briefs.find(x => x.id === sel);
+  const keep = {note: ($('noteBox') || {}).value || '', ask: ($('askBox') || {}).value || '',
+                focus: document.activeElement && document.activeElement.id};
+  if (!b) {
+    $('talk').innerHTML = '<div class="pane"><h2>Thread</h2><div class="empty">Pick or start a brief. Every brief carries its own thread and its own conversation with Claude.</div></div>';
+    return;
+  }
+  const th = notesFor(b.id);
+  $('talk').innerHTML =
+    '<div class="pane"><div class="paneheads"><h2>Thread</h2><span class="spacer"></span>' +
+      '<span class="muted" style="font-size:11.5px">' + th.filter(n => n.status !== 'resolved').length + ' open</span></div>' +
+      '<div class="scrollbox thread" id="thread">' + (th.length ? th.map(noteHtml).join('') :
+        '<div class="empty">Notes here survive the sync: Claude reads them, answers in the same thread, and they land in the idea’s open questions.</div>') + '</div>' +
+      '<div class="composer"><textarea id="noteBox" aria-label="New thread note" placeholder="A measurement you took, a change of mind, a question for Claude…"></textarea>' +
+      '<div class="row"><span class="muted" style="font-size:11.5px">⌘/Ctrl + Enter</span><span class="spacer"></span>' +
+      '<button class="btn small" id="addNote">Add note</button></div></div></div>' +
+    '<div class="pane grow"><div class="paneheads"><h2>Claude, on this brief</h2><span class="spacer"></span>' +
+      '<button class="btn ghost small" id="clearChat">clear</button></div>' +
+      '<div class="quick" id="quick"></div>' +
+      '<div class="scrollbox msgs" id="msgs"></div>' +
+      '<div class="composer"><textarea id="askBox" aria-label="Ask Claude about this brief" placeholder="Ask about the shape, the printability, what to reuse…"></textarea>' +
+      '<div class="row"><span id="chatState" class="muted" style="font-size:11.5px"></span><span class="spacer"></span>' +
+      '<button class="btn small" id="stopBtn" hidden>Stop</button><button class="btn small primary" id="askBtn">Ask</button></div></div></div>';
+
+  $('thread').querySelectorAll('[data-resolve]').forEach(el => el.addEventListener('click', () => {
+    const n = notes.find(x => x.id === el.dataset.resolve);
+    patchNote(el.dataset.resolve, {status: n && n.status === 'resolved' ? 'open' : 'resolved'});
+  }));
+  $('thread').querySelectorAll('[data-delnote]').forEach(el => el.addEventListener('click', () => deleteNote(el.dataset.delnote)));
+  const box = $('noteBox');
+  const post = () => { const t = box.value.trim(); if (!t) return; box.value = ''; addNote(b.id, t, 'me'); };
+  $('addNote').addEventListener('click', post);
+  box.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') post(); });
+
+  const QUICK = [
+    ['Interrogate it', 'Ask me the three questions that would most change this design, and say what you would assume for each if I never answered.'],
+    ['Reuse map', 'Draft the reuse map for this brief as a table (need | component id | note), using only component ids from the library above. List anything missing as a proposed gap id.'],
+    ['Printability', 'Where will this fight the printer? Pick the print orientation, name the overhangs and thin walls that follow from it, and say what you would change in the geometry.'],
+    ['Say it back', 'Say this brief back to me in five sentences — the problem, the shape, the constraints, the reuse, the risk — so I can see what you actually understood.'],
+  ];
+  $('quick').innerHTML = sample ? QUICK.map((q, i) => '<button data-q="' + i + '">' + esc(q[0]) + '</button>').join('') : '';
+  $('quick').querySelectorAll('button').forEach(el => el.addEventListener('click', () => ask(QUICK[+el.dataset.q][1])));
+  $('askBtn').addEventListener('click', () => { const v = $('askBox').value.trim(); if (v) { $('askBox').value = ''; ask(v); } });
+  $('askBox').addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') $('askBtn').click(); });
+  $('stopBtn').addEventListener('click', () => { if (chatCtl) chatCtl.abort(); });
+  $('clearChat').addEventListener('click', () => { chat[b.id] = []; saveChat(b.id); renderChat(); });
+  $('noteBox').value = keep.note; $('askBox').value = keep.ask;
+  if (keep.focus === 'noteBox' || keep.focus === 'askBox') {
+    const el = $(keep.focus); el.focus(); el.setSelectionRange(el.value.length, el.value.length);
+  }
+  renderChat();
+}
+function noteHtml(n){
+  return '<div class="note" data-author="' + esc(n.author) + '" data-status="' + esc(n.status || 'open') + '">' +
+    '<div class="m"><b>' + (n.author === 'claude' ? 'Claude' : 'You') + '</b><span>' + esc(day(n.created)) + '</span><span class="spacer"></span>' +
+    '<button class="btn ghost small" data-resolve="' + esc(n.id) + '">' + (n.status === 'resolved' ? 'reopen' : 'settled') + '</button>' +
+    '<button class="btn ghost small" data-delnote="' + esc(n.id) + '" aria-label="delete note">×</button></div>' +
+    '<div class="txt">' + esc(n.text) + '</div></div>';
+}
+function renderChat(){
+  const box = $('msgs'); if (!box) return;
+  const turns = chat[sel] || [];
+  if (!sample) {
+    box.innerHTML = '<div class="empty">' + (window.claude && window.claude.use
+      ? 'Claude is not available in this view — the thread still reaches him at the next sync.'
+      : 'Open the published page to talk to Claude here. Notes in the thread work either way.') + '</div>';
+    $('askBtn').disabled = true; $('askBox').disabled = true;
+    return;
+  }
+  box.innerHTML = turns.length ? turns.map((t, i) =>
+    '<div class="msg ' + t.role + '">' + esc(t.content) +
+    (t.role === 'assistant' && !t.pending ? '<div class="acts"><button class="btn ghost small" data-tonote="' + i + '">keep in thread</button></div>' : '') +
+    '</div>').join('')
+    : '<div class="empty">Ask anything, or use a chip above. Claude sees the brief as you have written it, the thread, and the whole library — but nothing you typed in a different brief.</div>';
+  box.querySelectorAll('[data-tonote]').forEach(el => el.addEventListener('click', () => {
+    addNote(sel, turns[+el.dataset.tonote].content, 'claude');
+    el.textContent = 'in the thread'; el.disabled = true;
+  }));
+  box.scrollTop = box.scrollHeight;
+}
+
+const SAMPLE_COPY = {
+  not_granted: 'You declined the Claude call for this page. The thread still reaches him at the next sync.',
+  rate_limited: 'Too many questions at once — give it a minute.',
+  cancelled: '',
+  prompt_too_large: 'This brief plus the thread is too long to send in one go. Trim the thread or ask about one field.',
+  unavailable: 'Claude could not be reached. Try again.',
+};
+function context(b){
+  const th = notesFor(b.id).map(n => (n.author === 'claude' ? 'Claude' : 'Me') + ' (' + day(n.created) + (n.status === 'resolved' ? ', settled' : '') + '): ' + n.text);
+  return [
+    'You are the design partner on `' + D.repo + '`, a build123d parts monorepo that prints on a ' + D.printer.machine +
+      ' (' + D.printer.bed + ' bed, ' + D.printer.nozzle + ' nozzle, ' + D.printer.layer + ' layers, ' + D.printer.toolheads +
+      ' toolheads, ' + D.printer.materials.join('/') + ').',
+    'How to answer: under 180 words unless I ask for more. At most two questions at a time, and make them the ones that would change the geometry.',
+    'Name library components by their exact id from the list below; never invent one. Anything missing is a gap, written as <category>.<name>.',
+    'Design rules that bind you: overhangs past 45° need support or a different orientation; walls below 0.8 mm will not print at a 0.4 nozzle and 1.2 mm is the honest minimum; largest flat face on the bed; chamfer, never fillet, the bed edge; snap features flex in the bed plane; no enclosed voids that trap water.',
+    'Be concrete and be willing to say the idea is wrong. No preamble, no restating my question.',
+    '',
+    'LIBRARY (' + D.components.length + ' components):',
+    D.components.map(c => c.id + ' — ' + c.summary).join('\n'),
+    '',
+    'MODELS BUILT: ' + (D.models.map(m => m.project).join(', ') || 'none'),
+    'IDEAS ON THE BOARD: ' + (D.ideas.map(i => i.slug + ' (' + i.status + ')').join(', ') || 'none'),
+    'GAPS IDEAS ARE WAITING ON: ' + (D.gaps.join(', ') || 'none'),
+    '',
+    'THE BRIEF, as I have written it so far:',
+    briefMarkdown(b),
+    '',
+    th.length ? 'THE THREAD so far:\n' + th.join('\n') : 'The thread is empty.',
+  ].join('\n');
+}
+async function ask(question){
+  const b = briefs.find(x => x.id === sel);
+  if (!b || !sample || chatBusy) return;
+  chatBusy = true; banner = '';
+  const turns = (chat[b.id] || []).slice();
+  turns.push({role: 'user', content: question});
+  turns.push({role: 'assistant', content: 'Thinking…', pending: true});
+  chat[b.id] = turns; renderChat();
+  $('stopBtn').hidden = false; $('askBtn').disabled = true; $('chatState').textContent = 'thinking…';
+  const history = turns.slice(0, -1).filter(t => !t.pending).map(t => ({role: t.role, content: t.content}));
+  chatCtl = new AbortController();
+  const last = turns.length - 1;
+  try {
+    const {text} = await sample([{role: 'user', content: context(b)}, {role: 'assistant', content: 'Read. Ask me anything about this brief.'}].concat(history), {
+      cache: false, signal: chatCtl.signal,
+      onText: ({text}) => { const t = chat[b.id]; if (t && t[last]) { t[last] = {role: 'assistant', content: text, pending: true}; renderChat(); } },
+    });
+    chat[b.id][last] = {role: 'assistant', content: text};
+  } catch (e) {
+    const code = (e && e.code) || 'error';
+    if (e && e.text) chat[b.id][last] = {role: 'assistant', content: e.text};
+    else chat[b.id].splice(last, 1);
+    if (code === 'not_granted') sample = null;
+    banner = SAMPLE_COPY[code] || ('Claude could not answer (' + code + ').');
+    if (banner) renderSheet();
+  } finally {
+    chatBusy = false; chatCtl = null;
+    await saveChat(b.id);
+    renderChat();
+    const st = $('chatState'), sb = $('stopBtn'), ab = $('askBtn');
+    if (st) st.textContent = ''; if (sb) sb.hidden = true; if (ab) ab.disabled = false;
+  }
+}
+
+/* ---------- shell ---------- */
+function renderAll(opts){ renderRail(); if (!(opts && opts.keepSheet)) renderSheet(); renderTalk(); renderTally(); }
+function renderTally(){
+  const n = s => briefs.filter(b => (b.status || 'draft') === s).length;
+  const open = notes.filter(x => x.status !== 'resolved' && briefs.some(b => b.id === x.brief)).length;
+  $('tally').innerHTML = '<span><b>' + n('draft') + '</b> draft</span><span><b>' + n('inbox') + '</b> with Claude</span>' +
+    '<span><b>' + n('filed') + '</b> filed</span><span><b>' + open + '</b> open notes</span>';
+}
+$('title').textContent = D.repo + ' briefs';
+$('git').textContent = (D.git && D.git.hash ? D.git.hash + (D.git.dirty ? '*' : '') + ' · ' : '') + 'library read ' + D.generated;
+$('newProblem').addEventListener('click', () => addBrief('problem'));
+$('newAesthetic').addEventListener('click', () => addBrief('aesthetic'));
+renderAll();
+connect();
+</script>

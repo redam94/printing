@@ -5,7 +5,8 @@ The artifact databases are only reachable through Claude's Artifact tool, so the
 
   1. Claude reads each collection with the Artifact tool (read_db, db_op list) and writes the
      documents it got back as a JSON list to .sync/<p>/notes.json (models/<p>/review.json pages)
-     and .sync/studio/ideas.json (studio.json inbox). Each list item is {"id": <doc id>, ...fields}
+     .sync/studio/ideas.json (studio.json inbox) and .sync/brief/{briefs,notes}.json (brief.json:
+     the `briefs` form documents and the `brief_notes` threads). Each list item is {"id": <doc id>, ...fields}
      (an {"id", "data": {...}} envelope is also accepted). read_db's out_dir option, which writes
      .sync/<p>/notes/<doc_id>.json per document, works too but needs a file-write approval that a
      headless routine cannot give.
@@ -16,7 +17,10 @@ The artifact databases are only reachable through Claude's Artifact tool, so the
        - records field evidence per component in lib/validation.json: a print that worked in a
          material validates every component the model uses (prune with --components if only
          some parts were printed); a failed print is recorded as a failure, never as validation
-       - files inbox ideas into ideas/<slug>/IDEA.md
+       - files inbox ideas into ideas/<slug>/IDEA.md, and handed-over briefs (status "inbox" on the
+         Briefs page) into ideas/<slug>/IDEA.md through scripts.brief.idea_text_from_brief, which
+         maps each form field to its IDEA.md section and carries the open thread notes into
+         "## Open questions"; open thread notes are listed for Claude to answer on the page
        - writes .sync/actions.json: OPTIONAL write_db updates (mark ideas filed, stamp notes as
          synced). The pages compute the same state from the repo (an inbox idea is "filed" when
          ideas/<slugify(title)>/IDEA.md exists; a review page shows the notes.json sync date), so a
@@ -37,6 +41,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts._common import MODELS_DIR, ROOT, list_projects, load_golden, review_info  # noqa: E402
+from scripts.brief import BRIEF_JSON, completeness, idea_text_from_brief  # noqa: E402
 from scripts.ideas import IDEAS_DIR, new_idea_text, slugify  # noqa: E402
 
 SYNC_DIR = ROOT / ".sync"
@@ -130,7 +135,8 @@ def ingest(sync_dir: Path = SYNC_DIR, *, components_override: dict[str, list[str
     idx = _read_json(ROOT / "parts.json", {"components": {}, "models": {}})
     validation = _read_json(VALIDATION_JSON, {})
     actions: list[dict] = []
-    summary = {"models": {}, "evidence_added": [], "ideas_filed": [], "inferred": [], "skipped_no_material": []}
+    summary = {"models": {}, "evidence_added": [], "ideas_filed": [], "briefs_filed": [], "brief_notes": [],
+               "inferred": [], "skipped_no_material": []}
 
     for project in list_projects():
         rv = review_info(project)
@@ -194,6 +200,37 @@ def ingest(sync_dir: Path = SYNC_DIR, *, components_override: dict[str, list[str
             actions.append({"artifact_url": studio["artifact_url"], "collection": studio.get("inbox_collection", "ideas"), "doc_id": doc["id"],
                             "data": {"status": "filed", "path": str(path.relative_to(ROOT)), "slug": slug, "synced": today}})
 
+    # Briefs page -> ideas/ (the form: framing, fields and its own thread)
+    brief_page = _read_json(BRIEF_JSON, {})
+    brief_docs = load_docs(sync_dir / "brief" / "briefs")
+    thread_docs = load_docs(sync_dir / "brief" / "notes")
+    by_brief: dict[str, list[dict]] = {}
+    for n in thread_docs:
+        by_brief.setdefault(str(n.get("brief") or ""), []).append(n)
+    for doc in brief_docs:
+        if doc.get("status") != "inbox" or not doc.get("title"):
+            continue
+        slug = slugify(str(doc["title"]))
+        path = IDEAS_DIR / slug / "IDEA.md"
+        existed = path.exists()
+        thread = sorted(by_brief.get(str(doc["id"]), []), key=lambda n: str(n.get("created") or ""))
+        have, total, missing = completeness(doc)
+        if not existed and not dry_run:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(idea_text_from_brief(doc, thread, today=today), encoding="utf-8")
+        summary["briefs_filed"].append({"slug": slug, "title": str(doc["title"]), "framing": str(doc.get("framing") or "problem"),
+                                        "pct": round(100 * have / total) if total else 0, "missing": missing,
+                                        "notes": len(thread), "existed": existed})
+        if brief_page.get("artifact_url"):
+            actions.append({"artifact_url": brief_page["artifact_url"], "collection": brief_page.get("briefs_collection", "briefs"),
+                            "doc_id": doc["id"], "data": {"status": "filed", "path": str(path.relative_to(ROOT)), "slug": slug, "synced": today}})
+    titles = {str(b.get("id")): str(b.get("title") or "") for b in brief_docs}
+    for n in thread_docs:
+        if str(n.get("status")) == "resolved" or str(n.get("author")) == "claude":
+            continue
+        summary["brief_notes"].append({"brief": titles.get(str(n.get("brief")), str(n.get("brief") or "?")), "id": n["id"],
+                                       "created": str(n.get("created") or "")[:10], "text": str(n.get("text") or "")})
+
     if not dry_run:
         for cid in list(validation):
             validation[cid].sort(key=lambda e: (e["date"], e["note_id"]))
@@ -226,6 +263,19 @@ def format_summary(s: dict) -> str:
         out.append("\ninbox ideas filed:")
         for i in s["ideas_filed"]:
             out.append(f"  ideas/{i['slug']}/IDEA.md  {i['title']}")
+    if s["briefs_filed"]:
+        out.append("\nbriefs handed over (Briefs page):")
+        for b in s["briefs_filed"]:
+            flag = "already existed, left alone" if b["existed"] else "written"
+            out.append(f"  ideas/{b['slug']}/IDEA.md  [{b['framing']}] {b['title']}  ({b['pct']}% answered, "
+                       f"{b['notes']} thread note(s), {flag})")
+            if b["missing"]:
+                out.append(f"      blank in the brief: {', '.join(b['missing'])}")
+    if s["brief_notes"]:
+        out.append("\nopen thread notes on the Briefs page — read them, answer in the same thread "
+                   "(write_db, collection brief_notes, author \"claude\"), then mark them resolved:")
+        for n in s["brief_notes"]:
+            out.append(f"  {n['created']}  {n['brief']}: {n['text'][:120]}")
     out.append(f"\n{len(s['actions'])} optional db update(s) queued in .sync/actions.json (Artifact write_db; interactive sessions only — "
                "the pages derive filed/synced state from the repo, so skipping them loses nothing)")
     out.append("next: uv run python scripts/reindex.py && uv run python -m pytest -q; then rebuild + republish affected review pages and the Studio page")
