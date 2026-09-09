@@ -4,7 +4,6 @@
   "synced": "2026-09-09",
   "notes": [
     {
-      "id": "ix3af10kmhjq3hon31a1",
       "build_id": "20260907-195428",
       "created": "2026-09-07T23:59:15.054Z",
       "kind": "critique",
@@ -16,7 +15,8 @@
       "visible": [
         "vase"
       ],
-      "z": null
+      "z": null,
+      "id": "ix3af10kmhjq3hon31a1"
     }
   ]
 }

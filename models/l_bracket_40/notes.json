@@ -4,7 +4,6 @@
   "synced": "2026-09-09",
   "notes": [
     {
-      "id": "zi69ukix7bnmqt934e8x",
       "build_id": "20260907-020055",
       "created": "2026-09-07T06:14:21.496Z",
       "part": "",
@@ -16,10 +15,10 @@
       "visible": [
         "bracket"
       ],
-      "z": null
+      "z": null,
+      "id": "zi69ukix7bnmqt934e8x"
     },
     {
-      "id": "obi2662jru7hr1gl7g0y",
       "build_id": "20260907-020055",
       "created": "2026-09-07T06:14:42.612Z",
       "part": "",
@@ -32,7 +31,8 @@
       "visible": [
         "bracket"
       ],
-      "z": null
+      "z": null,
+      "id": "obi2662jru7hr1gl7g0y"
     }
   ]
 }
