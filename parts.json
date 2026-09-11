@@ -2489,6 +2489,157 @@
       ],
       "import": "from lib.mechanisms.snap_fit import snap_ridge"
     },
+    "mechanisms.split_ring_clip": {
+      "id": "mechanisms.split_ring_clip",
+      "version": "0.1.0",
+      "summary": "Snap-on split-ring clip: a C-ring (bore = rod - grip) on two living-hinge push arms, sprung by thin side strips off a mounting rail; the rod snaps in through the bottom slit.",
+      "params": [
+        {
+          "name": "rod_d",
+          "type": "float",
+          "units": "mm",
+          "default": 5.5,
+          "description": "diameter of the rod, tube or cable the clip holds"
+        },
+        {
+          "name": "grip",
+          "type": "float",
+          "units": "mm",
+          "default": 0.45,
+          "description": "bore undersize: ring bore = rod_d - grip, so the closed jaws preload the rod (reference: 5.5 rod, 5.05 bore)"
+        },
+        {
+          "name": "wall",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "ring wall thickness (measured 1.0)"
+        },
+        {
+          "name": "ring_gap",
+          "type": "float",
+          "units": "mm",
+          "default": 0.5,
+          "description": "width of the slit that splits the ring top and bottom; the rod enters through the bottom one"
+        },
+        {
+          "name": "hinge_width",
+          "type": "float",
+          "units": "mm",
+          "default": 0.5,
+          "description": "in-plane width of every living-hinge neck: arm to post, arm to ring, and the bridge across the top slit (measured 0.46 = one 0.4 mm line)"
+        },
+        {
+          "name": "hinge_length",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "length of the arm-to-post and arm-to-ring necks along X"
+        },
+        {
+          "name": "neck_plate",
+          "type": "float",
+          "units": "mm",
+          "default": 1.9,
+          "description": "Z thickness of the two neck plates at the top and bottom faces (measured 1.9); the necks are absent between them. 0 = necks run the full depth"
+        },
+        {
+          "name": "arm_len",
+          "type": "float",
+          "units": "mm",
+          "default": 16.2,
+          "description": "overall length of each push arm including its rounded ends"
+        },
+        {
+          "name": "arm_w",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "width of the push arms (measured 1.54; 1.6 = four lines)"
+        },
+        {
+          "name": "arm_angle",
+          "type": "float",
+          "units": "deg",
+          "default": 16.0,
+          "description": "angle of the arms below the X axis, outer end lower (measured ~16 deg)"
+        },
+        {
+          "name": "jaw_attach",
+          "type": "float",
+          "units": "mm",
+          "default": -1.75,
+          "description": "Y of the arm-to-ring neck relative to the ring centre; negative = below centre, must stay below the top bridge so pulling the arms outward opens the jaws"
+        },
+        {
+          "name": "post_d",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "diameter of the round posts that join the strips to the arm necks"
+        },
+        {
+          "name": "strip_t",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "thickness of the side strips, the return springs (measured 0.55; 0.6 = one line plus gap fill)"
+        },
+        {
+          "name": "ring_clear",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "clear gap between the ring top and the rail underside"
+        },
+        {
+          "name": "rail_t",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "thickness (Y) of the mounting rail"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 7.2,
+          "description": "part height (Z) = print height (measured 7.2)"
+        }
+      ],
+      "tags": [
+        "cable",
+        "clip",
+        "compliant",
+        "holder",
+        "living hinge",
+        "print in place",
+        "ring clip",
+        "rod",
+        "snap-on",
+        "spring"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed, ring axis along Z, so every neck and strip bends in the bed plane; never stand it up",
+        "notes": "UNVALIDATED here. Reproduced from a downloaded mesh with no page or material notes; the necks are one 0.4 mm line and the strips one and a half, so print with thin-wall (Arachne) perimeters on. The strips and necks bend on every rod insertion; PETG expected to hold up, PLA expected to work for a few insertions and creep if the rod is oversize. A coupon print at the defaults (models/ring_clip_5_5) is the first test.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.ring_clip",
+      "qualname": "split_ring_clip",
+      "file": "lib/mechanisms/ring_clip.py",
+      "line": 46,
+      "returns": "Part",
+      "docstring": "Ring centre at the origin, rail along +Y above it, rod enters from -Y; the part stands on z=0.\n\nOne connected body: rail -> side strips -> posts -> necks -> arms -> necks -> ring halves, whose\ntop slit is bridged by a ``hinge_width`` neck.  Pushing the ring onto the rod spreads the halves\nabout that bridge, pulls the arms outward and bends the strips; the strips then hold the jaws\nshut on the rod.  Squeezing the posts together tightens the jaws.  With ``neck_plate`` > 0 the\nnecks and the top bridge exist only in the top and bottom plates, as in the reference, so the\nmiddle layers of the arms and ring halves are free islands standing on the bottom plate.\nMounting is by the rail's back face (y = rail_top); cut holes into it in the model.\n\nExample:\n    env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post ...\n    clip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\n    wall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
+      "example": "env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post ...\nclip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\nwall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
+      "used_by": [
+        "models/ring_clip_5_5/model.py"
+      ],
+      "import": "from lib.mechanisms.ring_clip import split_ring_clip"
+    },
     "patterns.corner_holes": {
       "id": "patterns.corner_holes",
       "version": "1.0.0",
@@ -4441,6 +4592,13 @@
         "form.flutes",
         "form.revolved_body",
         "form.shell_open_top"
+      ],
+      "golden": true
+    },
+    "ring_clip_5_5": {
+      "path": "models/ring_clip_5_5",
+      "components": [
+        "mechanisms.split_ring_clip"
       ],
       "golden": true
     },
