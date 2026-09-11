@@ -13,3 +13,10 @@ ideas/*/exports/
 
 .DS_Store
 **/.DS_Store
+
+models/*/references/files/
+ideas/*/references/files/
+
+# ticket quote packages keep their numbers; the copied viewer and renders are rebuilt from models/*/exports
+tickets/*/quotes/*/*.html
+tickets/*/quotes/*/*.png

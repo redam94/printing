@@ -24,6 +24,10 @@ Checks per part:
     baseline for the unpierced tube.  So in this mode wall thickness is reported and
     warned on but does not gate; everything else (watertight, bodies, overhangs,
     ceilings) gates as normal, and ``--opening`` runs the slow honest measure.
+  * hinged mode (``PRINT_MODES = {"part": "hinged"}``): the part carries intentional living
+    hinges or flexure necks thinner than 2 x nozzle (a 0.5 mm neck is one line).  Wall thickness
+    below 2 x nozzle is reported as a warning naming the fraction, not a failure; everything
+    else gates as normal.  Only declare it on parts whose thin members are the design.
   * vase mode (``PRINT_MODES = {"part": "vase"}`` in the model, or --vase): the
     slicer prints ONE continuous outer perimeter per layer, so the checks become
     "exactly one outer contour per layer above the floor" (islands / handles
@@ -126,8 +130,8 @@ def vase_layers(mesh, step: float = VASE_LAYER_STEP, floor: float = VASE_FLOOR) 
 def check_mesh(mesh, nozzle: float = 0.4, samples: int = SAMPLES, mode: str = "normal") -> dict:
     import numpy as np
 
-    vase, openwork = mode == "vase", mode == "openwork"
-    rep: dict = {"print_mode": mode if mode in ("vase", "openwork") else "normal"}
+    vase, openwork, hinged = mode == "vase", mode == "openwork", mode == "hinged"
+    rep: dict = {"print_mode": mode if mode in ("vase", "openwork", "hinged") else "normal"}
     rep["watertight"] = bool(mesh.is_watertight)
     rep["winding_consistent"] = bool(mesh.is_winding_consistent)
     rep["volume_mm3"] = round(float(mesh.volume), 2)
@@ -197,6 +201,9 @@ def check_mesh(mesh, nozzle: float = 0.4, samples: int = SAMPLES, mode: str = "n
             warnings.append(f"openwork: {rep['wall_below_2x_nozzle_pct']}% of surface < {2*nozzle:.1f} mm by the inward-ray metric, "
                             "which counts every hole rim — informational here, not a verdict. Size the webs at the "
                             "INNERMOST radius they reach and confirm with --opening if in doubt")
+        elif hinged and rep.get("wall_min_mm") is not None and rep["wall_below_2x_nozzle_pct"] > 0.5:
+            warnings.append(f"hinged: {rep['wall_below_2x_nozzle_pct']}% of surface < {2*nozzle:.1f} mm (min {rep['wall_min_mm']} mm) — the declared "
+                            "living hinges / necks. Print with thin-wall (Arachne) perimeters on; anything else this thin is a defect")
         elif rep.get("wall_min_mm") is not None and rep["wall_below_2x_nozzle_pct"] > 0.5:
             problems.append(f"{rep['wall_below_2x_nozzle_pct']}% of surface has walls < {2*nozzle:.1f} mm (min {rep['wall_min_mm']} mm)")
         elif not openwork and rep.get("wall_min_mm") is not None and rep["wall_below_3x_nozzle_pct"] > 5:

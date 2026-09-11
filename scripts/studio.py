@@ -29,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts._common import GOLDEN_DIR, MODELS_DIR, ROOT, Metrics, diff_golden, list_projects, load_golden, prints_info, review_info  # noqa: E402
 from scripts.ideas import STATUSES, list_ideas, validate  # noqa: E402
 from scripts.inspiration import INSPIRATION_JSON, list_records as list_inspiration, thumb_data_uri  # noqa: E402
+from scripts.references import list_records as list_references  # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "studio_template.html"
 STUDIO_JSON = ROOT / "studio.json"
@@ -66,6 +67,11 @@ def collect(with_images: bool = False) -> dict:
             except Exception:  # noqa: BLE001
                 d["thumb"] = ""
         insp.setdefault((r["kind"], r["target"]), []).append(d)
+
+    refs: dict[tuple[str, str], list[dict]] = {}
+    for r in list_references():
+        refs.setdefault((r["kind"], r["target"]), []).append(
+            {k: r[k] for k in ("id", "title", "url", "source", "license", "why", "subject", "mechanism", "tags", "pending", "measured", "files", "path", "created")})
 
     models = []
     for p in projects:
@@ -116,6 +122,7 @@ def collect(with_images: bool = False) -> dict:
             "fit_checks": report.get("fit_checks", {}), "plate": report.get("plate", {}),
             "review_url": rv.get("artifact_url", ""), "params": len(report.get("params", [])),
             "inspiration": insp.get(("model", p), []),
+            "references": refs.get(("model", p), []),
         })
 
     ideas = list_ideas()
@@ -128,6 +135,7 @@ def collect(with_images: bool = False) -> dict:
             d["render"] = "data:image/png;base64," + base64.b64encode(i.renders[0].read_bytes()).decode("ascii")
         d["has_render"] = bool(i.renders)
         d["inspiration"] = insp.get(("idea", i.slug), [])
+        d["references"] = refs.get(("idea", i.slug), [])
         idea_dicts.append(d)
 
     comp_rows = []
@@ -187,6 +195,24 @@ def collect(with_images: bool = False) -> dict:
         for r in recs:
             if r["pending"]:
                 attention.append({"kind": "photo", "ref": r["path"], "text": "inspiration photo has no brief yet", "fix": "design-inspiration skill: Haiku subagent reads it, then inspiration.py set-brief"})
+    for recs in refs.values():
+        for r in recs:
+            if r["pending"]:
+                attention.append({"kind": "reference", "ref": r["path"], "text": "reference model has no reading yet", "fix": "design-references skill: Haiku subagent reads page + images, then references.py set-reading"})
+
+    # design request tickets (scripts/tickets.py): the ones that need a person, not the requester
+    tickets = []
+    try:
+        from scripts.tickets import NEXT as TICKET_NEXT, list_tickets, ticket_summary
+        tickets = [ticket_summary(t) for t in list_tickets()]
+    except Exception:
+        TICKET_NEXT = {}
+    for t in tickets:
+        if t["status"] in ("new", "changes", "approved", "printing"):
+            what = {"new": "new request", "changes": "requester sent notes on quote r%s" % ((t["quote"] or {}).get("rev", "?")),
+                    "approved": "approved — print it", "printing": "on the bed"}[t["status"]]
+            attention.append({"kind": "ticket", "ref": t["id"], "text": f"{what}: {t['title'][:60]} ({t['requester'].get('name') or t['requester'].get('email')})",
+                              "fix": TICKET_NEXT.get(t["status"], "")})
 
     cats: dict[str, int] = {}
     for c in comp_rows:
@@ -200,7 +226,10 @@ def collect(with_images: bool = False) -> dict:
         "stats": {"components": len(comp_rows), "categories": cats, "models": len(models), "parts": sum(len(m["parts"]) for m in models),
                   "ideas": len(idea_dicts), "ideas_by_status": by_status, "unused_components": len(unused), "unvalidated": sum(c["unvalidated"] for c in comp_rows),
                   "gaps": len(gaps), "inspiration": sum(len(v) for v in insp.values()),
-                  "inspiration_pending": sum(1 for v in insp.values() for r in v if r["pending"])},
+                  "inspiration_pending": sum(1 for v in insp.values() for r in v if r["pending"]),
+                  "references": sum(len(v) for v in refs.values()), "references_pending": sum(1 for v in refs.values() for r in v if r["pending"]),
+                  "tickets": len(tickets), "tickets_open": sum(1 for t in tickets if t["status"] not in ("done", "declined")),
+                  "tickets_by_status": {k: sum(1 for t in tickets if t["status"] == k) for k in sorted({t["status"] for t in tickets})}},
         "components": comp_rows, "unused": unused, "gaps": gaps, "models": models, "ideas": idea_dicts, "attention": attention,
         "statuses": list(STATUSES),
     }
@@ -213,6 +242,14 @@ def _insp_lines(lines: list[str], recs: list[dict], indent: str = "    ") -> Non
         lines.append(f"{indent}inspiration {r['path']}  {flag}{what[:90]}" + (f"  [{', '.join(r['tags'][:6])}]" if r["tags"] else ""))
 
 
+def _ref_lines(lines: list[str], recs: list[dict], indent: str = "    ") -> None:
+    for r in recs:
+        what = r["mechanism"] or r["subject"] or r["why"] or "-"
+        flag = "READING PENDING  " if r["pending"] else ""
+        extra = ("  measured" if r["measured"] else "") + (f"  files: {', '.join(r['files'])}" if r["files"] else "")
+        lines.append(f"{indent}reference {r['path']}  {flag}{r['title'][:50]} [{r['source']}]  {what[:80]}{extra}")
+
+
 def format_text(d: dict) -> str:
     s = d["stats"]
     g = d["git"]
@@ -222,6 +259,8 @@ def format_text(d: dict) -> str:
         lines.append(f"studio page: {d['studio']['artifact_url']}   (read the inbox: Artifact read_db collection 'ideas' where status == inbox)")
     if d.get("inspiration_page", {}).get("artifact_url"):
         lines.append(f"inspiration page: {d['inspiration_page']['artifact_url']}   (photos: Artifact read_db collection 'inspiration' where status == inbox; {s.get('inspiration', 0)} filed, {s.get('inspiration_pending', 0)} brief(s) pending)")
+    if s.get("tickets"):
+        lines.append(f"tickets: {s['tickets_open']} open of {s['tickets']} ({', '.join(f'{v} {k}' for k, v in s['tickets_by_status'].items())})   uv run python scripts/tickets.py")
     lines += ["", "LIBRARY"]
     cur = None
     for c in d["components"]:
@@ -260,6 +299,7 @@ def format_text(d: dict) -> str:
         for n in m["open_critiques"]:
             lines.append(f"    open critique [{n['part'] or 'whole model'}] {n['created']}: {n['text'][:120]}")
         _insp_lines(lines, m.get("inspiration", []))
+        _ref_lines(lines, m.get("references", []))
     lines += ["", "IDEAS"]
     if not d["ideas"]:
         lines.append("  (none yet — ideas/README.md explains the format; the Studio page inbox captures new ones)")
@@ -278,6 +318,7 @@ def format_text(d: dict) -> str:
         for pr in i["problems"]:
             lines.append(f"      ! {pr}")
         _insp_lines(lines, i.get("inspiration", []), indent="      ")
+        _ref_lines(lines, i.get("references", []), indent="      ")
     lines += ["", f"ATTENTION ({len(d['attention'])})"]
     for a in d["attention"]:
         fix = f"   -> {a['fix']}" if a["fix"] else ""

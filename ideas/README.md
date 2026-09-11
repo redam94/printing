@@ -4,7 +4,9 @@ One directory per idea: `ideas/<slug>/IDEA.md` (the write-up), optionally `ideas
 (a throwaway build123d sketch run with `scripts/sketch.py <slug>`), `ideas/<slug>/exports/`
 (gitignored renders and meshes from the sketch) and `ideas/<slug>/inspiration/` (committed
 reference photos, each `<id>.jpg` with an `<id>.md` brief written by a small model; see
-`scripts/inspiration.py`). The Studio page (`scripts/studio.py`) shows every
+`scripts/inspiration.py`) and `ideas/<slug>/references/` (3D models found online as design
+guides: `<id>.md` with the page read, the numbers measured off the mesh and a small-model
+reading; meshes and images under `references/files/` are gitignored; see `scripts/references.py`). The Studio page (`scripts/studio.py`) shows every
 idea on a board next to the library and the models, and its inbox lets you jot new ideas from the
 browser; Claude files those into directories here.
 

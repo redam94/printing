@@ -129,6 +129,9 @@ td.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 .insp img{width:132px;height:99px;object-fit:cover;border-radius:4px;display:block;background:var(--panel-2)}
 .insp figcaption{font-size:11px;color:var(--muted);line-height:1.3;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .insp .pend{color:var(--warn)}
+.refs{margin:6px 0;font-size:12px;line-height:1.5}
+.refs .pend{color:var(--warn)}
+.refs .src{color:var(--muted);font-family:ui-monospace,monospace;font-size:11px}
 </style>
 
 <header class="top">
@@ -268,6 +271,7 @@ document.getElementById('models').innerHTML=D.models.length?D.models.map(m=>{
     ${m.summary?`<div class="doc">${esc(m.summary)}</div>`:''}
     ${renders?`<div class="renders">${renders}</div>`:''}
     ${inspHtml(m.inspiration)}
+    ${refHtml(m.references)}
     ${parts}
     <div class="chips"><span class="muted" style="margin-right:4px">uses</span>${m.components.length?m.components.map(c=>compChip(c,m.components_versions)).join(''):'<span class="muted">no library components</span>'}</div>
     ${m.docstring&&m.docstring.length>m.summary.length+20?`<details><summary class="muted" style="cursor:pointer">full model notes</summary><div class="doc full">${esc(m.docstring)}</div></details>`:''}
@@ -309,12 +313,18 @@ async function deleteIdea(id){
   if(dbRef&&!id.startsWith('l')){try{await dbRef.doc(id).delete();return;}catch(e){}}
   inbox=inbox.filter(x=>x.id!==id); localSave(); renderBoard();
 }
+function refHtml(xs){
+  if(!xs||!xs.length) return '';
+  return `<div class="refs" title="reference models filed under this ${xs[0].path.split('/')[0]} (references/*.md)">${xs.map(r=>`<div>📐 ${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>`:esc(r.title)} <span class="src">${esc(r.source)}${r.measured?' · measured':''}</span>${r.pending?' · <span class="pend">reading pending</span>':r.mechanism?' · '+esc(r.mechanism):''}${r.why?`<div class="muted">${esc(r.why)}</div>`:''}</div>`).join('')}</div>`;
+}
+
 function ideaCard(i){
   const chips=[...i.reuse.map(r=>compChip(r)),...i.gaps.map(g=>`<span class="chip gap" title="not in the library yet">${esc(g)}</span>`)].join('');
   const secs=['Problem','Concept','Constraints','Gaps','Open questions'].filter(s=>i.sections[s]).map(s=>`<div class="sec"><b>${esc(s)}</b>\n${esc(i.sections[s])}</div>`).join('');
   return `<div class="card"><div class="t">${esc(i.title)}</div><div class="k">${esc(i.kind)} · <span class="mono">${esc(i.slug)}</span>${i.updated?' · '+esc(i.updated):''}${i.model?' · models/'+esc(i.model):''}${i.has_sketch?' · has sketch':''}</div>
     ${i.render?`<img src="${i.render}" alt="sketch render for ${esc(i.title)}">`:''}
     ${inspHtml(i.inspiration)}
+    ${refHtml(i.references)}
     ${i.hardware.length?`<div class="k">fits: ${esc(i.hardware.join(', '))}</div>`:''}
     ${chips?`<div class="chips">${chips}</div>`:''}
     ${i.sections.Problem?`<div class="txt">${esc(i.sections.Problem.slice(0,240))}${i.sections.Problem.length>240?'…':''}</div>`:''}

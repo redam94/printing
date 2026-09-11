@@ -1,0 +1,25 @@
+{
+  "skill_name": "design-references",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I want a little bistable toggle for a desk lamp. Find me some existing printed ones I can learn from, I have no idea how thick the beams should be",
+      "expected_output": "Runs `scripts/references.py search \"bistable compliant switch\"` (and a second phrasing), possibly web search `site:compliantmechanisms.byu.edu`. Presents 2-4 candidates with URL, licence, makes count and whether the mesh downloads. Files the chosen one(s) with `references.py add <url> --new \"...\" --why \"beam thickness and angle of a printed bistable toggle\"` (or into an existing idea), spawns one Haiku subagent per pending reading with `references.py prompt`, attaches readings with `set-reading`, then answers the question from the reading: quotes key dimensions marked measured/estimated, says the STL needs a manual download for a measured number and gives the exact `attach` command. Does not Read the images itself."
+    },
+    {
+      "id": 1,
+      "prompt": "here's the STL I downloaded from that Printables switch: ~/Downloads/Bistable_Switch.STL — attach it to the bistable idea",
+      "expected_output": "Runs `references.py attach ideas/<slug>/references/printables-<id>.md ~/Downloads/Bistable_Switch.STL` (checks the units warning; re-runs with --scale 25.4 if it looks like inches). Reports the Measurements table: bbox, min wall, thinnest and thickest member per slice, bed contact. Since the reading previously held estimates, either re-runs the Haiku reading with the measurements and render available or notes in the log that the measured thickness supersedes the estimate. Suggests rounding the beam to nozzle-line multiples and sketching at the measured numbers."
+    },
+    {
+      "id": 2,
+      "prompt": "what references do I have attached to the drain tiles idea?",
+      "expected_output": "Runs `uv run python scripts/references.py` (or the Studio overview) and lists the references under ideas/drain_tiles: title, source, whether measured, whether the reading is pending, and the why line. If none, says so in one line and does not search unprompted."
+    },
+    {
+      "id": 3,
+      "prompt": "the studio overview says a reference has READING PENDING, sort it out",
+      "expected_output": "Runs `references.py pending`, launches one Haiku subagent per sidecar that follows `references.py prompt`, reads the sidecar and the images in references/files/, writes JSON; runs `set-reading ... --model \"haiku subagent\"` for each; reports the mechanism and key dimensions each reading found and any that failed (refused as empty) and stayed pending."
+    }
+  ]
+}

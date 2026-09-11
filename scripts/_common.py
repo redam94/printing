@@ -88,7 +88,7 @@ def build_parts(project: str) -> dict:
 
 
 def print_modes(project: str) -> dict[str, str]:
-    """``PRINT_MODES`` from the model: {part: "vase" | "openwork" | "normal"}; missing = normal."""
+    """``PRINT_MODES`` from the model: {part: "vase" | "openwork" | "hinged" | "normal"}; missing = normal."""
     mod = load_model(project)
     modes = getattr(mod, "PRINT_MODES", {}) or {}
     return {k: str(v) for k, v in modes.items()}

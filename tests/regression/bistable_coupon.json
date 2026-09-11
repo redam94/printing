@@ -1,0 +1,60 @@
+{
+  "project": "bistable_coupon",
+  "generated": "2026-09-10",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "coupon_h05": {
+      "bbox_min": [
+        -48.64,
+        -29.424,
+        0.0
+      ],
+      "bbox_max": [
+        48.64,
+        39.723,
+        6.35
+      ],
+      "bbox_size": [
+        97.28,
+        69.147,
+        6.35
+      ],
+      "volume": 15927.044,
+      "surface_area": 11627.802,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "d832e2efa625b8c5",
+      "triangles": 340,
+      "kind": "brep"
+    },
+    "coupon_h08": {
+      "bbox_min": [
+        -48.64,
+        -29.424,
+        0.0
+      ],
+      "bbox_max": [
+        48.64,
+        39.723,
+        6.35
+      ],
+      "bbox_size": [
+        97.28,
+        69.147,
+        6.35
+      ],
+      "volume": 15957.524,
+      "surface_area": 11606.772,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "65371199a7f5e56d",
+      "triangles": 340,
+      "kind": "brep"
+    }
+  }
+}

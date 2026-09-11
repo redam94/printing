@@ -38,6 +38,10 @@ If the user asks *what they already have* ("what compliant mechanisms do I have?
 Do not guess or pad with things that are not there.
 
 If the part is about a look rather than a fit (a vase, a lamp, a planter, "like this photo"),
+`models/<p>/references/` or `ideas/<slug>/references/` may hold reference models found online
+(`.md` sidecars with the page read, measured member thicknesses and a small-model reading; the
+`design-references` skill files them). For a new mechanism read those first and default its
+parameters to the measured numbers.
 `models/<p>/inspiration/` or `ideas/<slug>/inspiration/` may hold reference photos with `.md`
 briefs; read the briefs (never the jpg, the `design-inspiration` skill explains why) and name
 the borrowed features before writing geometry.  The **`form` category** is the organic /
