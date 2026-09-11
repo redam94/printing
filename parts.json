@@ -1834,6 +1834,121 @@
       "used_by": [],
       "import": "from lib.form.surface import wavy_circle"
     },
+    "mechanisms.bistable_beam_pair": {
+      "id": "mechanisms.bistable_beam_pair",
+      "version": "0.1.0",
+      "summary": "Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.",
+      "params": [
+        {
+          "name": "span",
+          "type": "float",
+          "units": "mm",
+          "default": 37.0,
+          "description": "straight length of each beam from anchor face to shuttle face, hinge to hinge (estimated from the reference renders)"
+        },
+        {
+          "name": "beam_width",
+          "type": "float",
+          "units": "mm",
+          "default": 5.0,
+          "description": "in-plane width of the beam body between the hinges (measured 5.0 on both reference variants)"
+        },
+        {
+          "name": "beam_count",
+          "type": "int",
+          "units": "count",
+          "default": 2,
+          "description": "beams per side; 2 parallel beams per side is the reference (4 beams, 8 hinges)"
+        },
+        {
+          "name": "beam_spacing",
+          "type": "float",
+          "units": "mm",
+          "default": 12.0,
+          "description": "Y pitch between the parallel beams of one side"
+        },
+        {
+          "name": "pretilt",
+          "type": "float",
+          "units": "deg",
+          "default": 8.0,
+          "description": "angle of the beams above the X axis in the rest state; the shuttle sits 2*span*sin(pretilt) higher than after a snap"
+        },
+        {
+          "name": "hinge_width",
+          "type": "float",
+          "units": "mm",
+          "default": 0.5,
+          "description": "in-plane width of the living-hinge necks at both ends of every beam (measured 0.5 = one 0.4 mm line)"
+        },
+        {
+          "name": "hinge_length",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "length of each neck along the beam"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 6.35,
+          "description": "part height (Z) = hinge and beam height (measured 6.35)"
+        },
+        {
+          "name": "shuttle_w",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "X width of the central moving block"
+        },
+        {
+          "name": "anchor_w",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "X width of each fixed end block (fuse these to the host part)"
+        },
+        {
+          "name": "margin",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "extra Y on the blocks beyond the outermost beam"
+        }
+      ],
+      "tags": [
+        "bistable",
+        "compliant",
+        "flexure",
+        "living hinge",
+        "print in place",
+        "shuttle",
+        "snap-through",
+        "switch",
+        "toggle"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed, beams and hinges in the XY plane (Z = depth) so bending runs along the extrusion lines; never stand it up",
+        "notes": "UNVALIDATED here. Reference (BYU CMR, Printables 581013) measured: hinge 0.5 mm, beam 5.0 mm, depth 6.35 mm; span ~37 mm and pre-tilt ~8 deg are ESTIMATED from renders and must be confirmed by a coupon print. The authors recommend polypropylene; PETG expected to work, PLA expected to creep when parked in one state and to fatigue at the necks. A 0.5 mm neck is one 0.4 mm line: enable thin-wall / Arachne perimeters in the slicer or widen hinge_width to 0.8 (two lines) and re-tune.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.bistable",
+      "qualname": "bistable_beam_pair",
+      "file": "lib/mechanisms/bistable.py",
+      "line": 61,
+      "returns": "Part",
+      "docstring": "Shuttle at x=0 raised by span*sin(pretilt) in +Y; anchors at -X and +X centred on y=0; everything stands on z=0.\n\nEach side has ``beam_count`` parallel beams tilted ``pretilt`` degrees upward toward the shuttle,\neach with a living-hinge neck at both ends (a pseudo-rigid-body four-bar per side).  Pushing the\nshuttle down past the flat position snaps it to the mirror state at -span*sin(pretilt); the travel is\n``bistable_travel(span, pretilt)``.  Anchors are meant to be fused into the host part (a frame, a\nwall, a lid rim); the shuttle carries the working feature.\n\nExample:\n    stage = bistable_beam_pair()                      # 37 mm beams, 8 deg, 0.5 mm necks\n    env = bistable_envelope()                         # rise, travel (~10.3), block_h, x_outer ...\n    frame = frame_around(env)                         # host geometry, any library primitive\n    toggle = frame + stage + Pos(0, env[\"rise\"], 0) * button_cap",
+      "example": "stage = bistable_beam_pair()                      # 37 mm beams, 8 deg, 0.5 mm necks\nenv = bistable_envelope()                         # rise, travel (~10.3), block_h, x_outer ...\nframe = frame_around(env)                         # host geometry, any library primitive\ntoggle = frame + stage + Pos(0, env[\"rise\"], 0) * button_cap",
+      "used_by": [
+        "models/bistable_coupon/model.py"
+      ],
+      "import": "from lib.mechanisms.bistable import bistable_beam_pair"
+    },
     "mechanisms.cantilever_latch": {
       "id": "mechanisms.cantilever_latch",
       "version": "1.0.1",
@@ -4229,6 +4344,13 @@
     }
   },
   "models": {
+    "bistable_coupon": {
+      "path": "models/bistable_coupon",
+      "components": [
+        "mechanisms.bistable_beam_pair"
+      ],
+      "golden": true
+    },
     "cloud_pi_holder": {
       "path": "models/cloud_pi_holder",
       "components": [

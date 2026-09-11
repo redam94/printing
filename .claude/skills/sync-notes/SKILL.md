@@ -41,6 +41,15 @@ if brief.json exists:
   -> Write .sync/brief/briefs.json the same way
   Artifact action: "read_db", url: <artifact_url>, db_op: "list", collection: "brief_notes"
   -> Write .sync/brief/notes.json the same way
+if tickets/jira.json exists (design-requests skill, Jira mode):
+  uv run python scripts/tickets.py fetch      # needs JIRA_SITE / JIRA_EMAIL / JIRA_API_TOKEN -> .sync/tickets/jira.json
+  (without the token in the environment, say so in the report and skip the tickets)
+elif tickets/ has any ticket or tickets.json exists (e-mail mode):
+  Gmail search_threads query "subject:REQ- OR subject:\"print request\" newer_than:60d", get_thread PLAIN_TEXT
+  -> Write .sync/tickets/mail.json  as a JSON list: [{"id", "thread_id", "from", "from_name", "subject", "date", "text"}, ...]
+     (or `uv run python scripts/tickets.py fetch` when PRINTING_MAIL_USER/PASS are set)
+  if tickets.json has board_url: Artifact read_db url: <board_url>, db_op: "list", collection: "requests"
+  -> Write .sync/tickets/requests.json the same way
 ```
 
 Copy documents verbatim (id, text, part, status, kind, material, outcome, created, build_id,
@@ -57,7 +66,13 @@ report and continue with the others.
 uv run python scripts/sync_notes.py ingest --dry-run    # preview
 uv run python scripts/sync_notes.py ingest              # write
 uv run python scripts/inspiration.py ingest             # photos from the Inspiration page (if any were dumped)
+uv run python scripts/tickets.py ingest                 # design-request mail + board intake -> tickets/ (if any were dumped)
 ```
+
+`tickets.py ingest` files new `[print request]` mails as tickets and replies on `[REQ-NNNN]`
+threads as messages, moving quoted tickets to `changes` / `approved` / `declined` by what the
+reply says; the design-requests skill covers what to do with each (design, quote, print). A
+routine files and reports; it never sends mail.
 
 `inspiration.py ingest` files each inbox photo under `models/<p>/inspiration/` or
 `ideas/<slug>/inspiration/` with its `.md` brief sidecar, creates inbox ideas for `new` targets,
@@ -119,6 +134,7 @@ uv run python -m pytest -q
 uv run python scripts/build.py --all
 uv run python scripts/studio.py --html
 uv run python scripts/brief.py --html          # if brief.json exists
+uv run python scripts/tickets.py --html        # if tickets.json exists (the board embeds the tickets)
 ```
 
 Rebuild **every** model, not only the ones whose notes changed: exports (build reports, renders)
@@ -135,7 +151,8 @@ review page report with the print log, component validation chips and the notes 
   or idea was added) `exports/inspiration.html` from `uv run python scripts/inspiration.py --html`
   with `url` = the inspiration.json URL, and `exports/brief.html` with `url` = the brief.json URL
   (it quotes the library, the models and the ideas to the page's own Claude helper, so a stale
-  one gives the user advice about a library that has moved on). Never publish without `url`. If a
+  one gives the user advice about a library that has moved on), and `exports/tickets.html` with
+  `url` = the `board_url` in tickets.json whenever a ticket changed. Never publish without `url`. If a
   publish is refused because the live version was not viewed in this session, run
   `Artifact action: "read"` on that URL and publish again; never pass `force`.
 - `.sync/actions.json` and `.sync/inspiration_actions.json` list optional `write_db` updates
@@ -152,8 +169,9 @@ review page report with the print log, component validation chips and the notes 
 ## 5. Commit
 
 Commit everything the sync produced in one commit: `notes.json`, `prints.json`,
-`lib/validation.json`, `PARTS.md`, `parts.json`, new idea files, filed photos and their sidecars. Message:
-`sync notes: <n> print report(s), <n> idea(s) filed, <n> photo(s) filed, <components> validated in <materials>`.
+`lib/validation.json`, `PARTS.md`, `parts.json`, new idea files, filed photos and their sidecars,
+new or changed `tickets/REQ-*/ticket.json`. Message:
+`sync notes: <n> print report(s), <n> idea(s) filed, <n> photo(s) filed, <n> ticket(s) filed/updated, <components> validated in <materials>`.
 The pre-commit hook checks the index is fresh. If running as a routine with push access, push
 to the branch you were given (main unless told otherwise); if tests failed, commit nothing and
 report what failed.
@@ -163,5 +181,6 @@ report what failed.
 Say per model how many notes were mirrored, how many critiques are open, and which print
 reports were recorded. List every component that gained field validation, by material, and any
 failures. List inferred reports you kept or dropped and why. List ideas filed. Give the review
-page and Studio page links that were republished. If nothing was on any page, say so in one
+page and Studio page links that were republished. List tickets filed and replies read (with the verdict) and which
+tickets now need a design, a quote or a print. If nothing was on any page, say so in one
 line; do not invent activity.

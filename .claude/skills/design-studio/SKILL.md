@@ -26,6 +26,7 @@ deserves `params.py`, a golden and a review page. Three surfaces, all generated 
 | text overview | library by category, models with metrics, ideas by status, library gaps, attention list | `uv run python scripts/studio.py` |
 | Studio page | the same as a published page: Overview (attention + usage matrix), Library (searchable), Models (renders, parts, review links), Ideas (board + inbox) | `uv run python scripts/studio.py --html` → `exports/studio.html` |
 | Briefs page | the standard form for handing an idea over: a problem brief or an aesthetic brief, its thread, and a Claude helper on the page | `uv run python scripts/brief.py --html` → `exports/brief.html` |
+| Request page + Tickets board | design requests from other people: the public form composes a `[print request]` mail; the board shows every ticket by status (design-requests skill) | `uv run python scripts/tickets.py --html` → `exports/requests.html`, `exports/tickets.html` |
 | ideas/ | one directory per idea: `IDEA.md` write-up, optional `sketch.py`, gitignored `exports/` | `ideas/README.md` documents the format |
 
 Run everything with `uv run python ...` from the repo root.
@@ -182,6 +183,15 @@ An idea for an artistic part usually starts from a photo. Photos and their brief
 `design-inspiration` skill, and show as thumbnails on the Studio page and as `inspiration` lines
 in the overview. During ideation read the `.md` briefs (never the jpg) and quote their
 "features to borrow" in the idea's Concept.
+
+## Reference models as design guides
+
+A mechanism idea (bistable toggle, snap-through clip, living hinge, flexure) should start from
+something that already prints. References found online live in `ideas/<slug>/references/` (and
+`models/<p>/references/`), are found, filed, measured and read by the `design-references` skill,
+and show as `reference` lines in the overview and as links on the Studio page. Before sketching a
+mechanism, read the sidecars' Reading sections and sketch at the reference's measured numbers;
+put its `Library map` entries into the idea's `reuse:` / `gaps:`.
 
 ## Print reports and the sync loop
 

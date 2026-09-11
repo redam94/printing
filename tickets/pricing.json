@@ -1,0 +1,23 @@
+{
+  "_": "Rates behind every quote scripts/tickets.py produces. Edit freely; a quote records the rates it was computed with.",
+  "currency": "USD",
+  "materials": {
+    "PLA":  {"density_g_cm3": 1.24, "cost_per_kg": 22.0},
+    "PETG": {"density_g_cm3": 1.27, "cost_per_kg": 26.0},
+    "TPU":  {"density_g_cm3": 1.21, "cost_per_kg": 38.0},
+    "ASA":  {"density_g_cm3": 1.07, "cost_per_kg": 30.0}
+  },
+  "shell_mm": 1.2,
+  "infill": 0.2,
+  "flow_g_per_h": 15.0,
+  "setup_min": 10,
+  "post_min_per_part": 5,
+  "machine_per_h": 2.0,
+  "labor_per_h": 20.0,
+  "design_fee": 15.0,
+  "min_charge": 10.0,
+  "margin": 0.15,
+  "hours_per_day": 8,
+  "queue_days": 2,
+  "round_to": 0.5
+}
