@@ -28,14 +28,21 @@ BLOCK_H = ENV["block_h"]        # mm, Y height of shuttle and anchors
 X_OUTER = ENV["x_outer"]        # mm, half the frame's outer X = anchor outer face
 
 # --- frame: side members are the anchors, top and bottom rails close the loop ---
-RAIL_W = 4.0            # mm, rail thickness (Y)
-CLEARANCE = 0.6         # mm, gap between the moving shuttle/plunger and anything fixed, both states
+# The rails must stay continuous: the first print (2026-09-10) cut a slot clean through each rail for the
+# plunger bar, which left two separate U-brackets joined only by the living hinges. The bar now runs under a
+# tunnel through each rail instead: open to the bed, bridged on top, so the loop is one part.
+RAIL_W = 6.0            # mm, rail thickness (Y); 6 so the bridge over the tunnel is a stiff 6 x CEILING_T section
+CLEARANCE = 0.6         # mm, gap between the moving shuttle/plunger and anything fixed, both states, and above the bar
 RAIL_Y = BLOCK_H / 2 + RISE + CLEARANCE + RAIL_W / 2   # rail centreline: clears the shuttle in either state
 FRAME_H = 2 * RAIL_Y + RAIL_W                          # outer Y of the frame = side member height
 
-# --- plunger: a bar through both rails so either end can be pressed to snap the shuttle ---
+# --- plunger: a bar under a tunnel through both rails so either end can be pressed to snap the shuttle ---
 PLUNGER_W = 4.0         # mm, bar width (X)
-SLOT_W = PLUNGER_W + 2 * CLEARANCE                     # slot cut through each rail for the bar
+BAR_H = 3.0             # mm, bar height (Z): shorter than the frame so the rail bridges over it (bar sits on the bed)
+TUNNEL_W = PLUNGER_W + 2 * CLEARANCE                   # tunnel width through each rail (= bridge span, 5.2)
+TUNNEL_H = BAR_H + CLEARANCE                           # tunnel height above the bed; the rail bridges from here to DEPTH
+CEILING_T = DEPTH - TUNNEL_H                           # mm, rail material bridging over the bar (2.75): keeps the loop closed
 KNOB_W = 12.0           # mm, finger pad width (X)
 KNOB_H = 5.0            # mm, finger pad length (Y) beyond the rail face in the far state
 PLUNGER_HALF = RAIL_Y + RAIL_W / 2 + RISE + KNOB_H + CLEARANCE   # the near pad clears the rail by CLEARANCE at rest (else it prints fused); the far pad clears by 2*RISE more
+assert CEILING_T >= 2.0, "rail bridge over the plunger tunnel is too thin; lower BAR_H or raise DEPTH"

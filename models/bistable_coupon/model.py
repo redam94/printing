@@ -2,8 +2,14 @@
 
 Parts: ``coupon_h05`` (0.5 mm living-hinge necks, one 0.4 mm line: the reference geometry) and
 ``coupon_h08`` (0.8 mm necks, two lines: the fallback). Everything else is identical: a rectangular
-frame whose side members are the component's anchors, a bar through slots in both rails so the
-shuttle can be pressed from either side, and finger pads on both ends of the bar.
+frame whose side members are the component's anchors, a bar that runs under a tunnel through each
+rail so the shuttle can be pressed from either side, and finger pads on both ends of the bar.
+
+The frame is one closed loop. The first print (2026-09-10) failed because the plunger slots cut
+each rail clean through, leaving two separate side brackets held together only by the living
+hinges. Now the bar is 3 mm tall on the bed and each rail keeps a 2.75 mm bridge over it: the
+tunnel is open to the bed (so the bar prints in place without support) and closed on top, 5.2 mm
+of bridging per rail. The pads and the shuttle stay full height.
 
 Print flat as built (bed at z=0, 6.35 mm tall), beams and necks in the bed plane. Enable thin-wall
 / Arachne perimeters for the 0.5 mm part. Print one of each in PETG first; the reference authors
@@ -28,21 +34,25 @@ PRINT_MODES = {"coupon_h05": "hinged", "coupon_h08": "hinged"}
 
 
 def _frame() -> Part:
-    """Side members over the anchors plus two slotted rails; the moving parts pass through the slots."""
+    """Side members over the anchors plus two continuous rails, each with a tunnel the plunger bar runs under.
+
+    The tunnel is cut from below the bed up to TUNNEL_H, so the rail keeps CEILING_T of material bridging
+    over the bar and the frame stays one closed loop (a through-slot here is what broke the first print).
+    """
     side = Box(P.ANCHOR_W, P.FRAME_H, P.DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
     rail = Box(2 * P.X_OUTER, P.RAIL_W, P.DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
-    slot = Box(P.SLOT_W, P.RAIL_W + 2, P.DEPTH + 2, align=(Align.CENTER, Align.CENTER, Align.MIN))
+    tunnel = Box(P.TUNNEL_W, P.RAIL_W + 2, P.TUNNEL_H + 1, align=(Align.CENTER, Align.CENTER, Align.MIN))
     frame = Pos(-(P.X_OUTER - P.ANCHOR_W / 2), 0, 0) * side + Pos(P.X_OUTER - P.ANCHOR_W / 2, 0, 0) * side
     for sy in (-1, 1):
         frame = frame + Pos(0, sy * P.RAIL_Y, 0) * rail
     for sy in (-1, 1):
-        frame = frame - Pos(0, sy * P.RAIL_Y, -1) * slot
+        frame = frame - Pos(0, sy * P.RAIL_Y, -1) * tunnel
     return frame
 
 
 def _plunger() -> Part:
-    """Bar through both rails with a finger pad at each end, attached to the shuttle at its rest position."""
-    bar = Box(P.PLUNGER_W, 2 * P.PLUNGER_HALF, P.DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
+    """Low bar under both rail tunnels with a full-height finger pad at each end, attached to the shuttle at rest."""
+    bar = Box(P.PLUNGER_W, 2 * P.PLUNGER_HALF, P.BAR_H, align=(Align.CENTER, Align.CENTER, Align.MIN))
     pad = Box(P.KNOB_W, P.KNOB_H, P.DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
     mover = bar + Pos(0, P.PLUNGER_HALF - P.KNOB_H / 2, 0) * pad + Pos(0, -(P.PLUNGER_HALF - P.KNOB_H / 2), 0) * pad
     return Pos(0, P.RISE, 0) * mover
@@ -65,9 +75,10 @@ def fit_checks(parts: dict[str, Part]) -> dict[str, tuple[Part, Part]]:
     shuttle = Pos(0, P.RISE, 0) * Box(P.SHUTTLE_W, P.BLOCK_H, P.DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
     mover_rest = _plunger() + shuttle
     mover_snapped = Pos(0, -P.TRAVEL, 0) * mover_rest
-    # grow the frame by the clearance so a mover that merely touches (and would print fused) also fails
+    # grow the frame by the clearance (in Y, and downward in Z for the tunnel ceiling over the bar) so a
+    # mover that merely touches (and would print fused) also fails
     frame = _frame()
-    fat_frame = frame + Pos(0, P.CLEARANCE / 2, 0) * frame + Pos(0, -P.CLEARANCE / 2, 0) * frame
+    fat_frame = frame + Pos(0, P.CLEARANCE / 2, 0) * frame + Pos(0, -P.CLEARANCE / 2, 0) * frame + Pos(0, 0, -P.CLEARANCE / 2) * frame
     return {"frame_vs_mover_rest": (fat_frame, mover_rest), "frame_vs_mover_snapped": (fat_frame, mover_snapped)}
 
 

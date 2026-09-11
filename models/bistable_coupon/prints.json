@@ -1,0 +1,18 @@
+{
+  "project": "bistable_coupon",
+  "prints": [
+    {
+      "note_id": "chat-20260910-2321",
+      "date": "2026-09-10",
+      "parts": [
+        "coupon_h05",
+        "coupon_h08"
+      ],
+      "material": "",
+      "outcome": "fail",
+      "text": "Reported in chat, not on the review page: printed the bistable_coupon and it failed. The left and right hand brackets must be connected, and the switch arms have to pass through a hole that tunnels through the frame. Cause: build 20260910-214446 cut the plunger slots clean through both rails, so the frame was two separate side brackets joined only by the living hinges. Material not stated; a frame design failure, not evidence about the mechanism or its hinges.",
+      "build_id": "20260910-214446",
+      "inferred": false
+    }
+  ]
+}
