@@ -42,28 +42,42 @@ def bistable_envelope(span: float = 37.0, beam_width: float = 5.0, beam_count: i
             "x_outer": x_anchor_face + anchor_w, "span_y": span_y}
 
 
-def _beam(span: float, beam_width: float, hinge_width: float, hinge_length: float, depth: float, overlap: float) -> Part:
-    """One beam along +X from x=0 (anchor face) to x=span (shuttle face), centred on y=0, standing on z=0.
+def hinged_beam(span: float, beam_width: float, hinge_width: float, hinge_length: float, depth: float, overlap: float,
+                neck_plate: float = 0.0) -> Part:
+    """One neck-body-neck beam along +X from x=0 (anchor face) to x=span (shuttle face), centred on y=0, standing on z=0.
 
+    The building block of every pre-tilted beam mechanism here: ``bistable_beam_pair`` uses N of
+    them per side, ``mechanisms.split_ring_clip`` one per side (half the mechanism, scaled down).
     Hinges are short necks at both ends; the beam body is the wide middle.  Both necks run
-    ``overlap`` past the faces they meet so the boolean fuses them into the blocks.
+    ``overlap`` past the faces they meet so the boolean fuses them into the blocks.  With
+    ``neck_plate`` > 0 each neck is two plates of that Z thickness at the bottom and top faces with
+    nothing between (the ring-clip reference does this: half the hinge stiffness for the same
+    neck width, and the same footprint); 0 runs the necks the full depth.  Not a component.
     """
     body_len = span - 2 * hinge_length
     if body_len <= 0:
         raise ValueError("span must exceed twice the hinge length")
+    if not 0 <= neck_plate <= depth / 2:
+        raise ValueError("neck_plate must be between 0 and half the depth")
     neck = hinge_length + overlap
-    root = Box(neck, hinge_width, depth, align=(Align.MIN, Align.CENTER, Align.MIN))
     body = Pos(hinge_length, 0, 0) * Box(body_len, beam_width, depth, align=(Align.MIN, Align.CENTER, Align.MIN))
-    tip = Pos(span - hinge_length, 0, 0) * Box(neck, hinge_width, depth, align=(Align.MIN, Align.CENTER, Align.MIN))  # runs past x=span into the shuttle
-    return Pos(-overlap, 0, 0) * root + body + tip
+    plate = neck_plate if neck_plate > 0 else depth
+    necks = Part()
+    for x0 in (-overlap, span - hinge_length):  # root neck buried in the anchor, tip neck running past x=span into the shuttle
+        for z0 in ((0.0,) if neck_plate == 0 else (0.0, depth - plate)):
+            necks = necks + Pos(x0, 0, z0) * Box(neck, hinge_width, plate, align=(Align.MIN, Align.CENTER, Align.MIN))
+    return necks + body
+
+
+_beam = hinged_beam  # old private name
 
 
 @component(
-    id="mechanisms.bistable_beam_pair", version="0.1.1",
+    id="mechanisms.bistable_beam_pair", version="0.2.0",
     summary="Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.",
     tags=["bistable", "compliant", "snap-through", "toggle", "switch", "shuttle", "living hinge", "flexure", "print in place"],
     units={"span": "mm", "beam_width": "mm", "beam_count": "count", "beam_spacing": "mm", "pretilt": "deg", "hinge_width": "mm",
-           "hinge_length": "mm", "depth": "mm", "shuttle_w": "mm", "anchor_w": "mm", "margin": "mm"},
+           "hinge_length": "mm", "depth": "mm", "shuttle_w": "mm", "anchor_w": "mm", "margin": "mm", "neck_plate": "mm"},
     descriptions={
         "span": "straight length of each beam from anchor face to shuttle face, hinge to hinge (estimated from the reference renders)",
         "beam_width": "in-plane width of the beam body between the hinges (measured 5.0 on both reference variants)",
@@ -76,6 +90,7 @@ def _beam(span: float, beam_width: float, hinge_width: float, hinge_length: floa
         "shuttle_w": "X width of the central moving block",
         "anchor_w": "X width of each fixed end block (fuse these to the host part)",
         "margin": "extra Y on the blocks beyond the outermost beam",
+        "neck_plate": "0 = necks run the full depth (the reference and the validated coupon); > 0 = each neck is two plates of this Z thickness at the faces with nothing between, half the hinge stiffness (the split_ring_clip reference uses 1.9 of 7.2)",
     },
     material_notes=MaterialNotes(
         validated=["PLA"],
@@ -85,7 +100,7 @@ def _beam(span: float, beam_width: float, hinge_width: float, hinge_length: floa
 )
 def bistable_beam_pair(span: float = 37.0, beam_width: float = 5.0, beam_count: int = 2, beam_spacing: float = 12.0, pretilt: float = 8.0,
                        hinge_width: float = 0.5, hinge_length: float = 2.0, depth: float = 6.35, shuttle_w: float = 8.0,
-                       anchor_w: float = 8.0, margin: float = 3.0) -> Part:
+                       anchor_w: float = 8.0, margin: float = 3.0, neck_plate: float = 0.0) -> Part:
     """Shuttle at x=0 raised by span*sin(pretilt) in +Y; anchors at -X and +X centred on y=0; everything stands on z=0.
 
     Each side has ``beam_count`` parallel beams tilted ``pretilt`` degrees upward toward the shuttle,
@@ -109,7 +124,7 @@ def bistable_beam_pair(span: float = 37.0, beam_width: float = 5.0, beam_count: 
         anchors = anchors + Pos(sx * (x_anchor_face + anchor_w / 2), 0, 0) * Box(anchor_w, block_h, depth, align=(Align.CENTER, Align.CENTER, Align.MIN))
     shuttle = Pos(0, rise, 0) * Box(shuttle_w, block_h, depth, align=(Align.CENTER, Align.CENTER, Align.MIN))
 
-    beam = _beam(span, beam_width, hinge_width, hinge_length, depth, overlap)
+    beam = hinged_beam(span, beam_width, hinge_width, hinge_length, depth, overlap, neck_plate)
     beams = Part()
     y0 = -(beam_count - 1) * beam_spacing / 2
     for i in range(beam_count):

@@ -118,3 +118,4 @@ exists only as two 1.9 mm plates at the faces with a 3.4 mm gap between them.
 - 2026-09-11 attached clip.stl: thinnest member 0.46 mm, min wall 0.21 mm
 - 2026-09-11 reading by haiku subagent
 - 2026-09-11 bore 5.05 (5.5-0.45), wall 1.0, necks 0.5 x 2.0 as 1.9 mm plates, arms 1.6 wide at 16 deg, strips 0.6, rail 3.0, depth 7.2 became the defaults of mechanisms.split_ring_clip and models/ring_clip_5_5
+- 2026-09-11 user: the arms are the bistable_beam_pair beams (thin neck, wide body, thin neck, pre-tilted), one per side, the ring as shuttle: half the mechanism scaled down. split_ring_clip v0.2.0 now builds its arms with hinged_beam from lib.mechanisms.bistable; span 20.5 at 14 deg re-measured hinge to hinge

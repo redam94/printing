@@ -3,7 +3,11 @@
 Parts: ``clip`` (necks as two 1.9 mm plates at the faces, exactly as the reference mesh) and
 ``clip_full_necks`` (the same clip with the necks running the full 7.2 mm; stiffer, no bridging over
 the neck footprints). Both are the component at its defaults: a C-ring with a 5.05 mm bore hung on
-two living-hinge push arms, sprung by 0.6 mm side strips off a 3 mm rail.
+two living-hinge push arms, sprung by 0.6 mm side strips off a 3 mm rail. The arms are the bistable
+beam pair's hinged beams (thin neck, wide body, thin neck, pre-tilted), one per side instead of two:
+this is half of ``bistable_coupon``'s mechanism scaled down, with the ring as the shuttle and the
+strips as sprung anchors. It does not toggle, because the rail stops the ring 1.2 mm up while the arms
+would need ~5 mm to go flat; the beams work as the return spring.
 
 Print flat as built (bed at z=0, 7.2 mm tall), one of each, with thin-wall / Arachne perimeters on:
 the necks are a single 0.4 mm line. PETG first; PLA is expected to work for a few insertions. The

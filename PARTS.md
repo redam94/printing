@@ -243,7 +243,7 @@ plate = RectangleRounded(120, 120, 5) - vesa_mount("100")
 
 ## mechanisms
 
-### `mechanisms.bistable_beam_pair` v0.1.1
+### `mechanisms.bistable_beam_pair` v0.2.0
 
 Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.
 
@@ -269,6 +269,7 @@ Fully compliant bistable slider: a central shuttle held between two fixed anchor
 | `shuttle_w` | float | mm | `8.0` | X width of the central moving block |
 | `anchor_w` | float | mm | `8.0` | X width of each fixed end block (fuse these to the host part) |
 | `margin` | float | mm | `3.0` | extra Y on the blocks beyond the outermost beam |
+| `neck_plate` | float | mm | `0.0` | 0 = necks run the full depth (the reference and the validated coupon); > 0 = each neck is two plates of this Z thickness at the faces with nothing between, half the hinge stiffness (the split_ring_clip reference uses 1.9 of 7.2) |
 
 ```python
 stage = bistable_beam_pair()                      # 37 mm beams, 8 deg, 0.5 mm necks
@@ -449,16 +450,16 @@ Half-round snap ridge (bead) running along X, protruding in +Y from a wall face 
 lip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)
 ```
 
-### `mechanisms.split_ring_clip` v0.1.0
+### `mechanisms.split_ring_clip` v0.2.0
 
-Snap-on split-ring clip: a C-ring (bore = rod - grip) on two living-hinge push arms, sprung by thin side strips off a mounting rail; the rod snaps in through the bottom slit.
+Snap-on split-ring clip: half a bistable beam pair, one hinged beam per side at a pre-tilt, a split C-ring (bore = rod - grip) for a shuttle and thin spring strips off a mounting rail for anchors.
 
 - **import:** `from lib.mechanisms.ring_clip import split_ring_clip`  
 - **returns:** `Part`  
-- **tags:** cable, clip, compliant, holder, living hinge, print in place, ring clip, rod, snap-on, spring  
+- **tags:** cable, clip, compliant, hinged beam, holder, living hinge, print in place, ring clip, rod, snap-on, spring  
 - **validated in:** UNVALIDATED  
 - **orientation:** flat on the bed, ring axis along Z, so every neck and strip bends in the bed plane; never stand it up  
-- **notes:** UNVALIDATED here. Reproduced from a downloaded mesh with no page or material notes; the necks are one 0.4 mm line and the strips one and a half, so print with thin-wall (Arachne) perimeters on. The strips and necks bend on every rod insertion; PETG expected to hold up, PLA expected to work for a few insertions and creep if the rod is oversize. A coupon print at the defaults (models/ring_clip_5_5) is the first test.  
+- **notes:** UNVALIDATED here. The arms are bistable_beam_pair's hinged beams (validated in PLA at 0.5 mm necks, 6.35 deep) scaled down to a 1.6 mm body; reproduced from a downloaded mesh with no page or material notes. Necks are one 0.4 mm line and the strips one and a half, so print with thin-wall (Arachne) perimeters on. The strips and necks bend on every rod insertion; PETG expected to hold up, PLA expected to work for a few insertions and creep if the rod is oversize. A coupon print at the defaults (models/ring_clip_5_5) is the first test.  
 - **used by:** models/ring_clip_5_5/model.py  
 
 | param | type | units | default | description |
@@ -467,21 +468,21 @@ Snap-on split-ring clip: a C-ring (bore = rod - grip) on two living-hinge push a
 | `grip` | float | mm | `0.45` | bore undersize: ring bore = rod_d - grip, so the closed jaws preload the rod (reference: 5.5 rod, 5.05 bore) |
 | `wall` | float | mm | `1.0` | ring wall thickness (measured 1.0) |
 | `ring_gap` | float | mm | `0.5` | width of the slit that splits the ring top and bottom; the rod enters through the bottom one |
-| `hinge_width` | float | mm | `0.5` | in-plane width of every living-hinge neck: arm to post, arm to ring, and the bridge across the top slit (measured 0.46 = one 0.4 mm line) |
-| `hinge_length` | float | mm | `2.0` | length of the arm-to-post and arm-to-ring necks along X |
-| `neck_plate` | float | mm | `1.9` | Z thickness of the two neck plates at the top and bottom faces (measured 1.9); the necks are absent between them. 0 = necks run the full depth |
-| `arm_len` | float | mm | `16.2` | overall length of each push arm including its rounded ends |
-| `arm_w` | float | mm | `1.6` | width of the push arms (measured 1.54; 1.6 = four lines) |
-| `arm_angle` | float | deg | `16.0` | angle of the arms below the X axis, outer end lower (measured ~16 deg) |
+| `hinge_width` | float | mm | `0.5` | in-plane width of every living-hinge neck: both ends of each arm, and the bridge across the top slit (measured 0.46 = one 0.4 mm line); bistable_beam_pair's hinge_width |
+| `hinge_length` | float | mm | `2.0` | length of each neck along the arm; bistable_beam_pair's hinge_length |
+| `neck_plate` | float | mm | `1.9` | Z thickness of the two neck plates at the top and bottom faces (measured 1.9), the necks absent between them; 0 = necks run the full depth. Same option as bistable_beam_pair |
+| `arm_len` | float | mm | `20.5` | arm span from the post face to the ring wall, hinge to hinge (measured ~20.5); bistable_beam_pair's span |
+| `arm_w` | float | mm | `1.6` | width of the arm body between the necks (measured 1.54; 1.6 = four lines); bistable_beam_pair's beam_width |
+| `arm_angle` | float | deg | `14.0` | pre-tilt of the arms: angle below the X axis toward the posts (measured ~14 deg hinge to hinge); bistable_beam_pair's pretilt |
 | `jaw_attach` | float | mm | `-1.75` | Y of the arm-to-ring neck relative to the ring centre; negative = below centre, must stay below the top bridge so pulling the arms outward opens the jaws |
-| `post_d` | float | mm | `2.0` | diameter of the round posts that join the strips to the arm necks |
+| `post_d` | float | mm | `2.0` | diameter of the round posts that anchor the arms to the strips |
 | `strip_t` | float | mm | `0.6` | thickness of the side strips, the return springs (measured 0.55; 0.6 = one line plus gap fill) |
-| `ring_clear` | float | mm | `1.2` | clear gap between the ring top and the rail underside |
+| `ring_clear` | float | mm | `1.2` | clear gap between the ring top and the rail underside; also how far the ring can climb, which keeps it short of the snap-through position |
 | `rail_t` | float | mm | `3.0` | thickness (Y) of the mounting rail |
 | `depth` | float | mm | `7.2` | part height (Z) = print height (measured 7.2) |
 
 ```python
-env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post ...
+env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post, rise ...
 clip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube
 wall = Pos(0, env["rail_top"] + wall_t / 2, 0) * Box(env["width"], wall_t, depth)   # fuse to a host
 ```

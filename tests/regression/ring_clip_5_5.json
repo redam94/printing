@@ -8,52 +8,52 @@
   "parts": {
     "clip": {
       "bbox_min": [
-        -24.694,
-        -6.774,
+        -24.921,
+        -7.951,
         0.0
       ],
       "bbox_max": [
-        24.694,
+        24.921,
         7.725,
         7.2
       ],
       "bbox_size": [
-        49.389,
-        14.499,
+        49.843,
+        15.676,
         7.2
       ],
-      "volume": 1673.529,
-      "surface_area": 2383.165,
+      "volume": 1708.22,
+      "surface_area": 2460.862,
       "solids": 1,
       "valid": true,
       "watertight": true,
-      "mesh_hash": "db9bc9cd35a53988",
-      "triangles": 3388,
+      "mesh_hash": "8435e6b5dd8abc1b",
+      "triangles": 2404,
       "kind": "brep"
     },
     "clip_full_necks": {
       "bbox_min": [
-        -24.694,
-        -6.774,
+        -24.921,
+        -7.951,
         0.0
       ],
       "bbox_max": [
-        24.694,
+        24.921,
         7.725,
         7.2
       ],
       "bbox_size": [
-        49.389,
-        14.499,
+        49.843,
+        15.676,
         7.2
       ],
-      "volume": 1688.115,
-      "surface_area": 2416.476,
+      "volume": 1722.712,
+      "surface_area": 2493.593,
       "solids": 1,
       "valid": true,
       "watertight": true,
-      "mesh_hash": "6a8f5fa963f1e2e1",
-      "triangles": 2984,
+      "mesh_hash": "b757d347adf950e7",
+      "triangles": 2200,
       "kind": "brep"
     }
   }

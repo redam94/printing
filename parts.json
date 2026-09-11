@@ -1836,7 +1836,7 @@
     },
     "mechanisms.bistable_beam_pair": {
       "id": "mechanisms.bistable_beam_pair",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "summary": "Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.",
       "params": [
         {
@@ -1915,6 +1915,13 @@
           "units": "mm",
           "default": 3.0,
           "description": "extra Y on the blocks beyond the outermost beam"
+        },
+        {
+          "name": "neck_plate",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "0 = necks run the full depth (the reference and the validated coupon); > 0 = each neck is two plates of this Z thickness at the faces with nothing between, half the hinge stiffness (the split_ring_clip reference uses 1.9 of 7.2)"
         }
       ],
       "tags": [
@@ -1958,7 +1965,7 @@
       "module": "lib.mechanisms.bistable",
       "qualname": "bistable_beam_pair",
       "file": "lib/mechanisms/bistable.py",
-      "line": 61,
+      "line": 75,
       "returns": "Part",
       "docstring": "Shuttle at x=0 raised by span*sin(pretilt) in +Y; anchors at -X and +X centred on y=0; everything stands on z=0.\n\nEach side has ``beam_count`` parallel beams tilted ``pretilt`` degrees upward toward the shuttle,\neach with a living-hinge neck at both ends (a pseudo-rigid-body four-bar per side).  Pushing the\nshuttle down past the flat position snaps it to the mirror state at -span*sin(pretilt); the travel is\n``bistable_travel(span, pretilt)``.  Anchors are meant to be fused into the host part (a frame, a\nwall, a lid rim); the shuttle carries the working feature.\n\nExample:\n    stage = bistable_beam_pair()                      # 37 mm beams, 8 deg, 0.5 mm necks\n    env = bistable_envelope()                         # rise, travel (~10.3), block_h, x_outer ...\n    frame = frame_around(env)                         # host geometry, any library primitive\n    toggle = frame + stage + Pos(0, env[\"rise\"], 0) * button_cap",
       "example": "stage = bistable_beam_pair()                      # 37 mm beams, 8 deg, 0.5 mm necks\nenv = bistable_envelope()                         # rise, travel (~10.3), block_h, x_outer ...\nframe = frame_around(env)                         # host geometry, any library primitive\ntoggle = frame + stage + Pos(0, env[\"rise\"], 0) * button_cap",
@@ -2491,8 +2498,8 @@
     },
     "mechanisms.split_ring_clip": {
       "id": "mechanisms.split_ring_clip",
-      "version": "0.1.0",
-      "summary": "Snap-on split-ring clip: a C-ring (bore = rod - grip) on two living-hinge push arms, sprung by thin side strips off a mounting rail; the rod snaps in through the bottom slit.",
+      "version": "0.2.0",
+      "summary": "Snap-on split-ring clip: half a bistable beam pair, one hinged beam per side at a pre-tilt, a split C-ring (bore = rod - grip) for a shuttle and thin spring strips off a mounting rail for anchors.",
       "params": [
         {
           "name": "rod_d",
@@ -2527,42 +2534,42 @@
           "type": "float",
           "units": "mm",
           "default": 0.5,
-          "description": "in-plane width of every living-hinge neck: arm to post, arm to ring, and the bridge across the top slit (measured 0.46 = one 0.4 mm line)"
+          "description": "in-plane width of every living-hinge neck: both ends of each arm, and the bridge across the top slit (measured 0.46 = one 0.4 mm line); bistable_beam_pair's hinge_width"
         },
         {
           "name": "hinge_length",
           "type": "float",
           "units": "mm",
           "default": 2.0,
-          "description": "length of the arm-to-post and arm-to-ring necks along X"
+          "description": "length of each neck along the arm; bistable_beam_pair's hinge_length"
         },
         {
           "name": "neck_plate",
           "type": "float",
           "units": "mm",
           "default": 1.9,
-          "description": "Z thickness of the two neck plates at the top and bottom faces (measured 1.9); the necks are absent between them. 0 = necks run the full depth"
+          "description": "Z thickness of the two neck plates at the top and bottom faces (measured 1.9), the necks absent between them; 0 = necks run the full depth. Same option as bistable_beam_pair"
         },
         {
           "name": "arm_len",
           "type": "float",
           "units": "mm",
-          "default": 16.2,
-          "description": "overall length of each push arm including its rounded ends"
+          "default": 20.5,
+          "description": "arm span from the post face to the ring wall, hinge to hinge (measured ~20.5); bistable_beam_pair's span"
         },
         {
           "name": "arm_w",
           "type": "float",
           "units": "mm",
           "default": 1.6,
-          "description": "width of the push arms (measured 1.54; 1.6 = four lines)"
+          "description": "width of the arm body between the necks (measured 1.54; 1.6 = four lines); bistable_beam_pair's beam_width"
         },
         {
           "name": "arm_angle",
           "type": "float",
           "units": "deg",
-          "default": 16.0,
-          "description": "angle of the arms below the X axis, outer end lower (measured ~16 deg)"
+          "default": 14.0,
+          "description": "pre-tilt of the arms: angle below the X axis toward the posts (measured ~14 deg hinge to hinge); bistable_beam_pair's pretilt"
         },
         {
           "name": "jaw_attach",
@@ -2576,7 +2583,7 @@
           "type": "float",
           "units": "mm",
           "default": 2.0,
-          "description": "diameter of the round posts that join the strips to the arm necks"
+          "description": "diameter of the round posts that anchor the arms to the strips"
         },
         {
           "name": "strip_t",
@@ -2590,7 +2597,7 @@
           "type": "float",
           "units": "mm",
           "default": 1.2,
-          "description": "clear gap between the ring top and the rail underside"
+          "description": "clear gap between the ring top and the rail underside; also how far the ring can climb, which keeps it short of the snap-through position"
         },
         {
           "name": "rail_t",
@@ -2611,6 +2618,7 @@
         "cable",
         "clip",
         "compliant",
+        "hinged beam",
         "holder",
         "living hinge",
         "print in place",
@@ -2622,7 +2630,7 @@
       "material_notes": {
         "validated": [],
         "orientation": "flat on the bed, ring axis along Z, so every neck and strip bends in the bed plane; never stand it up",
-        "notes": "UNVALIDATED here. Reproduced from a downloaded mesh with no page or material notes; the necks are one 0.4 mm line and the strips one and a half, so print with thin-wall (Arachne) perimeters on. The strips and necks bend on every rod insertion; PETG expected to hold up, PLA expected to work for a few insertions and creep if the rod is oversize. A coupon print at the defaults (models/ring_clip_5_5) is the first test.",
+        "notes": "UNVALIDATED here. The arms are bistable_beam_pair's hinged beams (validated in PLA at 0.5 mm necks, 6.35 deep) scaled down to a 1.6 mm body; reproduced from a downloaded mesh with no page or material notes. Necks are one 0.4 mm line and the strips one and a half, so print with thin-wall (Arachne) perimeters on. The strips and necks bend on every rod insertion; PETG expected to hold up, PLA expected to work for a few insertions and creep if the rod is oversize. A coupon print at the defaults (models/ring_clip_5_5) is the first test.",
         "evidence": [],
         "field_validated": [],
         "field_failed": []
@@ -2631,10 +2639,10 @@
       "module": "lib.mechanisms.ring_clip",
       "qualname": "split_ring_clip",
       "file": "lib/mechanisms/ring_clip.py",
-      "line": 46,
+      "line": 51,
       "returns": "Part",
-      "docstring": "Ring centre at the origin, rail along +Y above it, rod enters from -Y; the part stands on z=0.\n\nOne connected body: rail -> side strips -> posts -> necks -> arms -> necks -> ring halves, whose\ntop slit is bridged by a ``hinge_width`` neck.  Pushing the ring onto the rod spreads the halves\nabout that bridge, pulls the arms outward and bends the strips; the strips then hold the jaws\nshut on the rod.  Squeezing the posts together tightens the jaws.  With ``neck_plate`` > 0 the\nnecks and the top bridge exist only in the top and bottom plates, as in the reference, so the\nmiddle layers of the arms and ring halves are free islands standing on the bottom plate.\nMounting is by the rail's back face (y = rail_top); cut holes into it in the model.\n\nExample:\n    env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post ...\n    clip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\n    wall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
-      "example": "env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post ...\nclip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\nwall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
+      "docstring": "Ring centre at the origin, rail along +Y above it, rod enters from -Y; the part stands on z=0.\n\nThe same construction as ``bistable_beam_pair`` with one beam per side: each arm is a\n``hinged_beam`` (neck, body, neck) running from the post face to the ring wall, tilted\n``arm_angle`` so the ring sits above the posts.  Pushing the ring onto the rod spreads the halves\nabout the bridge across the top slit, pulls the arms outward and bends the strips; the strips\nthen hold the jaws shut.  Squeezing the posts together tightens the jaws.  Unlike the pair, it\ndoes not snap through: the ring would have to climb ``arm_len * sin(arm_angle)`` (~5 mm) to\nflatten the arms and the rail stops it after ``ring_clear``, so the beams act as a spring.  Set\n``ring_clear`` above the rise and add travel for the rod, and you have a toggling clip.  With\n``neck_plate`` > 0 the necks and the top bridge exist only in the top and bottom plates, as in\nthe reference, so the middle layers of the arms and ring halves are islands standing on the\nbottom plate.  Mounting is by the rail's back face (y = rail_top); cut holes into it in the model.\n\nExample:\n    env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post, rise ...\n    clip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\n    wall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
+      "example": "env = split_ring_clip_envelope(rod_d=8)                   # rail_top, width, x_post, rise ...\nclip = split_ring_clip(rod_d=8, grip=0.6)                 # holds an 8 mm tube\nwall = Pos(0, env[\"rail_top\"] + wall_t / 2, 0) * Box(env[\"width\"], wall_t, depth)   # fuse to a host",
       "used_by": [
         "models/ring_clip_5_5/model.py"
       ],

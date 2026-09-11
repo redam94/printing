@@ -18,9 +18,11 @@ their Z extent, push-arm width and angle, side spring thickness, rail thickness)
 parametric library component so the same clip can be built for any rod and fused to any host part.
 
 ## Concept
-A C-ring (bore = rod - grip) hangs on two angled push arms through living-hinge necks; the arms'
-outer ends sit on round posts at the foot of thin side strips that drop from a stiff mounting
-rail. The rod snaps in through the bottom slit: the halves spread about a thin bridge across the
+Half a bistable beam pair, scaled down (the user's observation): each arm is the same thin-neck,
+wide-body, thin-neck beam at a pre-tilt, one per side instead of two, with the split C-ring
+(bore = rod - grip) as the shuttle and round posts on thin side strips as sprung anchors, the
+strips dropping from a stiff mounting rail. The rail stops the ring 1.2 mm up while the arms would
+need ~5 mm to go flat, so it springs rather than toggles. The rod snaps in through the bottom slit: the halves spread about a thin bridge across the
 top slit, the arms are pulled outward, the strips bend, and then hold the jaws shut on the rod.
 Squeezing the posts together tightens the jaws. The reference keeps every neck as two 1.9 mm
 plates at the faces with a gap between them (half the hinge stiffness); the component reproduces
@@ -34,7 +36,8 @@ that with `neck_plate` and can also run the necks full depth.
 ## Reuse map
 | need | component | notes |
 |---|---|---|
-| the whole clip | mechanisms.split_ring_clip v0.1.0 | new; defaults are the measured reference numbers rounded to line multiples |
+| the whole clip | mechanisms.split_ring_clip v0.2.0 | new; defaults are the measured reference numbers rounded to line multiples |
+| the arms | mechanisms.bistable_beam_pair v0.2.0 (`hinged_beam`) | the same neck-body-neck beam; `neck_plate` added to both so the pair can use the clip's plated necks |
 
 ## Gaps
 none: the clip is the component. If a mounted version is wanted, add a rail hole option or fuse to a host.

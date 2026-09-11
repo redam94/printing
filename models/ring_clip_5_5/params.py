@@ -22,10 +22,10 @@ HINGE_LEN = 2.0         # mm, arm-to-post and arm-to-ring neck length (measured 
 NECK_PLATE = 1.9        # mm, neck plate thickness at each face (measured); the necks are absent between the plates
 NECK_FULL = 0.0         # the second part: necks over the full depth
 
-# --- push arms ---
-ARM_LEN = 16.2          # mm, overall arm length including rounded ends (measured 15.6 in X at 16 deg)
-ARM_W = 1.6             # mm, four lines (measured 1.54)
-ARM_ANGLE = 16.0        # deg, arms drop toward the posts (measured ~15.8)
+# --- push arms: one bistable hinged beam per side (neck, body, neck) ---
+ARM_LEN = 20.5          # mm, span from post face to ring wall, hinge to hinge (measured; = bistable_beam_pair span)
+ARM_W = 1.6             # mm, beam body width, four lines (measured 1.54)
+ARM_ANGLE = 14.0        # deg, pre-tilt: arms drop toward the posts (measured ~14 hinge to hinge)
 JAW_ATTACH = -1.75      # mm, arm-to-ring neck height below the ring centre (measured)
 
 # --- springs and rail ---
@@ -34,7 +34,8 @@ STRIP_T = 0.6           # mm, side strip = return spring (measured 0.55)
 RAIL_T = 3.0            # mm, mounting rail thickness (measured)
 DEPTH = 7.2             # mm, print height (measured)
 
-ENV = split_ring_clip_envelope(ROD_D, GRIP, WALL, RING_CLEAR, RAIL_T, ARM_LEN, ARM_W, ARM_ANGLE, JAW_ATTACH, HINGE_LEN, POST_D, STRIP_T)
+ENV = split_ring_clip_envelope(ROD_D, GRIP, WALL, RING_CLEAR, RAIL_T, ARM_LEN, ARM_ANGLE, JAW_ATTACH, POST_D, STRIP_T)
 WIDTH = ENV["width"]            # mm, overall X (~49)
 RAIL_TOP = ENV["rail_top"]      # mm, the mounting face, above the ring centre
 Y_MIN = ENV["y_min"]            # mm, lowest point (post undersides)
+RISE = ENV["rise"]              # mm, ring climb that would flatten the arms (~5); the rail stops it at RING_CLEAR, so no snap-through
