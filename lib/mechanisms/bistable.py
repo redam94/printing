@@ -59,7 +59,7 @@ def _beam(span: float, beam_width: float, hinge_width: float, hinge_length: floa
 
 
 @component(
-    id="mechanisms.bistable_beam_pair", version="0.1.0",
+    id="mechanisms.bistable_beam_pair", version="0.1.1",
     summary="Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.",
     tags=["bistable", "compliant", "snap-through", "toggle", "switch", "shuttle", "living hinge", "flexure", "print in place"],
     units={"span": "mm", "beam_width": "mm", "beam_count": "count", "beam_spacing": "mm", "pretilt": "deg", "hinge_width": "mm",
@@ -78,9 +78,9 @@ def _beam(span: float, beam_width: float, hinge_width: float, hinge_length: floa
         "margin": "extra Y on the blocks beyond the outermost beam",
     },
     material_notes=MaterialNotes(
-        validated=[],
+        validated=["PLA"],
         orientation="flat on the bed, beams and hinges in the XY plane (Z = depth) so bending runs along the extrusion lines; never stand it up",
-        notes="UNVALIDATED here. Reference (BYU CMR, Printables 581013) measured: hinge 0.5 mm, beam 5.0 mm, depth 6.35 mm; span ~37 mm and pre-tilt ~8 deg are ESTIMATED from renders and must be confirmed by a coupon print. The authors recommend polypropylene; PETG expected to work, PLA expected to creep when parked in one state and to fatigue at the necks. A 0.5 mm neck is one 0.4 mm line: enable thin-wall / Arachne perimeters in the slicer or widen hinge_width to 0.8 (two lines) and re-tune.",
+        notes="Validated in PLA by the bistable_coupon print of 2026-09-11 (closed frame, plunger tunnels): snaps both ways and holds, at the defaults below. Reference (BYU CMR, Printables 581013) measured: hinge 0.5 mm, beam 5.0 mm, depth 6.35 mm; span 37 mm and pre-tilt 8 deg were estimated from renders and the coupon confirmed they snap. The authors recommend polypropylene; PETG expected to work and is still unprinted here. PLA may creep when parked in one state for long and fatigue at the necks; not yet observed, cycle it and watch the necks for whitening. A 0.5 mm neck is one 0.4 mm line: enable thin-wall / Arachne perimeters in the slicer or widen hinge_width to 0.8 (two lines) and re-tune.",
     ),
 )
 def bistable_beam_pair(span: float = 37.0, beam_width: float = 5.0, beam_count: int = 2, beam_spacing: float = 12.0, pretilt: float = 8.0,

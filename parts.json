@@ -473,15 +473,15 @@
         "notes": "UNVALIDATED. This is the one blob primitive that can print unsupported nonsense, so check the overhang number after using it, not just the fit.",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -561,15 +561,15 @@
         "notes": "UNVALIDATED",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -770,15 +770,15 @@
         "notes": "UNVALIDATED. Neighbours only fuse where they OVERLAP, and the spacing is the path length over count-1: a long path with few segments gives a row of separate beads. Rule of thumb, keep count above path_length / r_tail.",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -1028,15 +1028,15 @@
         "notes": "UNVALIDATED: no test print yet; keep flute depth <= wall - 0.8 unless shelled afterwards",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -1129,15 +1129,15 @@
         "notes": "UNVALIDATED: no test print yet; designed for spiral (vase) mode or 2-4 perimeters",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -1358,15 +1358,15 @@
         "notes": "UNVALIDATED. A ray that misses the body is skipped silently, so check the stud count against the ray count when a spot goes missing.",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -1836,7 +1836,7 @@
     },
     "mechanisms.bistable_beam_pair": {
       "id": "mechanisms.bistable_beam_pair",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "summary": "Fully compliant bistable slider: a central shuttle held between two fixed anchors by N pre-tilted beams per side with living-hinge necks; snaps between +Y and -Y rest positions.",
       "params": [
         {
@@ -1929,11 +1929,29 @@
         "toggle"
       ],
       "material_notes": {
-        "validated": [],
+        "validated": [
+          "PLA"
+        ],
         "orientation": "flat on the bed, beams and hinges in the XY plane (Z = depth) so bending runs along the extrusion lines; never stand it up",
-        "notes": "UNVALIDATED here. Reference (BYU CMR, Printables 581013) measured: hinge 0.5 mm, beam 5.0 mm, depth 6.35 mm; span ~37 mm and pre-tilt ~8 deg are ESTIMATED from renders and must be confirmed by a coupon print. The authors recommend polypropylene; PETG expected to work, PLA expected to creep when parked in one state and to fatigue at the necks. A 0.5 mm neck is one 0.4 mm line: enable thin-wall / Arachne perimeters in the slicer or widen hinge_width to 0.8 (two lines) and re-tune.",
-        "evidence": [],
-        "field_validated": [],
+        "notes": "Validated in PLA by the bistable_coupon print of 2026-09-11 (closed frame, plunger tunnels): snaps both ways and holds, at the defaults below. Reference (BYU CMR, Printables 581013) measured: hinge 0.5 mm, beam 5.0 mm, depth 6.35 mm; span 37 mm and pre-tilt 8 deg were estimated from renders and the coupon confirmed they snap. The authors recommend polypropylene; PETG expected to work and is still unprinted here. PLA may creep when parked in one state for long and fatigue at the necks; not yet observed, cycle it and watch the necks for whitening. A 0.5 mm neck is one 0.4 mm line: enable thin-wall / Arachne perimeters in the slicer or widen hinge_width to 0.8 (two lines) and re-tune.",
+        "evidence": [
+          {
+            "date": "2026-09-11",
+            "inferred": false,
+            "material": "PLA",
+            "model": "bistable_coupon",
+            "note_id": "chat-20260911-1232",
+            "outcome": "ok",
+            "parts": [
+              "coupon_h05",
+              "coupon_h08"
+            ],
+            "text": "Reported in chat, not on the review page: printed the redesigned coupon (build 20260910-232439, closed frame with plunger tunnels) in PLA because no PETG was on hand, and it works really well. The user did not say which hinge width was printed; both parts are listed. Confirms the estimated 37 mm span and 8 deg pre-tilt snap in PLA. Long-term creep when parked in one state is still unobserved."
+          }
+        ],
+        "field_validated": [
+          "PLA"
+        ],
         "field_failed": []
       },
       "category": "mechanisms",
@@ -3955,15 +3973,15 @@
         "notes": "",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],
@@ -4166,15 +4184,15 @@
         "notes": "UNVALIDATED: no test print yet. Clearance is added to the DIAMETER, not per side. Leave vent_d at 0 for anything that can leak \u2014 a vent under the pocket drips onto the desk.",
         "evidence": [
           {
+            "date": "2026-09-09",
+            "inferred": false,
             "material": "PLA",
-            "outcome": "ok",
             "model": "vape_pen_holder",
+            "note_id": "chat-20260909-1025",
+            "outcome": "ok",
             "parts": [
               "holder"
             ],
-            "date": "2026-09-09",
-            "note_id": "chat-20260909-1025",
-            "inferred": false,
             "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
           }
         ],

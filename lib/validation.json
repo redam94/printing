@@ -1,114 +1,129 @@
 {
   "form.ball_chain": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "form.blob_outline": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "form.dome_chain": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "form.flutes": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "form.revolved_body": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "form.surface_studs": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+    }
+  ],
+  "mechanisms.bistable_beam_pair": [
+    {
+      "date": "2026-09-11",
       "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "material": "PLA",
+      "model": "bistable_coupon",
+      "note_id": "chat-20260911-1232",
+      "outcome": "ok",
+      "parts": [
+        "coupon_h05",
+        "coupon_h08"
+      ],
+      "text": "Reported in chat, not on the review page: printed the redesigned coupon (build 20260910-232439, closed frame with plunger tunnels) in PLA because no PETG was on hand, and it works really well. The user did not say which hinge width was printed; both parts are listed. Confirms the estimated 37 mm span and 8 deg pre-tilt snap in PLA. Long-term creep when parked in one state is still unobserved."
     }
   ],
   "primitives.rubber_foot_recess": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ],
   "primitives.socket_array": [
     {
+      "date": "2026-09-09",
+      "inferred": false,
       "material": "PLA",
-      "outcome": "ok",
       "model": "vape_pen_holder",
+      "note_id": "chat-20260909-1025",
+      "outcome": "ok",
       "parts": [
         "holder"
       ],
-      "date": "2026-09-09",
-      "note_id": "chat-20260909-1025",
-      "inferred": false,
-      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) — the Ø16 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
+      "text": "Reported in chat, not on the review page: printed and it works well. Build 20260908-210557 (commit 1e5362f) \u2014 the \u00d816 bores with the diamond lattice, wrapped caterpillar and reared head. Confirmed by "
     }
   ]
 }

@@ -13,6 +13,19 @@
       "text": "Reported in chat, not on the review page: printed the bistable_coupon and it failed. The left and right hand brackets must be connected, and the switch arms have to pass through a hole that tunnels through the frame. Cause: build 20260910-214446 cut the plunger slots clean through both rails, so the frame was two separate side brackets joined only by the living hinges. Material not stated; a frame design failure, not evidence about the mechanism or its hinges.",
       "build_id": "20260910-214446",
       "inferred": false
+    },
+    {
+      "note_id": "chat-20260911-1232",
+      "date": "2026-09-11",
+      "parts": [
+        "coupon_h05",
+        "coupon_h08"
+      ],
+      "material": "PLA",
+      "outcome": "ok",
+      "text": "Reported in chat, not on the review page: printed the redesigned coupon (build 20260910-232439, closed frame with plunger tunnels) in PLA because no PETG was on hand, and it works really well. The user did not say which hinge width was printed; both parts are listed. Confirms the estimated 37 mm span and 8 deg pre-tilt snap in PLA. Long-term creep when parked in one state is still unobserved.",
+      "build_id": "20260910-232439",
+      "inferred": false
     }
   ]
 }
