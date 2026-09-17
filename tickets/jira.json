@@ -1,0 +1,56 @@
+{
+  "project": "PRINT",
+  "transitions": {
+    "designing": [
+      "Start progress",
+      "In progress",
+      "In Progress"
+    ],
+    "quoted": [
+      "Respond to customer",
+      "Waiting for customer",
+      "Pending"
+    ],
+    "changes": [
+      "Back to support",
+      "Waiting for support",
+      "In Progress"
+    ],
+    "approved": [
+      "Approved",
+      "Approve",
+      "In Progress"
+    ],
+    "printing": [
+      "Printing",
+      "In progress",
+      "In Progress"
+    ],
+    "done": [
+      "Resolve this issue",
+      "Done",
+      "Resolved",
+      "Close"
+    ],
+    "declined": [
+      "Cancel request",
+      "Cancel",
+      "Declined",
+      "Won't do",
+      "Done"
+    ]
+  },
+  "field_labels": {
+    "Sizes it must fit": "dimensions",
+    "Material": "material",
+    "Color": "material",
+    "Photos": "links",
+    "Additional information": "notes",
+    "What do you need?": "title",
+    "What is it for?": "purpose"
+  },
+  "request_type": "3D print request",
+  "jql": "",
+  "site": "https://matt-reda.atlassian.net",
+  "service_desk_id": "1"
+}

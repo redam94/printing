@@ -61,10 +61,32 @@ class JiraError(RuntimeError):
     pass
 
 
+ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
+
+
+def load_dotenv(path: Path = ENV_FILE) -> None:
+    """KEY=value lines from the repo's .env (gitignored) into os.environ; the real environment wins."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.removeprefix("export ").split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip("'\""))
+
+
+def _env(*names: str) -> str:
+    return next((v for n in names if (v := os.environ.get(n, "").strip())), "")
+
+
 def credentials() -> dict | None:
-    site = os.environ.get("JIRA_SITE", "").strip().rstrip("/")
-    email = os.environ.get("JIRA_EMAIL", "").strip()
-    token = os.environ.get("JIRA_API_TOKEN", "").strip()
+    """One Atlassian API token serves Jira and Confluence on the same site, so the CONFLUENCE_* names work too."""
+    load_dotenv()
+    site = _env("JIRA_SITE", "ATLASSIAN_SITE", "CONFLUENCE_URL")
+    site = re.sub(r"/wiki/?$", "", site.rstrip("/"))
+    email = _env("JIRA_EMAIL", "ATLASSIAN_EMAIL", "CONFLUENCE_EMAIL")
+    token = _env("JIRA_API_TOKEN", "ATLASSIAN_API_TOKEN", "CONFLUENCE_API_TOKEN")
     return {"site": site, "email": email, "token": token} if site and email and token else None
 
 
@@ -124,7 +146,7 @@ class JiraClient:
     def request(self, key: str) -> dict | None:
         """The JSM view of one issue: portal field values by label, reporter with e-mail, current status.  None if not a JSM request."""
         try:
-            return self.get(f"/rest/servicedeskapi/request/{key}")
+            return self.get(f"/rest/servicedeskapi/request/{key}", expand="requestType")
         except JiraError as e:
             if "HTTP 404" in str(e) or "HTTP 403" in str(e):
                 return None
@@ -266,6 +288,29 @@ def portal_url(site: str, service_desk_id: str) -> str:
 
 # ---------------------------------------------------------------- the pull: Jira -> plain dicts for tickets.py
 
+def field_text(v) -> str:
+    """A portal field value as text: options by their value, attachments by file name, 3.0 as 3."""
+    if v is None:
+        return ""
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, bool):
+        return "yes" if v else "no"
+    if isinstance(v, float) and v.is_integer():
+        return str(int(v))
+    if isinstance(v, (int, float)):
+        return str(v)
+    if isinstance(v, list):
+        return ", ".join(t for t in (field_text(x) for x in v) if t)
+    if isinstance(v, dict):
+        for k in ("value", "filename", "name", "displayName", "text"):
+            if v.get(k):
+                return field_text(v[k])
+        if v.get("type") == "doc":
+            return adf_text(v).strip()
+    return json.dumps(v)
+
+
 def pull(client: JiraClient, cfg: dict, field_map: Callable[[str], str | None]) -> list[dict]:
     """Every request in the project as {key, url, summary, status, created, updated, reporter{name,email,accountId},
     fields{<request field key>: value}, description, comments[...], jsm}.  Pure data; tickets.py ingests it."""
@@ -280,15 +325,19 @@ def pull(client: JiraClient, cfg: dict, field_map: Callable[[str], str | None]) 
             for fv in req.get("requestFieldValues", []):
                 k = field_map(str(fv.get("label") or fv.get("fieldId") or ""))
                 v = fv.get("value")
-                if k and v not in (None, ""):
-                    fields[k] = v if isinstance(v, str) else (v.get("value") if isinstance(v, dict) and "value" in v else json.dumps(v))
+                v = field_text(v)
+                if k and v:
+                    # two portal fields can feed one request field (Material + Color): keep both
+                    fields[k] = f"{fields[k]}, {v}" if fields.get(k) and v not in fields[k] else fields.get(k) or v
             rep = req.get("reporter") or {}
         else:
             rep = f.get("reporter") or {}
         reporter = {"name": rep.get("displayName", ""), "email": (rep.get("emailAddress") or "").lower(), "accountId": rep.get("accountId", "")}
         desc = adf_text(f.get("description")) if f.get("description") else ""
         fields.setdefault("title", f.get("summary") or "")
-        if desc and "purpose" not in fields:
+        desc_mapped = req and any(fv.get("fieldId") == "description" and field_map(str(fv.get("label") or "")) not in (None, "purpose")
+                                  for fv in req.get("requestFieldValues", []))
+        if desc and "purpose" not in fields and not desc_mapped:
             fields["purpose"] = desc.strip()
         fields.setdefault("name", reporter["name"]); fields.setdefault("email", reporter["email"])
         if cfg.get("request_type") and req and str((req.get("requestType") or {}).get("name") or req.get("requestTypeId") or "") not in ("", cfg["request_type"]):
