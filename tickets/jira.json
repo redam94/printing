@@ -49,7 +49,11 @@
     "What do you need?": "title",
     "What is it for?": "purpose"
   },
-  "request_type": "3D print request",
+  "request_type": [
+    "3D print request",
+    "Reprint or fix an earlier part",
+    "Print my file"
+  ],
   "jql": "",
   "site": "https://matt-reda.atlassian.net",
   "service_desk_id": "1"

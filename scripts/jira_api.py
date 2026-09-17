@@ -15,7 +15,7 @@ tickets/jira.json:
 
     {"project": "PRINT",                     # the JSM project key
      "service_desk_id": "",                  # resolved from the project by `tickets.py jira check`
-     "request_type": "",                     # optional: only pull requests of this type
+     "request_type": [],                     # optional: only pull requests of these types (names or ids)
      "jql": "",                              # optional: replaces the default `project = <key>` search
      "transitions": {"designing": ["Start progress", "In progress"],
                      "quoted": ["Respond to customer", "Waiting for customer"],
@@ -340,7 +340,10 @@ def pull(client: JiraClient, cfg: dict, field_map: Callable[[str], str | None]) 
         if desc and "purpose" not in fields and not desc_mapped:
             fields["purpose"] = desc.strip()
         fields.setdefault("name", reporter["name"]); fields.setdefault("email", reporter["email"])
-        if cfg.get("request_type") and req and str((req.get("requestType") or {}).get("name") or req.get("requestTypeId") or "") not in ("", cfg["request_type"]):
+        types = cfg.get("request_type") or []
+        types = [types] if isinstance(types, str) else types
+        rt = req and {str((req.get("requestType") or {}).get("name") or ""), str(req.get("requestTypeId") or "")} - {""}
+        if types and rt and not rt & set(types):
             continue
         comments = []
         for c in client.comments(key, jsm=bool(req)):

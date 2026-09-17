@@ -22,3 +22,6 @@ tickets/*/quotes/*/*.html
 tickets/*/quotes/*/*.png
 
 .env
+
+# personal setup guides (local only)
+guides/
