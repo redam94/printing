@@ -14,11 +14,13 @@ uv run python scripts/references.py search "bistable switch"   # find printed re
 uv run python scripts/tickets.py                 # design requests from other people, fronted by Jira Service Management (tickets/jira.json + JIRA_* env) or e-mail: board by status; jira check / fetch / ingest / quote / send / set; --html -> the Request page + the Tickets board
 uv run python scripts/site.py [--serve|--deploy]   # public sales site in the Augur theme (work, pricing, track record, how to order; site.json holds the copy) -> _site/, --deploy force-pushes gh-pages
 uv run python scripts/product_shot.py <project>     # clean product render (three.js in headless Chrome) used by the site
+uv run python scripts/confluence.py [push]          # customer help space (Confluence PRINTHELP) from docs/help/*.md; no args = dry run
 uv run python -m pytest -q
 ```
 
 Layout: `lib/{patterns,mechanisms,fasteners,primitives}` components with `@component` metadata ·
 `models/<project>/{params.py,model.py}` · `ideas/<slug>/IDEA.md` (+ optional `sketch.py`) backlog and prototypes ·
 `tests/regression/` golden metrics · `PARTS.md` / `parts.json` generated index · `studio.json` URL of the published Studio page ·
-`tickets/<KEY>/` design requests from other people (request, quotes, thread, status; `tickets/pricing.json` the rates, `tickets/jira.json` the Jira Service Management mapping).
+`tickets/<KEY>/` design requests from other people (request, quotes, thread, status; `tickets/pricing.json` the rates, `tickets/jira.json` the Jira Service Management mapping) ·
+`site.json` + `docs/help/` the customer-facing copy: the public site and the Confluence help space.
 Exports (`models/*/exports/`) are gitignored.
