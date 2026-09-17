@@ -12,6 +12,8 @@ uv run python scripts/studio.py                 # repo overview: library, models
 uv run python scripts/sketch.py --new my_idea     # throwaway sketch loop for ideas/<slug>/ before it becomes a model
 uv run python scripts/references.py search "bistable switch"   # find printed reference models online; add <url> files one next to a model/idea and measures its mesh
 uv run python scripts/tickets.py                 # design requests from other people, fronted by Jira Service Management (tickets/jira.json + JIRA_* env) or e-mail: board by status; jira check / fetch / ingest / quote / send / set; --html -> the Request page + the Tickets board
+uv run python scripts/site.py [--serve|--deploy]   # public sales site in the Augur theme (work, pricing, track record, how to order; site.json holds the copy) -> _site/, --deploy force-pushes gh-pages
+uv run python scripts/product_shot.py <project>     # clean product render (three.js in headless Chrome) used by the site
 uv run python -m pytest -q
 ```
 

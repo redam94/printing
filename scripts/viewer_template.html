@@ -1,20 +1,20 @@
 <title>__TITLE__</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+/* Augur (Claude Design): warm cream paper, green-cast ink, sage primary. Light-only by design. */
 :root{
-  --bg:#F2F3F0; --panel:#FFFFFF; --panel-2:#F7F8F6; --ink:#1A1F25; --muted:#5E6771; --line:#D9DDD8;
-  --accent:#E8791D; --accent-ink:#FFFFFF; --ok:#2E9E5B; --warn:#C48F12; --bad:#D24B3F;
-  --viewport:#262B31; --focus:#2F6FE8;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+  --bg:#faf8f3; --panel:#FFFFFF; --panel-2:#f3f0e6; --ink:#2a3528; --muted:#4a5a48; --line:#e8e4d5;
+  --accent:#5a7a3a; --accent-ink:#FFFFFF; --ok:#5a7a3a; --warn:#b8860b; --bad:#a04535;
+  --viewport:#2a3528; --focus:#4a6d8a;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --accent-ink:#1A1F25;
-}}
-:root[data-theme="dark"]{ --bg:#14171B; --panel:#1C2127; --panel-2:#222831; --ink:#E4E7EA; --muted:#9AA3AD; --line:#2C333B; --accent-ink:#1A1F25; }
+[hidden]{display:none!important}   /* the artifact host adds this; a quote attachment opened as a file does not */
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13.5px;line-height:1.45;height:100vh;display:grid;grid-template-rows:auto 1fr;overflow:hidden}
 header.top{display:flex;align-items:center;gap:18px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
-header.top h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.01em}
+header.top h1{font-family:var(--display);font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em}
 .sub{color:var(--muted)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .seg button{background:var(--panel);color:var(--ink);border:0;padding:5px 12px;font:inherit;cursor:pointer}
@@ -54,8 +54,8 @@ h2.k,.k{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.0
 .btn.small{padding:1px 7px;font-size:12px}
 #stage{position:relative;background:var(--viewport);min-width:0;min-height:0}
 #stage canvas{display:block;width:100%;height:100%}
-.hud{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:#C9D1D9;background:rgba(20,23,27,.72);padding:8px 10px;border-radius:5px;font-variant-numeric:tabular-nums;pointer-events:none;white-space:pre}
-.hint{position:absolute;right:14px;bottom:12px;font-family:var(--mono);font-size:11px;color:#8B949E;pointer-events:none}
+.hud{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:#e7eddc;background:rgba(31,40,30,.78);padding:8px 10px;border-radius:5px;font-variant-numeric:tabular-nums;pointer-events:none;white-space:pre}
+.hint{position:absolute;right:14px;bottom:12px;font-family:var(--mono);font-size:11px;color:#a9b6a0;pointer-events:none}
 .drawer-tabs{position:absolute;top:12px;right:14px;display:flex;gap:6px}
 .drawer{position:absolute;top:0;right:0;height:100%;width:min(600px,64%);background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column;color:var(--ink)}
 .drawer[data-open="true"]{transform:none}
@@ -170,7 +170,7 @@ h2.k,.k{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.0
 (function(){
 const DATA = JSON.parse(document.getElementById('data').textContent);
 const RUNS = DATA.runs;
-const PART_COLORS = [0xB7C2CC, 0xE8791D, 0x3FA7A0, 0x8E7CC3, 0xD9C15A, 0xC96B8A];
+const PART_COLORS = [0xA3BC80, 0xD9A441, 0x7FA2C0, 0xC87B69, 0xE3DCC6, 0x6F8F4E];   // Augur sage, gold, steel, rust, cream, deep sage
 const hex = c => '#'+c.toString(16).padStart(6,'0');
 const esc = s => String(s==null?'':s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
@@ -194,7 +194,7 @@ function volumeOf(g){const p=g.attributes.position.array;let v=0;for(let i=0;i<p
 const stage=document.getElementById('stage');
 const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.localClippingEnabled=true; renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 stage.insertBefore(renderer.domElement, stage.firstChild);
-const scene=new THREE.Scene(); scene.background=new THREE.Color(0x262B31);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x2a3528);
 const camera=new THREE.PerspectiveCamera(35,1,1,5000); camera.up.set(0,0,1);
 scene.add(new THREE.HemisphereLight(0xdfe6ee,0x2a2f36,0.85));
 const key=new THREE.DirectionalLight(0xffffff,0.9); key.position.set(120,-160,220); scene.add(key);
@@ -227,7 +227,7 @@ document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',(
 let current=null; const meshes=[];
 const cut=document.getElementById('cut'), cutOut=document.getElementById('cutOut');
 const ui={wire:document.getElementById('wire'),xray:document.getElementById('xray'),bed:document.getElementById('bed'),plate:document.getElementById('plate')};
-function buildBed(size,cx,cy){bedGroup.clear();const n=Math.ceil(size/10)*10;const grid=new THREE.GridHelper(n,n/10,0x4A535E,0x363D46);grid.rotation.x=Math.PI/2;grid.position.set(cx,cy,-0.05);bedGroup.add(grid);const plate=new THREE.Mesh(new THREE.PlaneGeometry(n,n),new THREE.MeshBasicMaterial({color:0x1f2429}));plate.position.set(cx,cy,-0.1);bedGroup.add(plate);const axes=new THREE.AxesHelper(20);axes.position.set(cx-n/2,cy-n/2,0);bedGroup.add(axes);}
+function buildBed(size,cx,cy){bedGroup.clear();const n=Math.ceil(size/10)*10;const grid=new THREE.GridHelper(n,n/10,0x56654f,0x3a4737);grid.rotation.x=Math.PI/2;grid.position.set(cx,cy,-0.05);bedGroup.add(grid);const plate=new THREE.Mesh(new THREE.PlaneGeometry(n,n),new THREE.MeshBasicMaterial({color:0x232c22}));plate.position.set(cx,cy,-0.1);bedGroup.add(plate);const axes=new THREE.AxesHelper(20);axes.position.set(cx-n/2,cy-n/2,0);bedGroup.add(axes);}
 function setCut(v){if(v==null||v>=parseFloat(cut.max)){cut.value=cut.max;clipPlane.constant=1e6;cutOut.textContent='off';}else{cut.value=v;clipPlane.constant=v;cutOut.textContent=v.toFixed(1)+' mm';}}
 cut.addEventListener('input',()=>setCut(parseFloat(cut.value)));
 

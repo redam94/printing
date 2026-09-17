@@ -1,0 +1,67 @@
+{
+  "_": "Copy and settings for the public site (scripts/site.py). Models built for a ticket (tickets/*/ticket.json 'model') are never published, whatever this file says; 'hidden' drops any other model.",
+  "brand": "3D Printing Service",
+  "tagline": "Custom 3D-printed parts, designed around the thing you already have.",
+  "hero_model": "vape_pen_holder",
+  "hidden": [],
+  "order": ["vape_pen_holder", "cloud_pi_holder", "ribbed_vase", "pi5_fan_case", "esp32_devkit_case", "drain_system", "l_bracket_40", "bistable_coupon"],
+  "models": {
+    "vape_pen_holder": {
+      "title": "Caterpillar pen stand",
+      "kind": "Desk & decor",
+      "tagline": "A caterpillar curling round three mushroom cups that hold a slim pen and two spare cartridges upright.",
+      "story": "Sized to the pen, not the other way round: each cup is bored to the measured barrel with a lattice sleeve, and the caterpillar's body doubles as the weighted base. Printed in PLA and in daily use."
+    },
+    "cloud_pi_holder": {
+      "title": "Cloud Raspberry Pi case",
+      "kind": "Electronics",
+      "tagline": "A Raspberry Pi 5 case shaped like a cloud, with a soft textured skin and every port where the board expects it.",
+      "story": "The outline is a cloud, but the inside is all fit: heat-set standoffs on the Pi 5 hole pattern, windows for power, HDMI, Ethernet, USB and the SD card, and a lid that drops in and screws down."
+    },
+    "ribbed_vase": {
+      "title": "Fluted desk vase",
+      "kind": "Desk & decor",
+      "tagline": "A tall fluted vase with a bulging shoulder, drawn from a reference photo and printed as one continuous wall.",
+      "story": "Printed in spiral mode, so the nozzle never stops: a single perimeter climbs from base to rim and the flutes come out crisp. Fast to print and light on filament."
+    },
+    "pi5_fan_case": {
+      "title": "Raspberry Pi 5 fan case",
+      "kind": "Electronics",
+      "tagline": "A ventilated Pi 5 enclosure with a 30 mm fan in the lid, in a screw-down or a snap-on version.",
+      "story": "Brass inserts hold the board and the lid; vent slots run vertically so they print cleanly. Two lids are included so you can choose tools or no tools."
+    },
+    "esp32_devkit_case": {
+      "title": "ESP32 dev board case",
+      "kind": "Electronics",
+      "tagline": "A small enclosure for an ESP32 DevKitC with a USB opening, side vents and a cable grommet.",
+      "story": "These boards have no mounting holes, so the case holds the board by its edges and the lid keeps it seated. Four screws close it."
+    },
+    "drain_system": {
+      "title": "Sink-side drain set",
+      "kind": "Home",
+      "tagline": "An edge rail, drain tiles and a pot rack that turn the counter beside an undermount sink into a drying area.",
+      "story": "The rail clips over the stone edge with no drilling and pitches water back into the basin. The 420 mm run is printed in three segments that butt together, because it is longer than the printer bed."
+    },
+    "l_bracket_40": {
+      "title": "40 mm corner bracket",
+      "kind": "Hardware",
+      "tagline": "A stiff 40 mm L-bracket for M3 screws, oriented on the printer so the corner is as strong as it can be.",
+      "story": "Printed on its side so the load runs along the layers, not across them. The simplest thing here, and a good example of how orientation decides strength."
+    },
+    "bistable_coupon": {
+      "title": "Snap-through switch test",
+      "kind": "R&D",
+      "tagline": "A test piece for a two-position flexure switch that snaps between states with no spring and no hinge pin.",
+      "story": "Mechanisms that bend are tested before they go into a product. The first version failed and taught us the frame must be one closed piece; the redesign snaps reliably in PLA."
+    }
+  },
+  "faq": [
+    ["What can you make?", "Holders, mounts, brackets, enclosures for electronics, replacement parts, organizers and decorative pieces. If it fits in a 270 mm cube, or can be split into pieces that join, it can usually be printed."],
+    ["Do I need a 3D file?", "No. Most requests are a description, a few measurements and a photo. If you already have an STL, 3MF or STEP file, choose “Print my file” on the portal."],
+    ["What does it cost?", "Every quote is worked out from the design: filament, printer time, handling and a design fee. The examples on this page show typical prices; you always see the price before anything is printed."],
+    ["How long does it take?", "Most parts are ready a few days after you confirm the quote. The quote gives the estimate for your part."],
+    ["What if it doesn't fit?", "Check the 3D model and the measurements before you confirm, and ask for as many changes as you need. If a printed part still isn't right, raise a “Reprint or fix an earlier part” request."],
+    ["Which material should I choose?", "PLA for most indoor parts, PETG for anything warm, wet or that needs to flex a little, TPU for rubbery parts, ASA for outdoors. Pick “Not sure” and one will be recommended."],
+    ["Do I need an account?", "The request portal asks for your e-mail so it can send you the quote and updates. No Jira licence or payment details are needed to ask."]
+  ]
+}

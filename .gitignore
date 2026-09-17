@@ -25,3 +25,4 @@ tickets/*/quotes/*/*.png
 
 # personal setup guides (local only)
 guides/
+/_site/
