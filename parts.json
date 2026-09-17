@@ -3836,6 +3836,92 @@
       ],
       "import": "from lib.primitives.pcb_cradle import pcb_slot_cradle"
     },
+    "primitives.pocket_array": {
+      "id": "primitives.pocket_array",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me): row of blind rounded-rectangle pockets, each its own size and depth, with chamfered lead-ins; rims at z=0, pockets extend down.",
+      "params": [
+        {
+          "name": "sizes",
+          "type": "tuple[tuple[float, float, float], ...]",
+          "units": "mm",
+          "default": [
+            [
+              45.0,
+              20.0,
+              60.0
+            ]
+          ],
+          "description": "one (x, y, depth) per pocket, in order along +X: the held object's footprint before clearance, and the pocket depth from the rim"
+        },
+        {
+          "name": "web",
+          "type": "float",
+          "units": "mm",
+          "default": 2.4,
+          "description": "wall left between neighbouring pockets"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "added to each pocket's X and Y (total, not per side)"
+        },
+        {
+          "name": "corner_r",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "vertical corner radius of each pocket (clamped below half the short side)"
+        },
+        {
+          "name": "lead_in",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "45 degree chamfer at the rim so the object finds the pocket; 0 = sharp rim"
+        },
+        {
+          "name": "align_y",
+          "type": "str",
+          "units": "enum",
+          "default": "center",
+          "description": "min | center | max: which Y side the pockets line up on (the row is centred on y=0 for center, else that side sits on y=0)"
+        }
+      ],
+      "tags": [
+        "caddy",
+        "holder",
+        "negative",
+        "organizer",
+        "phone",
+        "pocket",
+        "rectangular",
+        "remote",
+        "slot"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "rims up (floors are up-facing, lead-ins 45 deg) or rims on the bed (each floor becomes a bridge across the pocket's SHORT side: keep that <= 25 mm)",
+        "notes": "UNVALIDATED: no test print yet. Clearance is added to the total X and Y, not per side.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.pocket_array",
+      "qualname": "pocket_array",
+      "file": "lib/primitives/pocket_array.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Pockets in a row along X, the whole row centred on x=0, rims in the z=0 plane.\n\n``row_length(sizes, web, clearance)`` gives the X extent, for sizing the body around it::\n\n    block = block - Pos(0, 0, top_z) * pocket_array(((45, 20, 90), (40, 18, 75)), web=2.4)\n\nExample:\n    caddy = box - Pos(0, 0, box_h) * pocket_array(((45, 20, 90), (40, 18, 75), (38, 15, 70)))",
+      "example": "caddy = box - Pos(0, 0, box_h) * pocket_array(((45, 20, 90), (40, 18, 75), (38, 15, 70)))",
+      "used_by": [
+        "models/couch_remote_caddy/model.py"
+      ],
+      "import": "from lib.primitives.pocket_array import pocket_array"
+    },
     "primitives.rounded_box": {
       "id": "primitives.rounded_box",
       "version": "1.0.0",
@@ -4000,6 +4086,7 @@
       "example": "body = body - [loc * rubber_foot_recess(10) for loc in GridLocations(80, 50, 2, 2)]",
       "used_by": [
         "models/cloud_pi_holder/model.py",
+        "models/couch_remote_caddy/model.py",
         "models/pi5_fan_case/model.py",
         "models/vape_pen_holder/model.py"
       ],
@@ -4381,6 +4468,14 @@
         "patterns.pi_board_outline",
         "primitives.rubber_foot_recess",
         "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "couch_remote_caddy": {
+      "path": "models/couch_remote_caddy",
+      "components": [
+        "primitives.pocket_array",
+        "primitives.rubber_foot_recess"
       ],
       "golden": true
     },

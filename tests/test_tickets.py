@@ -152,6 +152,12 @@ class FakeJira:
                                               {"fieldId": "customfield_3", "label": "Colour", "value": "black PETG"}]})
         if path == "/rest/servicedeskapi/request/PRINT-12/comment" and method == "GET":
             return ok({"values": self.comments, "isLastPage": True})
+        if path == "/rest/servicedeskapi/request/PRINT-12/comment" and method == "POST":
+            # posted with the API account, which here is also the reporter (someone filing for themselves)
+            b = J.loads(body); cid = str(20 + len(self.comments))
+            self.comments.append({"id": cid, "body": b["body"], "public": b["public"], "created": {"iso8601": "2026-09-13T10:00:00+0000"},
+                                  "author": {"accountId": "cust1", "displayName": "Ana Ruiz", "emailAddress": "ana@example.org"}})
+            return 201, J.dumps({"id": cid}).encode()
         if path == "/rest/servicedeskapi/servicedesk/3/attachTemporaryFile":
             assert headers["X-Atlassian-Token"] == "no-check" and b'filename="measurements.md"' in body
             return 201, J.dumps({"temporaryAttachments": [{"temporaryAttachmentId": "tmp1", "fileName": "x"}, {"temporaryAttachmentId": "tmp2", "fileName": "y"}]}).encode()
@@ -225,3 +231,9 @@ def test_jira_ingest_send_and_set(tmp_path, monkeypatch):
     # set done -> the configured transition
     assert T.jira_transition(t, "done", client=client, cfg=cfg) == "Jira: Resolve this issue -> Resolved"
     assert T.jira_transition(t, "approved", client=client, cfg=cfg).startswith("Jira: no transition")
+    # a status note is its own comment, recorded by id, so it is never read back as the requester's reply
+    # even when the API account is the reporter
+    T.jira_transition(t, "done", comment="Printed and checked, thanks", client=client, cfg=cfg); T.save_ticket(t)
+    assert t["messages"][-1]["from"] == "me" and t["messages"][-1]["id"].startswith("jira-comment-")
+    (sync / "jira.json").write_text(json.dumps(T.jira_fetch()), encoding="utf-8")
+    assert T.ingest(sync, mine={"me@shop.org"})["replies"] == []

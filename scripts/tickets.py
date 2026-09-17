@@ -403,7 +403,8 @@ def quote_email_text(t: dict, q: dict, report: dict) -> str:
               f"  Ready in      about {e['lead_days']} day(s) from your confirmation", "",
               "  Time and price are estimates from the model's geometry; the sliced print may differ a little either way.", "",
               "WHAT NEXT", "",
-              "  Reply to this e-mail (keep the subject) with:",
+              ("  Reply on the request in the portal (or to Jira's e-mail about it) with:" if t.get("jira") else
+               "  Reply to this e-mail (keep the subject) with:"),
               "    CONFIRM                 - to have it printed as shown, or",
               "    your notes              - anything to change: a size, a feature, the material, the count.",
               "  A revised design and estimate come back the same way, until you are happy.", "",
@@ -422,46 +423,48 @@ def quote_email_html(t: dict, q: dict, report: dict, sender: str = "") -> str:
     e = q["estimate"]
     first = html.escape((t["requester"].get("name") or "there").split()[0])
     cur = e["currency"]
-    row = lambda k, v: f"<tr><td style='padding:4px 10px 4px 0;color:#5E6771;white-space:nowrap'>{k}</td><td style='padding:4px 0'>{v}</td></tr>"  # noqa: E731
+    row = lambda k, v: f"<tr><td style='padding:4px 10px 4px 0;color:#4a5a48;white-space:nowrap'>{k}</td><td style='padding:4px 0'>{v}</td></tr>"  # noqa: E731
     parts_rows = "".join(
         f"<tr><td style='padding:4px 10px 4px 0'>{html.escape(p['name'])}</td>"
-        f"<td style='padding:4px 10px;font-family:Menlo,Consolas,monospace'>{' × '.join(f'{x:g}' for x in p['bbox_mm'])}</td>"
+        f"<td style='padding:4px 10px;font-family:'JetBrains Mono',Menlo,Consolas,monospace'>{' × '.join(f'{x:g}' for x in p['bbox_mm'])}</td>"
         f"<td style='padding:4px 10px;text-align:right'>{p['volume_cm3']:g}</td><td style='padding:4px 10px;text-align:right'>{p['mass_g']:g}</td>"
         f"<td style='padding:4px 10px;text-align:right'>{p['wall_min_mm'] if p['wall_min_mm'] is not None else '—'}</td></tr>"
         for p in e["parts"])
     params = [p for p in report.get("params") or [] if p.get("value") is not None and not p.get("derived")]
     param_rows = "".join(
-        f"<tr><td style='padding:3px 10px 3px 0;font-family:Menlo,Consolas,monospace;font-size:12px'>{html.escape(str(p['name']))}</td>"
-        f"<td style='padding:3px 10px;font-family:Menlo,Consolas,monospace;font-size:12px'>{html.escape(str(p['value']))}</td>"
-        f"<td style='padding:3px 0;color:#5E6771;font-size:12px'>{html.escape(p.get('comment') or '')}</td></tr>" for p in params[:24])
+        f"<tr><td style='padding:3px 10px 3px 0;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:12px'>{html.escape(str(p['name']))}</td>"
+        f"<td style='padding:3px 10px;font-family:'JetBrains Mono',Menlo,Consolas,monospace;font-size:12px'>{html.escape(str(p['value']))}</td>"
+        f"<td style='padding:3px 0;color:#4a5a48;font-size:12px'>{html.escape(p.get('comment') or '')}</td></tr>" for p in params[:24])
     renders = [a for a in q.get("attachments", []) if a.endswith(".png")]
-    img = f"<p><img src='cid:{html.escape(renders[0])}' alt='render' style='max-width:520px;border:1px solid #D9DDD8;border-radius:6px'></p>" if renders else ""
+    img = f"<p><img src='cid:{html.escape(renders[0])}' alt='render' style='max-width:520px;border:1px solid #e8e4d5;border-radius:6px'></p>" if renders else ""
     note = f"<p>{html.escape(q['note']).replace(chr(10), '<br>')}</p>" if q.get("note") else ""
-    price = _money(e["total"], cur) + (f" <span style='color:#5E6771'>({_money(e['per_unit'], cur)} each)</span>" if e["qty"] > 1 else "")
-    return f"""<div style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#1A1F25;max-width:640px">
+    price = _money(e["total"], cur) + (f" <span style='color:#4a5a48'>({_money(e['per_unit'], cur)} each)</span>" if e["qty"] > 1 else "")
+    return f"""<div style="background:#faf8f3;padding:24px 28px;border:1px solid #e8e4d5;border-radius:10px;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#2a3528;max-width:640px">
+<p style="margin:0 0 4px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4a5a48">Quote r{q['rev']} · {t['id']}</p>
+<h2 style="margin:0 0 16px;font-family:Fraunces,Georgia,'Times New Roman',serif;font-weight:600;font-size:24px;letter-spacing:-.02em;color:#2a3528">{html.escape(t['title'])}</h2>
 <p>Hi {first},</p>
 <p>Here is the design for your request <b>{html.escape(t['title'])}</b> ({t['id']}), revision {q['rev']}.
 The attached <b>3D viewer</b> opens in any browser: orbit it, section it, and check every measurement against the spot it goes in.</p>
 {note}{img}
-<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#5E6771;margin:22px 0 6px">Measurements</h3>
-<table style="border-collapse:collapse;font-size:13px"><tr style="color:#5E6771;text-align:left"><th style="padding:4px 10px 4px 0;font-weight:500">part</th>
+<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#4a5a48;margin:22px 0 6px">Measurements</h3>
+<table style="border-collapse:collapse;font-size:13px"><tr style="color:#4a5a48;text-align:left"><th style="padding:4px 10px 4px 0;font-weight:500">part</th>
 <th style="padding:4px 10px;font-weight:500">X × Y × Z mm</th><th style="padding:4px 10px;font-weight:500;text-align:right">cm³</th>
 <th style="padding:4px 10px;font-weight:500;text-align:right">≈ g</th><th style="padding:4px 10px;font-weight:500;text-align:right">thinnest wall</th></tr>{parts_rows}</table>
-{"<p style='margin:12px 0 4px;color:#5E6771;font-size:12px'>Key dimensions and choices (mm unless said otherwise):</p><table style='border-collapse:collapse'>" + param_rows + "</table>" if param_rows else ""}
-<p style="color:#5E6771;font-size:12px">The full list is in <b>measurements.md</b>, attached.</p>
-<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#5E6771;margin:22px 0 6px">Estimate</h3>
+{"<p style='margin:12px 0 4px;color:#4a5a48;font-size:12px'>Key dimensions and choices (mm unless said otherwise):</p><table style='border-collapse:collapse'>" + param_rows + "</table>" if param_rows else ""}
+<p style="color:#4a5a48;font-size:12px">The full list is in <b>measurements.md</b>, attached.</p>
+<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#4a5a48;margin:22px 0 6px">Estimate</h3>
 <table style="border-collapse:collapse;font-size:13px">
 {row('Material', f"{html.escape(e['material'])}, about {e['mass_g']:g} g")}
-{row('Print time', f"about {_hours(e['print_h'])} <span style='color:#5E6771'>+ {_hours(e['post_h'])} finishing</span>")}
+{row('Print time', f"about {_hours(e['print_h'])} <span style='color:#4a5a48'>+ {_hours(e['post_h'])} finishing</span>")}
 {row('Quantity', e['qty'])}
 {row('Price', f"<b>{price}</b>")}
 {row('Ready in', f"about {e['lead_days']} day{'s' if e['lead_days'] != 1 else ''} from your confirmation")}
 </table>
-<p style="color:#5E6771;font-size:12px">Time and price are estimates from the model's geometry; the sliced print may differ a little either way.</p>
-<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#5E6771;margin:22px 0 6px">What next</h3>
-<div style="border:1px solid #D9DDD8;border-left:3px solid #E8791D;border-radius:0 6px 6px 0;padding:10px 14px">
-<p style="margin:0 0 6px">Reply to this e-mail (keep the subject line) with:</p>
-<p style="margin:0 0 4px"><b>CONFIRM</b> — to have it printed as shown, or</p>
+<p style="color:#4a5a48;font-size:12px">Time and price are estimates from the model's geometry; the sliced print may differ a little either way.</p>
+<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#4a5a48;margin:22px 0 6px">What next</h3>
+<div style="border:1px solid #e8e4d5;border-left:3px solid #5a7a3a;background:#f3f0e6;border-radius:0 6px 6px 0;padding:10px 14px">
+<p style="margin:0 0 6px">{"Reply on the request in the portal (or to Jira's e-mail about it) with:" if t.get("jira") else "Reply to this e-mail (keep the subject line) with:"}</p>
+<p style="margin:0 0 4px"><b style="font-family:'JetBrains Mono',Menlo,monospace;color:#46612c">CONFIRM</b> — to have it printed as shown, or</p>
 <p style="margin:0"><b>your notes</b> — anything to change: a size, a feature, the material, the count. A revised design and estimate come back the same way, until you are happy.</p>
 </div>
 <p style="margin-top:20px">Thanks,<br>{html.escape(sender or _sender_name())}</p>
@@ -528,7 +531,14 @@ def jira_transition(t: dict, status: str, comment: str = "", client=None, cfg: d
     try:
         client, cfg = (client, cfg) if client else jira_client(cfg)
         wanted = (cfg.get("transitions") or {}).get(status) or jira_api.DEFAULT_TRANSITIONS.get(status) or []
-        pick = client.transition(t["jira"]["key"], wanted, comment=comment) if wanted else None
+        if comment:
+            # posted on its own so its id is known: when the requester is also the API account (a self-test,
+            # or you filing for yourself), ingest can only tell this comment from a reply by that id
+            res = client.add_comment(t["jira"]["key"], comment, jsm=bool(t["jira"].get("jsm", True)))
+            cid = str(res.get("id") or "")
+            add_message(t, frm="me", kind="comment", subject=f"comment on {t['jira']['key']}", text=comment,
+                        mail_id=f"jira-comment-{cid}" if cid else "")
+        pick = client.transition(t["jira"]["key"], wanted) if wanted else None
     except (SystemExit, jira_api.JiraError) as e:
         return f"Jira transition skipped: {e}"
     if pick:

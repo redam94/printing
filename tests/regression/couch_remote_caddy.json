@@ -1,0 +1,35 @@
+{
+  "project": "couch_remote_caddy",
+  "generated": "2026-09-17",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "caddy": {
+      "bbox_min": [
+        -75.2,
+        -70.1,
+        -0.0
+      ],
+      "bbox_max": [
+        99.6,
+        70.1,
+        74.4
+      ],
+      "bbox_size": [
+        174.8,
+        140.2,
+        74.4
+      ],
+      "volume": 207321.75,
+      "surface_area": 106939.807,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "a0f017f2489ad7c8",
+      "triangles": 5552,
+      "kind": "brep"
+    }
+  }
+}
