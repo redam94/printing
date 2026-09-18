@@ -36,7 +36,7 @@ Hold the measurement sheet next to the real object and check, in this order:
 
 ## The estimate
 
-The price and time come from the design's geometry: the weight of plastic, the hours on the printer, the handling, and the {price.design_fee} design fee. Rates are on *Prices and turnaround*.
+The price is two numbers. The **print price** comes from the design's geometry: the weight of plastic, the hours on the printer and the handling. The **design fee** is flat and says how much was new: nothing for an existing design or your own file, {price.design_adapt} when an existing design or the library parts were fitted to your object, {price.design_fee} when it was drawn from scratch. Rates and worked examples are on *Prices and turnaround*; what the library is and why it makes design cheap is on *Designed from proven parts*.
 
 ::: warn Estimates versus the slicer
 Print time and weight are calculated from the model. When the part is prepared for the printer the real numbers can differ a little. If they differ by more than a little, you are told before it is printed — the price on your quote does not go up afterwards.

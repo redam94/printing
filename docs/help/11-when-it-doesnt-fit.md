@@ -22,7 +22,7 @@ Include:
 | The print failed, or the part came out flawed | Free reprint |
 | The part does not match the design or the quote | Free reprint |
 | The design was built on a measurement that turned out wrong | Materials and print time only, no new design fee |
-| You want it different from what you confirmed | Quoted as a change: usually print time, sometimes a small design fee |
+| You want it different from what you confirmed | Quoted as a change: the print price, plus the {price.design_adapt} fitting fee if the design has to change |
 
 ## Making the second one right
 

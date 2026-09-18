@@ -22,3 +22,7 @@ def test_build(tmp_path):
     everything = "".join(p.read_text(encoding="utf-8", errors="ignore") for p in out.rglob("*.html") if p.name != "viewer.html")
     assert "tickets/" not in everything and "PRINT-1 " not in everything
     assert "CONFIRM" in (out / "request.html").read_text(encoding="utf-8")
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert 'id="library"' in index and d["library"]["count"] > 0      # the parts library is on the page
+    for x in d["designs"]:                                             # a piece on the page is priced as a print, no design fee
+        assert x["estimate"]["design_fee"] == 0 and x["estimate"]["total"] == x["estimate"]["print_price"]

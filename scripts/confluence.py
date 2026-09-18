@@ -75,8 +75,11 @@ def values() -> dict[str, str]:
         "printer.nozzle": f"{PRINTER['nozzle']:g} mm",
         "printer.layer": "0.2 mm",
         "printer.toolheads": str(PRINTER["toolheads"]),
-        "price.design_fee": m(pricing["design_fee"], cents=False),
+        "price.design_fee": m(pricing["design"]["new"]["fee"], cents=False),
+        "price.design_adapt": m(pricing["design"]["adapt"]["fee"], cents=False),
+        "price.design_none": m(pricing["design"]["none"]["fee"], cents=False),
         "price.min_charge": m(pricing["min_charge"], cents=False),
+        "repo": "https://github.com/redam94/printing",
         "price.machine_per_h": m(pricing["machine_per_h"]),
         "price.labor_per_h": m(pricing["labor_per_h"], cents=False),
         "price.setup_min": str(pricing["setup_min"]),
@@ -89,7 +92,37 @@ def values() -> dict[str, str]:
     }
     for name, mat in pricing["materials"].items():
         v[f"price.{name.lower()}_kg"] = m(mat["cost_per_kg"], cents=False)
+    v |= library_values()
+    v["price.examples_table"] = examples_table(m)
     return v
+
+
+def library_values() -> dict[str, str]:
+    """The component library by the numbers, from parts.json, as the public site describes it."""
+    from scripts.site import LIB_CATEGORIES, library
+    lib = library([])
+    rows = ["| Group | Components | What is in it |", "|---|---|---|"]
+    rows += [f"| {c['name']} | {c['count']} | {LIB_CATEGORIES[c['key']][1]} |" for c in lib["categories"]]
+    return {"lib.count": str(lib["count"]), "lib.categories_table": "\n".join(rows)}
+
+
+def examples_table(m) -> str:
+    """Worked examples priced from the published designs (the same ones the site shows); a one-line
+    note when no model has been built where this runs."""
+    try:
+        from scripts.site import collect, price_examples
+        examples = price_examples(collect())
+    except Exception:  # noqa: BLE001 - exports are gitignored; the site may not be buildable here
+        examples = []
+    if not examples:
+        return "*Worked examples are on [the pricing section of the site](https://redam94.github.io/printing/#pricing).*"
+    rows = ["| Example | What it is | Print | Design | Price | Ready in |", "|---|---|---|---|---|---|"]
+    for x in examples:
+        e, d = x["estimate"], x["design"]
+        what = f"{d['title']}" + (f" × {x['qty']}" if x["qty"] > 1 else "") + f", {e['mass_g']:.0f} g PLA, about {e['print_h']:.0f} h"
+        per = f" ({m(e['per_unit'])} each)" if x["qty"] > 1 else ""
+        rows.append(f"| **{x['label']}** | {what} | {m(e['print_price'])}{per} | {m(e['design_fee'])} | **{m(e['total'])}** | about {e['lead_days']} days |")
+    return "\n".join(rows)
 
 
 def fill(text: str, vals: dict[str, str]) -> str:

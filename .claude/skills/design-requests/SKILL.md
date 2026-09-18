@@ -133,7 +133,7 @@ of the mail) and, if a number really is unknown, ask for it in the same mail ins
 ## 3. Quote and send — status `designing` → `quoted`
 
 ```
-uv run python scripts/tickets.py quote REQ-0001 --model shelf_bracket_40 [--material PETG] [--qty 4] --note "..."
+uv run python scripts/tickets.py quote REQ-0001 --model shelf_bracket_40 [--material PETG] [--qty 4] [--design new|adapt|none] --note "..."
 uv run python scripts/tickets.py send REQ-0001 [--dry-run]
 ```
 
@@ -145,8 +145,11 @@ default to what the request said. **Read `email.txt` before sending** — it is 
 will see; if the estimate looks wrong, fix `tickets/pricing.json` or the model, not the mail.
 
 The estimate is honest about what it is: mass from the geometry (shell + sparse infill), time from
-a typical deposition rate, price from `pricing.json` with a minimum charge and a margin, lead
-time as queue days plus print hours over a working day. The slicer's numbers win once the part is
+a typical deposition rate, a PRINT price from `pricing.json` (with a minimum charge and a margin,
+multiplied by quantity) plus a flat DESIGN fee chosen with `--design`: `new` (default, drawn from
+scratch), `adapt` (an existing model or library components fitted to the requester's object: most
+tickets), `none` (an existing design as is, a reprint, or the requester's own file). Lead time is
+queue days plus print hours over a working day. The slicer's numbers win once the part is
 sliced; say so if they differ by more than a little.
 
 In Jira mode `send` posts `email.txt` as a **public comment** on the request with the viewer,

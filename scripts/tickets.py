@@ -6,7 +6,7 @@
     uv run python scripts/tickets.py new --name "Ana" --email ana@x.org --title "Drip tray" [--field key=value ...]
     uv run python scripts/tickets.py fetch                 # IMAP: new requests and replies -> .sync/tickets/mail.json
     uv run python scripts/tickets.py ingest [.sync]        # file mail.json (+ the board page's `requests` dump) into tickets/
-    uv run python scripts/tickets.py quote REQ-0001 --model <project> [--material PLA] [--qty 1] [--note "..."]
+    uv run python scripts/tickets.py quote REQ-0001 --model <project> [--material PLA] [--qty 1] [--design new|adapt|none] [--note "..."]
     uv run python scripts/tickets.py send REQ-0001 [--dry-run]   # e-mail the latest quote (SMTP), or print the outbox
     uv run python scripts/tickets.py set REQ-0001 approved|printing|done|declined [--note "..."]
     uv run python scripts/tickets.py --html                # exports/requests.html (public form) + exports/tickets.html (board)
@@ -237,18 +237,36 @@ def _round(x: float, step: float) -> float:
     return round(math.ceil(x / step) * step, 2) if step else round(x, 2)
 
 
-def estimate(report: dict, material: str = "PLA", qty: int = 1, pricing: dict | None = None) -> dict:
+DESIGN_KINDS = ("none", "adapt", "new")
+
+
+def design_fee(pricing: dict, design: str = "new") -> float:
+    """The flat design fee for how much of the design is new (see pricing.json 'design')."""
+    tiers = pricing.get("design") or {}
+    if design not in tiers:
+        raise ValueError(f"design must be one of {', '.join(tiers) or DESIGN_KINDS}, not {design!r}")
+    return float(tiers[design]["fee"])
+
+
+def estimate(report: dict, material: str = "PLA", qty: int = 1, pricing: dict | None = None, design: str = "new") -> dict:
     """Cost and time for printing every part of one build report, `qty` times.
 
     Mass is the honest part: solid volume is known exactly, and a print is a shell plus sparse infill,
     so printed volume ~ shell (surface area x shell thickness, capped at the solid) + infill fraction of
     the rest.  Time is mass over a typical deposition rate plus setup and per-part finishing.  Both are
     labelled estimates on the quote; the slicer's numbers replace them the day the part is sliced.
+
+    The price is two things: the PRINT price (filament, printer time and handling, with the margin,
+    never below the minimum charge) and a flat DESIGN fee for how much of the design is new
+    (`design`: "none" for an existing design or the customer's own file, "adapt" when an existing
+    design or library parts are fitted to their object, "new" from scratch). Quantity multiplies the
+    print price; the design fee is paid once.
     """
     pr = pricing or load_pricing()
     material = (material or "PLA").upper()
     mat = pr["materials"].get(material) or pr["materials"]["PLA"]
     qty = max(1, int(qty or 1))
+    fee = design_fee(pr, design)
     parts = []
     for name, p in (report.get("parts") or {}).items():
         m = p.get("metrics") or {}
@@ -269,17 +287,18 @@ def estimate(report: dict, material: str = "PLA", qty: int = 1, pricing: dict | 
     material_cost = mass_g / 1000.0 * mat["cost_per_kg"]
     machine_cost = print_h * pr["machine_per_h"]
     labor_cost = (post_h + pr["setup_min"] / 60.0) * pr["labor_per_h"]
-    subtotal = material_cost + machine_cost + labor_cost + pr["design_fee"]
-    total = max(pr["min_charge"], subtotal * (1 + pr["margin"]))
-    total = _round(total, pr.get("round_to", 0.5))
+    subtotal = material_cost + machine_cost + labor_cost
+    print_price = _round(max(pr["min_charge"], subtotal * (1 + pr["margin"])), pr.get("round_to", 0.5))
+    total = round(print_price + fee, 2)
     lead_days = pr["queue_days"] + math.ceil((print_h + post_h) / pr["hours_per_day"])
     return {"material": material, "qty": qty, "currency": pr.get("currency", "USD"), "parts": parts,
             "mass_g": round(mass_g, 1), "print_h": round(print_h, 1), "post_h": round(post_h, 1), "lead_days": lead_days,
             "material_cost": round(material_cost, 2), "machine_cost": round(machine_cost, 2), "labor_cost": round(labor_cost, 2),
-            "design_fee": round(pr["design_fee"], 2), "subtotal": round(subtotal, 2), "margin": pr["margin"],
-            "total": total, "per_unit": round(total / qty, 2),
+            "subtotal": round(subtotal, 2), "margin": pr["margin"], "print_price": print_price,
+            "design": design, "design_fee": round(fee, 2),
+            "total": total, "per_unit": round(print_price / qty, 2),
             "rates": {k: pr[k] for k in ("shell_mm", "infill", "flow_g_per_h", "setup_min", "post_min_per_part",
-                                         "machine_per_h", "labor_per_h", "design_fee", "min_charge", "margin", "queue_days")}
+                                         "machine_per_h", "labor_per_h", "design", "min_charge", "margin", "queue_days")}
             | {"material": mat}}
 
 
@@ -321,7 +340,7 @@ def quote_dir(t: dict, rev: int) -> Path:
     return TICKETS_DIR / t["id"] / "quotes" / f"r{rev}"
 
 
-def make_quote(t: dict, project: str, *, material: str = "", qty: int = 0, note: str = "", sender: str = "") -> dict:
+def make_quote(t: dict, project: str, *, material: str = "", qty: int = 0, note: str = "", sender: str = "", design: str = "new") -> dict:
     """Package quote revision N for a ticket from a built model: estimate, measurements, e-mail, attachments."""
     if project not in set(list_projects()):
         raise SystemExit(f"no model {project} under models/")
@@ -332,7 +351,7 @@ def make_quote(t: dict, project: str, *, material: str = "", qty: int = 0, note:
     fields = t["request"].get("fields") or {}
     material = material or _material_in(fields.get("material", "")) or "PLA"
     qty = qty or _int_in(fields.get("quantity", "")) or 1
-    est = estimate(report, material, qty)
+    est = estimate(report, material, qty, design=design)
     rev = len(t["quotes"]) + 1
     qd = quote_dir(t, rev)
     qd.mkdir(parents=True, exist_ok=True)
@@ -344,7 +363,7 @@ def make_quote(t: dict, project: str, *, material: str = "", qty: int = 0, note:
         shutil.copy(png, qd / png.name); attachments.append(png.name)
     (qd / "measurements.md").write_text(measurements_md(report, est), encoding="utf-8"); attachments.append("measurements.md")
     q = {"rev": rev, "created": now_iso(), "sent": "", "model": project, "build_id": report.get("build_id", ""),
-         "material": material, "qty": qty, "estimate": est, "note": note, "attachments": attachments,
+         "material": material, "qty": qty, "design": design, "estimate": est, "note": note, "attachments": attachments,
          "subject": f"[{t['id']}] Quote r{rev}: {t['title']}", "message_id": ""}
     q["email_html"] = quote_email_html(t, q, report, sender=sender)
     q["email_text"] = quote_email_text(t, q, report)
@@ -374,6 +393,11 @@ def _money(x: float, cur: str) -> str:
     return f"{sym}{x:,.2f}"
 
 
+def _design_label(e: dict) -> str:
+    tiers = (e.get("rates") or {}).get("design") or {}
+    return str((tiers.get(e.get("design", "new")) or {}).get("label") or e.get("design", "")).lower()
+
+
 def _hours(h: float) -> str:
     return f"{h:g} h" if h < 1 or h == int(h) else f"{int(h)} h {int(round((h % 1) * 60)):02d} min"
 
@@ -399,7 +423,9 @@ def quote_email_text(t: dict, q: dict, report: dict) -> str:
               f"  Material      {e['material']}, about {e['mass_g']:g} g",
               f"  Print time    about {_hours(e['print_h'])} (+ {_hours(e['post_h'])} finishing)",
               f"  Quantity      {e['qty']}",
-              f"  Price         {_money(e['total'], e['currency'])} total" + (f" ({_money(e['per_unit'], e['currency'])} each)" if e['qty'] > 1 else ""),
+              f"  Print         {_money(e['print_price'], e['currency'])}" + (f" ({_money(e['per_unit'], e['currency'])} each)" if e['qty'] > 1 else ""),
+              f"  Design        {_money(e['design_fee'], e['currency'])}  ({_design_label(e)})",
+              f"  Price         {_money(e['total'], e['currency'])} total",
               f"  Ready in      about {e['lead_days']} day(s) from your confirmation", "",
               "  Time and price are estimates from the model's geometry; the sliced print may differ a little either way.", "",
               "WHAT NEXT", "",
@@ -438,7 +464,8 @@ def quote_email_html(t: dict, q: dict, report: dict, sender: str = "") -> str:
     renders = [a for a in q.get("attachments", []) if a.endswith(".png")]
     img = f"<p><img src='cid:{html.escape(renders[0])}' alt='render' style='max-width:520px;border:1px solid #e8e4d5;border-radius:6px'></p>" if renders else ""
     note = f"<p>{html.escape(q['note']).replace(chr(10), '<br>')}</p>" if q.get("note") else ""
-    price = _money(e["total"], cur) + (f" <span style='color:#4a5a48'>({_money(e['per_unit'], cur)} each)</span>" if e["qty"] > 1 else "")
+    print_price = _money(e["print_price"], cur) + (f" <span style='color:#4a5a48'>({_money(e['per_unit'], cur)} each)</span>" if e["qty"] > 1 else "")
+    design_row = f"{_money(e['design_fee'], cur)} <span style='color:#4a5a48'>({html.escape(_design_label(e))})</span>"
     return f"""<div style="background:#faf8f3;padding:24px 28px;border:1px solid #e8e4d5;border-radius:10px;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#2a3528;max-width:640px">
 <p style="margin:0 0 4px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4a5a48">Quote r{q['rev']} · {t['id']}</p>
 <h2 style="margin:0 0 16px;font-family:Fraunces,Georgia,'Times New Roman',serif;font-weight:600;font-size:24px;letter-spacing:-.02em;color:#2a3528">{html.escape(t['title'])}</h2>
@@ -457,7 +484,9 @@ The attached <b>3D viewer</b> opens in any browser: orbit it, section it, and ch
 {row('Material', f"{html.escape(e['material'])}, about {e['mass_g']:g} g")}
 {row('Print time', f"about {_hours(e['print_h'])} <span style='color:#4a5a48'>+ {_hours(e['post_h'])} finishing</span>")}
 {row('Quantity', e['qty'])}
-{row('Price', f"<b>{price}</b>")}
+{row('Print', print_price)}
+{row('Design', design_row)}
+{row('Price', f"<b>{_money(e['total'], cur)}</b>")}
 {row('Ready in', f"about {e['lead_days']} day{'s' if e['lead_days'] != 1 else ''} from your confirmation")}
 </table>
 <p style="color:#4a5a48;font-size:12px">Time and price are estimates from the model's geometry; the sliced print may differ a little either way.</p>
@@ -1012,6 +1041,7 @@ def main() -> int:
     i = sub.add_parser("ingest"); i.add_argument("sync_dir", nargs="?", type=Path, default=SYNC_DIR); i.add_argument("--dry-run", action="store_true")
     q = sub.add_parser("quote"); q.add_argument("ticket"); q.add_argument("--model", required=True); q.add_argument("--material", default="")
     q.add_argument("--qty", type=int, default=0); q.add_argument("--note", default="", help="a paragraph to the requester at the top of the mail")
+    q.add_argument("--design", default="new", choices=DESIGN_KINDS, help="how much design is new: new (from scratch), adapt (an existing design or library parts fitted), none (existing design / their own file)")
     s = sub.add_parser("send"); s.add_argument("ticket"); s.add_argument("--dry-run", action="store_true")
     s.add_argument("--sent", default="", help="record an id from a send done elsewhere (Gmail connector) instead of sending")
     s.add_argument("--thread", default="")
@@ -1060,12 +1090,12 @@ def main() -> int:
         return 0
     if a.cmd == "quote":
         t = load_ticket(a.ticket)
-        q_ = make_quote(t, a.model, material=a.material, qty=a.qty, note=a.note)
+        q_ = make_quote(t, a.model, material=a.material, qty=a.qty, note=a.note, design=a.design)
         set_status(t, "designing" if t["status"] in ("new",) else t["status"], by="me", note=f"quote r{q_['rev']} packaged from {a.model}")
         save_ticket(t)
         e = q_["estimate"]
         print(f"{t['id']} quote r{q_['rev']} from {a.model}: {e['material']} x{e['qty']}, ~{e['mass_g']:g} g, ~{e['print_h']:g} h, "
-              f"{e['currency']} {e['total']:g}, ~{e['lead_days']} day(s)\n  package: {quote_dir(t, q_['rev']).relative_to(ROOT)}/  "
+              f"{e['currency']} {e['total']:g} (print {e['print_price']:g} + design {e['design_fee']:g}), ~{e['lead_days']} day(s)\n  package: {quote_dir(t, q_['rev']).relative_to(ROOT)}/  "
               f"({', '.join(q_['attachments'])})\n  send:    uv run python scripts/tickets.py send {t['id']}")
         return 0
     if a.cmd == "send":

@@ -4,7 +4,16 @@
   "tagline": "Custom 3D-printed parts, designed around the thing you already have.",
   "hero_model": "vape_pen_holder",
   "hidden": [],
-  "order": ["vape_pen_holder", "cloud_pi_holder", "ribbed_vase", "pi5_fan_case", "esp32_devkit_case", "drain_system", "l_bracket_40", "bistable_coupon"],
+  "order": [
+    "vape_pen_holder",
+    "cloud_pi_holder",
+    "ribbed_vase",
+    "pi5_fan_case",
+    "esp32_devkit_case",
+    "drain_system",
+    "l_bracket_40",
+    "bistable_coupon"
+  ],
   "models": {
     "vape_pen_holder": {
       "title": "Caterpillar pen stand",
@@ -56,12 +65,41 @@
     }
   },
   "faq": [
-    ["What can you make?", "Holders, mounts, brackets, enclosures for electronics, replacement parts, organizers and decorative pieces. If it fits in a 270 mm cube, or can be split into pieces that join, it can usually be printed."],
-    ["Do I need a 3D file?", "No. Most requests are a description, a few measurements and a photo. If you already have an STL, 3MF or STEP file, choose “Print my file” on the portal."],
-    ["What does it cost?", "Every quote is worked out from the design: filament, printer time, handling and a design fee. The examples on this page show typical prices; you always see the price before anything is printed."],
-    ["How long does it take?", "Most parts are ready a few days after you confirm the quote. The quote gives the estimate for your part."],
-    ["What if it doesn't fit?", "Check the 3D model and the measurements before you confirm, and ask for as many changes as you need. If a printed part still isn't right, raise a “Reprint or fix an earlier part” request."],
-    ["Which material should I choose?", "PLA for most indoor parts, PETG for anything warm, wet or that needs to flex a little, TPU for rubbery parts, ASA for outdoors. Pick “Not sure” and one will be recommended."],
-    ["Do I need an account?", "The request portal asks for your e-mail so it can send you the quote and updates. No Jira licence or payment details are needed to ask."]
+    [
+      "What can you make?",
+      "Holders, mounts, brackets, enclosures for electronics, replacement parts, organizers and decorative pieces. If it fits in a 270 mm cube, or can be split into pieces that join, it can usually be printed."
+    ],
+    [
+      "Do I need a 3D file?",
+      "No. Most requests are a description, a few measurements and a photo. If you already have an STL, 3MF or STEP file, choose “Print my file” on the portal."
+    ],
+    [
+      "What does it cost?",
+      "Two numbers. The print price is worked out from the part: filament, printer time and handling, from $10. The design fee is flat: nothing for a design that already exists or a file you send, a small fee to fit an existing design or the proven library parts to your object, and the full fee only when something is drawn from scratch. The worked examples on this page are priced exactly as a request would be."
+    ],
+    [
+      "Can I have one of the designs on this page?",
+      "Yes. Printed as designed it costs the print price shown on its page, with no design fee. Ask for it sized to your own board, pen or gap and it is adjusted for the small design fee; you see the revised model before anything is printed."
+    ],
+    [
+      "Why is design so cheap?",
+      "Because most of it already exists. Every design is assembled from a library of parametric components that have been printed and measured before: insert pockets, board hole patterns, vents, lids, snap fits. Fitting those around your measurements is quick, so the fee reflects the new work, not the whole drawing."
+    ],
+    [
+      "How long does it take?",
+      "Most parts are ready a few days after you confirm the quote. The quote gives the estimate for your part."
+    ],
+    [
+      "What if it doesn't fit?",
+      "Check the 3D model and the measurements before you confirm, and ask for as many changes as you need. If a printed part still isn't right, raise a “Reprint or fix an earlier part” request."
+    ],
+    [
+      "Which material should I choose?",
+      "PLA for most indoor parts, PETG for anything warm, wet or that needs to flex a little, TPU for rubbery parts, ASA for outdoors. Pick “Not sure” and one will be recommended."
+    ],
+    [
+      "Do I need an account?",
+      "The request portal asks for your e-mail so it can send you the quote and updates. No Jira licence or payment details are needed to ask."
+    ]
   ]
 }

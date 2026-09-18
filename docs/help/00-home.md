@@ -18,6 +18,7 @@ Custom 3D-printed parts, designed around the thing you already have. Describe wh
 - **Got a quote?** *Reading your quote* explains the 3D viewer and the numbers; *Confirming, changing or cancelling* tells you what to reply.
 - **Already have a file?** *Sending your own file to print*.
 - **Something not right?** *When a part doesn't fit: reprints and fixes*.
+- **Wondering about the price?** *Prices and turnaround* has the two numbers and worked examples; *Designed from proven parts* explains why design is the small one.
 
 ## Every article
 

@@ -1,26 +1,40 @@
 ---
 title: Prices and turnaround
 order: 8
-summary: Exactly how a price is built, what it includes, and how long things take.
+summary: The two numbers on every quote (the print price and the design fee), worked examples, what is included, and how long things take.
 ---
 
-Every quote shows its working, and the price you confirm is the price you pay.
+Every quote shows its working, and the price you confirm is the price you pay. A price is two numbers: the **print price**, worked out from the part itself, and a flat **design fee** that depends on how much design is new.
 
-## How a price is built
+## The print price
 
 | Part of the price | How it is worked out |
 |---|---|
-| Filament | The weight of the part, calculated from the design: {price.shell} walls plus {price.infill} infill, at the material's price per kilo |
-| Printer time | {price.machine_per_h} an hour of printing, plus {price.setup_min} minutes of setup |
-| Handling | Cleaning up and checking, about {price.post_min} minutes a part, at {price.labor_per_h} an hour |
-| Design | {price.design_fee} per request — the modelling, and every revision you ask for |
-| Minimum | {price.min_charge} per order |
+| Filament | The weight of the part, calculated from the design: {price.shell} walls plus {price.infill} infill, at the material's price per kilo ({price.pla_kg} PLA, {price.petg_kg} PETG, {price.tpu_kg} TPU, {price.asa_kg} ASA) |
+| Printer time | {price.machine_per_h} an hour on the printer, from setup to the last layer |
+| Handling | Setup, cleanup and checking against the measurements, at {price.labor_per_h} an hour: {price.setup_min} minutes a job plus about {price.post_min} minutes a part |
 
-Totals include a {price.margin} margin and are rounded to the nearest 50 cents. Quantities are priced per part: ten of something costs ten times the filament and printing, but the design fee is paid once.
+Those three, plus a {price.margin} margin, rounded up to the nearest 50 cents, and never less than **{price.min_charge}**. Quantity multiplies the print price only: five of something costs five times the filament and printing, but the design is paid once.
 
-## What that works out to
+## The design fee
 
-Most small holders, clips and brackets land between {price.min_charge} and $40. A full enclosure or a large decorative piece is usually $30–$80. [The work page on the site]({site}) lists real designs with their real prices, so you can find something similar in size to yours.
+Every design is built from a library of parts that have already been printed and measured (see *Designed from proven parts*), so most requests are a matter of fitting, not inventing. The fee reflects how much is new:
+
+| Case | Fee | When it applies |
+|---|---|---|
+| Existing design, or your own file | {price.design_none} | A piece from [the work page]({site}) printed as it is, a reprint, or an STL you send us |
+| Fitted to your object | {price.design_adapt} | An existing design or the library parts, resized and rearranged around your measurements. Most requests land here |
+| Designed from scratch | {price.design_fee} | Nothing on file fits, so it is drawn from your description. One flat fee, however many revisions it takes |
+
+The quote names which case it is. If you think a request was put in the wrong one, say so on the request.
+
+## Worked examples
+
+Priced from real designs, exactly as a request would be today:
+
+{price.examples_table}
+
+[The work page on the site]({site}) lists every published design with its print price, so you can find something similar in size to yours.
 
 ## What is included
 

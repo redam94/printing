@@ -35,6 +35,14 @@ def test_estimate_scales_with_quantity_and_material():
     assert four["mass_g"] == pytest.approx(one["mass_g"] * 4, abs=0.2) and four["total"] > one["total"]
     assert four["per_unit"] < one["total"] and petg["mass_g"] > one["mass_g"]
     assert one["total"] >= PRICING["min_charge"] and one["lead_days"] >= PRICING["queue_days"] + 1
+    # the price is a print price (per copy, never below the minimum) plus a flat design fee paid once
+    asis, adapt = T.estimate(REPORT, "PLA", 1, PRICING, design="none"), T.estimate(REPORT, "PLA", 1, PRICING, design="adapt")
+    assert asis["design_fee"] == 0 and asis["total"] == asis["print_price"] == one["print_price"]
+    assert one["design_fee"] == PRICING["design"]["new"]["fee"] and one["total"] == one["print_price"] + one["design_fee"]
+    assert asis["total"] < adapt["total"] < one["total"] and four["design_fee"] == one["design_fee"]
+    assert four["per_unit"] == pytest.approx(four["print_price"] / 4, abs=0.01)
+    with pytest.raises(ValueError):
+        T.estimate(REPORT, "PLA", 1, PRICING, design="magic")
     assert one["rates"]["material"]["cost_per_kg"] == PRICING["materials"]["PLA"]["cost_per_kg"]
     md = T.measurements_md(REPORT, one)
     assert "| bracket | 40 x 40 x 20 |" in md and "| ARM_LEN | 40.0 | mm |" in md

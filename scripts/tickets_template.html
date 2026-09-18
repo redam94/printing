@@ -302,7 +302,7 @@ function renderSheet(){
   if (!t) {
     sheet.innerHTML = '<div class="head"><div class="ttl">Tickets</div><div class="who">Pick a card. Each column names what the ticket needs next; the repo is the record (<span class="mono">tickets/&lt;id&gt;/ticket.json</span>), this page is the view of it as of ' + esc(D.generated) + '.</div></div>' +
       '<div class="kv">' + D.statuses.map(s => '<span class="k"><span class="chip ' + s + '">' + s + '</span></span><span class="v">' + esc(D.next[s] || 'closed') + '</span>').join('') + '</div>' +
-      '<div class="muted" style="font-size:12px">Rates: ' + esc(D.pricing.currency) + ' ' + Object.entries(D.pricing.materials).map(([k, v]) => k + ' ' + v.cost_per_kg + '/kg').join(', ') + '; machine ' + D.pricing.machine_per_h + '/h, labour ' + D.pricing.labor_per_h + '/h, design fee ' + D.pricing.design_fee + ', margin ' + Math.round(D.pricing.margin * 100) + '%, queue ' + D.pricing.queue_days + ' d — <span class="mono">tickets/pricing.json</span></div>';
+      '<div class="muted" style="font-size:12px">Rates: ' + esc(D.pricing.currency) + ' ' + Object.entries(D.pricing.materials).map(([k, v]) => k + ' ' + v.cost_per_kg + '/kg').join(', ') + '; machine ' + D.pricing.machine_per_h + '/h, labour ' + D.pricing.labor_per_h + '/h, design ' + Object.entries(D.pricing.design || {}).map(([k, v]) => k + ' ' + v.fee).join(' / ') + ', min ' + D.pricing.min_charge + ', margin ' + Math.round(D.pricing.margin * 100) + '%, queue ' + D.pricing.queue_days + ' d — <span class="mono">tickets/pricing.json</span></div>';
     return;
   }
   const f = t.fields || {};

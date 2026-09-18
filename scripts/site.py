@@ -39,7 +39,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts._common import MODELS_DIR, PRINTER, ROOT, list_projects  # noqa: E402
-from scripts.tickets import TICKETS_DIR, estimate, load_pricing  # noqa: E402
+from scripts.tickets import TICKETS_DIR, design_fee, estimate, load_pricing  # noqa: E402
 
 OUT = ROOT / "_site"
 REPO_URL = "https://github.com/redam94/printing"
@@ -64,6 +64,25 @@ def title_of(project: str) -> str:
     words = [ACRONYMS.get(w, w) for w in project.split("_")]
     s = " ".join(words)
     return s[:1].upper() + s[1:]
+
+
+LIB_CATEGORIES = {   # category -> (plain name, what a visitor would call the things in it)
+    "fasteners": ("Fasteners", "Pockets for brass heat-set inserts, screw bosses, captive nuts and clearance holes."),
+    "patterns": ("Hole patterns", "Raspberry Pi, ESP32, fan, VESA and DIN-rail footprints, with the connector windows to match."),
+    "primitives": ("Enclosure parts", "Rounded boxes and lids, vent grids, cable grommets, feet, edge clips and slot racks."),
+    "mechanisms": ("Mechanisms", "Snap fits, latches, living hinges and flexures that come off the printer ready to move."),
+    "form": ("Shapes and textures", "Fluting, twists, surface textures and organic outlines for decorative pieces."),
+}
+LIB_NAMES = {"heat_set_boss": "Heat-set insert boss", "heat_set_pocket": "Heat-set insert pocket", "pi5_mount": "Raspberry Pi 5 mount",
+             "pi4_mount": "Raspberry Pi 4 mount", "pi_zero_mount": "Raspberry Pi Zero mount", "pi5_port_cutouts": "Pi 5 port windows",
+             "pi_board_outline": "Raspberry Pi outline", "esp32_footprint": "ESP32 board footprint", "esp32_header_rows": "ESP32 header pockets",
+             "vesa_mount": "VESA mount pattern", "din_rail_ts35_profile": "DIN rail profile", "pcb_slot_cradle": "PCB slot cradle",
+             "sdf_solid": "Sculpted solid", "l_bracket": "L bracket", "rubber_foot_recess": "Rubber-foot recess"}
+
+
+def lib_name(cid: str) -> str:
+    name = cid.split(".", 1)[-1]
+    return LIB_NAMES.get(name) or (name.replace("_", " ")[:1].upper() + name.replace("_", " ")[1:])
 
 
 def rst_inline(text: str) -> str:
@@ -152,7 +171,9 @@ def collect() -> dict:
             "summary": " ".join(summary.split()), "details": rest, "parts": parts, "prints": prints,
             "status": "printed" if "ok" in outcomes else "failed" if outcomes else "unprinted", "ok_materials": ok_materials,
             "components": report.get("components") or [], "plate": report.get("plate") or {},
-            "viewer": exports / "view.html", "files": files, "estimate": estimate(report, "PLA", 1, pricing),
+            "viewer": exports / "view.html", "files": files,
+            # a piece on this page already exists, so its price is the print price alone
+            "estimate": estimate(report, "PLA", 1, pricing, design="none"),
         })
     designs.sort(key=lambda d: (order.get(d["project"], len(order)), d["title"]))
     j = load_json(ROOT / "tickets" / "jira.json", {})
@@ -160,7 +181,33 @@ def collect() -> dict:
     portal = f"{site}/servicedesk/customer/portal/{j['service_desk_id']}" if site and j.get("service_desk_id") else ""
     return {"designs": designs, "pricing": pricing, "jira": j, "portal": portal,
             "help": f"{site}/wiki/spaces/PRINTHELP" if site else "", "cfg": cfg,
-            "brand": cfg.get("brand") or "3D Printing Service"}
+            "brand": cfg.get("brand") or "3D Printing Service", "library": library(designs)}
+
+
+def library(designs: list[dict]) -> dict:
+    """The component library as a visitor would see it: categories with counts, and each component
+    with how many of the published designs use it and which materials it has been printed in."""
+    comps = (load_json(ROOT / "parts.json", {}).get("components") or {})
+    used: dict[str, set[str]] = {}
+    printed: dict[str, set[str]] = {}
+    for d in designs:
+        for c in d["components"]:
+            used.setdefault(c["id"], set()).add(d["project"])
+            printed.setdefault(c["id"], set()).update(c.get("field_validated") or [])
+    items = []
+    for cid, c in comps.items():
+        notes = c.get("material_notes") or {}
+        mats = set(notes.get("validated") or []) | set(notes.get("field_validated") or []) | printed.get(cid, set())
+        items.append({"id": cid, "name": lib_name(cid), "category": c.get("category") or cid.split(".")[0],
+                      "summary": c.get("summary", ""), "used_in": sorted(used.get(cid, ())), "printed_in": sorted(mats),
+                      "in_use": sorted(printed.get(cid, ()))})
+    cats = []
+    for key, (name, blurb) in LIB_CATEGORIES.items():
+        n = sum(1 for x in items if x["category"] == key)
+        if n:
+            cats.append({"key": key, "name": name, "blurb": blurb, "count": n})
+    return {"count": len(items), "categories": cats, "components": items,
+            "printed": sum(1 for x in items if x["printed_in"]), "used": sum(1 for x in items if x["used_in"])}
 
 
 # ---------------------------------------------------------------- page shell
@@ -191,7 +238,7 @@ h2{font-size:clamp(28px,3.4vw,40px)}
 h3{font-size:21px;letter-spacing:-.01em}
 p{margin:0}
 .num,code{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-code{font-size:.86em;background:var(--well);padding:1px 5px;border-radius:4px}
+code{font-size:.86em;background:var(--well);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
 .eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
 .muted{color:var(--ink-2)}
 .wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:24px}
@@ -330,6 +377,36 @@ code{font-size:.86em;background:var(--well);padding:1px 5px;border-radius:4px}
 .mat b{font-family:var(--display);font-size:24px;font-weight:600}
 .mat p{color:var(--ink-2);font-size:15px}
 .mat .num{font-size:13px;color:var(--ink-2)}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
+@media (max-width:760px){.tiers{grid-template-columns:1fr}}
+.tier{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:6px;align-content:start}
+.tier .fee{font-family:var(--mono);font-size:30px;font-weight:500;letter-spacing:-.03em}
+.tier .fee small{font-size:14px;color:var(--ink-2);font-family:var(--sans);letter-spacing:0;margin-left:6px}
+.tier b{font-size:16px}
+.tier p{color:var(--ink-2);font-size:15px}
+.tier.hi{border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-soft)}
+.examples{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px}
+.ex{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:10px;align-content:start}
+.ex h3{font-family:var(--sans);font-size:16px;letter-spacing:0}
+.ex p{color:var(--ink-2);font-size:14.5px}
+.ex .sum{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:14px;border-top:1px solid var(--line);padding-top:10px;align-items:start}
+.ex .sum>span:nth-child(even){font-family:var(--mono);text-align:right;white-space:nowrap}
+.ex .sum .muted{font-size:13px}
+.ex .sum .t{font-weight:600;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+
+/* library */
+.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+@media (max-width:1000px){.cats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.cats{grid-template-columns:1fr 1fr}}
+@media (max-width:400px){.cats{grid-template-columns:1fr}}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:6px;align-content:start}
+.cat b{font-family:var(--mono);font-size:30px;font-weight:500;letter-spacing:-.03em;color:var(--sage-dark)}
+.cat h3{font-family:var(--sans);font-size:16px;letter-spacing:0}
+.cat p{color:var(--ink-2);font-size:14.5px}
+.lib-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:48px;align-items:start;margin-top:48px}
+@media (max-width:900px){.lib-grid{grid-template-columns:1fr;gap:28px}}
+.lib-grid .prose p{color:var(--ink-2)}
+.ledger td .muted{font-size:13px}
 
 /* faq */
 .faq{display:grid;gap:0;border-top:1px solid var(--line);max-width:820px}
@@ -411,8 +488,8 @@ FONTS = ("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..
 def page(title: str, body: str, data: dict, *, depth: int, current: str = "", description: str = "") -> str:
     up = "../" * depth
     links = [("work", "index.html#work", "Work", ""), ("how", "index.html#how", "How it works", "opt"),
-             ("pricing", "index.html#pricing", "Pricing", "opt"), ("prints", "prints.html", "Track record", "opt"),
-             ("order", "request.html", "How to order", "")]
+             ("pricing", "index.html#pricing", "Pricing", "opt"), ("library", "index.html#library", "Parts library", "opt"),
+             ("prints", "prints.html", "Track record", "opt"), ("order", "request.html", "How to order", "")]
     nav = "".join(f'<a class="{cls}" href="{up}{href}"{" aria-current=page" if key == current else ""}>{label}</a>'
                   for key, href, label, cls in links)
     cta = f'<a class="btn primary small" href="{esc(data["portal"])}">Request a part</a>' if data["portal"] else ""
@@ -561,7 +638,8 @@ def hero(data: dict) -> str:
     ds = data["designs"]
     pick = next((d for d in ds if d["project"] == data["cfg"].get("hero_model")), ds[0] if ds else None)
     cur = data["pricing"].get("currency", "USD")
-    lo = min((d["estimate"]["total"] for d in ds), default=data["pricing"]["min_charge"])
+    lo = min((d["estimate"]["print_price"] for d in ds), default=data["pricing"]["min_charge"])
+    fee = design_fee(data["pricing"], "new")
     portal_btn = f'<a class="btn primary" href="{esc(data["portal"])}">Request a part <span class="arr">→</span></a>' if data["portal"] else ""
     visual = ""
     if pick:
@@ -576,7 +654,7 @@ def hero(data: dict) -> str:
 <h1>Parts made to fit <em>the thing you already have.</em></h1>
 <p class="lede">Tell us what it has to hold, fix or fit. You get a 3D model you can turn in your browser, every measurement and a fixed price, and nothing is printed until you say so.</p>
 <div class="actions">{portal_btn}<a class="btn" href="#work">See the work</a></div>
-<div class="assure"><span>{ICONS['check']}Quotes from <b class="num">&nbsp;{money(lo, cur, cents=False)}</b></span><span>{ICONS['check']}Changes until it's right</span><span>{ICONS['check']}PLA, PETG, TPU, ASA</span></div>
+<div class="assure"><span>{ICONS['check']}Prints from <b class="num">&nbsp;{money(lo, cur, cents=False)}</b>, design <b class="num">&nbsp;{money(0, cur, cents=False)}–{money(fee, cur, cents=False)}</b></span><span>{ICONS['check']}Changes until it's right</span><span>{ICONS['check']}PLA, PETG, TPU, ASA</span></div>
 </div>
 {visual}
 </div></section>"""
@@ -619,7 +697,7 @@ def work(data: dict) -> str:
         cards.append(f"""<a class="card" href="designs/{d['project']}/index.html" data-kind="{esc(d['kind'])}">
 <div class="img">{img}</div><div class="body"><span class="kind">{esc(d['kind'])}</span><h3>{esc(d['title'])}</h3>
 <p>{esc(d['tagline'])}</p>
-<div class="foot">{status_pill(d)}<span class="price">{money(ex['total'], cur)}</span></div></div></a>""")
+<div class="foot">{status_pill(d)}<span class="price">{money(ex['print_price'], cur)}</span></div></div></a>""")
     filters = ('<div class="filters" role="group" aria-label="Filter by kind"><button type="button" aria-pressed="true" data-kind="">All</button>'
                + "".join(f'<button type="button" aria-pressed="false" data-kind="{esc(k)}">{esc(k)}</button>' for k in kinds) + "</div>")
     script = """<script>
@@ -629,7 +707,7 @@ g.querySelectorAll('.card').forEach(c=>{c.hidden=!!b.dataset.kind&&c.dataset.kin
 </script>"""
     return f"""<section class="band well" id="work"><div class="wrap">
 <div class="head"><span class="eyebrow">Selected work</span><h2>Designed here, printed here.</h2>
-<p>Every piece below was modelled for a real object and checked for printability. Prices are what one of each would cost in PLA today, design included.</p></div>
+<p>Every piece below was modelled for a real object and checked for printability. The price is what one costs in PLA today, printed as designed. Want it sized to your own object instead? That is a {money(design_fee(data['pricing'], 'adapt'), cur, cents=False)} adjustment, not a new design.</p></div>
 {filters}<div class="grid" id="work-grid">{''.join(cards)}</div>{script}
 </div></section>"""
 
@@ -639,12 +717,13 @@ def quote_anatomy(data: dict) -> str:
     d = next((x for x in ds if x["project"] == "esp32_devkit_case"), ds[0] if ds else None)
     if not d:
         return ""
-    e, cur = d["estimate"], data["pricing"].get("currency", "USD")
+    cur = data["pricing"].get("currency", "USD")
+    e = estimate(d["report"], "PLA", 1, data["pricing"], design="new")     # the example is a request designed from scratch
     big = max(d["parts"], key=lambda p: p["volume"])
     wall = min((p["wall_min"] for p in d["parts"] if p["wall_min"] is not None), default=None)
     feats = [("cube", "A 3D model you can inspect", "Orbit it, cut through it and check every opening before anything is printed. It opens in any browser."),
              ("ruler", "Every measurement, written down", "Outer size, thinnest wall, hole sizes and each dimension that was assumed, so you can check it against the real thing."),
-             ("tag", "A price and a date", "Filament, print time and handling are worked out from the design itself, with the ready date."),
+             ("tag", "A price in two lines, and a date", "The print price comes from the design itself: filament, printer time and handling. The design fee is flat and shown separately, with the ready date."),
              ("chat", "Changes until it's right", "Reply with what to change and a revised design comes back. Nothing is printed until you confirm.")]
     return f"""<section class="band"><div class="wrap quote-grid">
 <div><div class="head"><span class="eyebrow">What every quote includes</span><h2>You see the part before you pay for it.</h2></div>
@@ -658,6 +737,8 @@ def quote_anatomy(data: dict) -> str:
 <dt>Material</dt><dd>PLA · about {e['mass_g']:.0f} g</dd>
 <dt>Print time</dt><dd>about {e['print_h']:.1f} h</dd>
 <dt>Ready in</dt><dd>about {e['lead_days']} days</dd>
+<dt>Print</dt><dd>{money(e['print_price'], cur)}</dd>
+<dt>Design, from scratch</dt><dd>{money(e['design_fee'], cur)}</dd>
 <dt class="total">Price</dt><dd class="total">{money(e['total'], cur)}</dd>
 </dl>
 <div class="reply">Reply <span class="kbd">CONFIRM</span> to print it, or say what to change.</div>
@@ -673,32 +754,111 @@ MATERIALS = [
 ]
 
 
+def price_examples(data: dict) -> list[dict]:
+    """Worked examples priced from real designs, so the numbers are the ones a quote would give:
+    a catalogue piece as is, one adapted to the requester's object, one designed from scratch, and a batch."""
+    ds, pr = data["designs"], data["pricing"]
+    if not ds:
+        return []
+    by_price = sorted(ds, key=lambda d: d["estimate"]["print_price"])
+    small, mid = by_price[0], by_price[len(by_price) // 2]
+    multi = next((d for d in ds if len(d["parts"]) > 1 and d["status"] != "failed"), ds[0])
+    big = next((d for d in reversed(by_price) if d is not small), by_price[-1])
+    picks = [("As designed", small, 1, "none",
+              f"One {small['title'].lower()} exactly as it appears above. It already exists, so there is no design fee."),
+             ("Fitted to your object", mid, 1, "adapt",
+              f"A {mid['title'].lower()} resized around your own board, object or gap. The proven parts stay; only the sizes change."),
+             ("Designed from scratch", big, 1, "new",
+              f"Something like the {big['title'].lower()}, drawn from your description and measurements. The fee covers every revision."),
+             ("A batch", multi, 5, "adapt",
+              f"Five of the {multi['title'].lower()}, fitted to your object. The design is paid once; the print price is per copy.")]
+    out = []
+    for label, d, qty, design, blurb in picks:
+        e = estimate(d["report"], "PLA", qty, pr, design=design)
+        out.append({"label": label, "design": d, "qty": qty, "kind": design, "blurb": blurb, "estimate": e})
+    return out
+
+
 def pricing(data: dict) -> str:
     pr, cur = data["pricing"], data["pricing"].get("currency", "USD")
-    rows = "".join(f'<tr><td><a href="designs/{d["project"]}/index.html">{esc(d["title"])}</a></td>'
+    tiers = pr.get("design") or {}
+    rows = "".join(f'<tr><td><a href="designs/{d["project"]}/index.html">{esc(d["title"])}</a><br><span class="muted">{len(d["parts"])} part{"s" if len(d["parts"]) != 1 else ""}</span></td>'
                    f'<td class="r num">{d["estimate"]["mass_g"]:.0f} g</td><td class="r num">{d["estimate"]["print_h"]:.1f} h</td>'
-                   f'<td class="r num"><b>{money(d["estimate"]["total"], cur)}</b></td></tr>'
-                   for d in sorted(data["designs"], key=lambda d: d["estimate"]["total"]))
+                   f'<td class="r num"><b>{money(d["estimate"]["print_price"], cur)}</b></td></tr>'
+                   for d in sorted(data["designs"], key=lambda d: d["estimate"]["print_price"]))
+    tier_copy = {"none": ("Existing design, or your own file",
+                          "A piece from this page printed as it is, a reprint, or an STL you already have. You pay the print price only."),
+                 "adapt": ("Fitted to your object",
+                           "An existing design or the proven library parts, resized and rearranged around your measurements. Most requests land here."),
+                 "new": ("Designed from scratch",
+                         "Nothing on file fits, so it is drawn from your description. One flat fee, however many revisions it takes.")}
+    tier_cards = "".join(f"""<div class="tier{' hi' if k == 'adapt' else ''}"><span class="fee">{money(t['fee'], cur, cents=False)}<small>{'no design fee' if not t['fee'] else 'flat'}</small></span>
+<b>{esc(tier_copy.get(k, (t.get('label', k), ''))[0])}</b><p>{esc(tier_copy.get(k, ('', t.get('label', '')))[1])}</p></div>""" for k, t in tiers.items())
+    ex_cards = []
+    for x in price_examples(data):
+        e, d = x["estimate"], x["design"]
+        per = f'<span class="muted">of which each</span><span class="muted">{money(e["per_unit"], cur)}</span>' if x["qty"] > 1 else ""
+        ex_cards.append(f"""<div class="ex"><span class="eyebrow">{esc(x['label'])}</span><h3><a href="designs/{d['project']}/index.html" style="color:inherit;text-decoration:none">{esc(d['title'])}</a>{f" × {x['qty']}" if x['qty'] > 1 else ""}</h3>
+<p>{esc(x['blurb'])}</p>
+<div class="sum"><span>Print<br><span class="muted">{e['mass_g']:.0f} g PLA · about {e['print_h']:.0f} h</span></span><span>{money(e['print_price'], cur)}</span>{per}
+<span>Design</span><span>{money(e['design_fee'], cur)}</span>
+<span class="t">Price</span><span class="t">{money(e['total'], cur)}</span>
+<span class="muted">Ready in</span><span class="muted">about {e['lead_days']} days</span></div></div>""")
     mats = pr.get("materials", {})
     mat_cards = "".join(f"""<div class="mat"><div class="sw" style="background:{c}"></div><b>{m}</b><p>{esc(t)}</p>
 <span class="num">{esc(note)} · {money(mats[m]['cost_per_kg'], cur, cents=False)}/kg</span></div>""" for m, c, t, note in MATERIALS if m in mats)
     return f"""<section class="band well" id="pricing"><div class="wrap">
-<div class="head"><span class="eyebrow">Pricing</span><h2>Priced from the design, not a menu.</h2>
-<p>Each quote is worked out from the part itself. Here is what goes into it, and what the pieces above would cost.</p></div>
+<div class="head"><span class="eyebrow">Pricing</span><h2>Two numbers: the print, and the design.</h2>
+<p>The print price is worked out from the part itself, so a small bracket costs a few dollars and a big rack costs what its filament and hours cost. The design fee is flat and depends on how much is new.</p></div>
 <div class="price-grid">
 <dl class="formula">
 <div><dt>Filament</dt><dd>The part's volume printed with {pr['shell_mm']:g} mm walls and {pr['infill'] * 100:g}% infill, at the material's price.</dd></div>
-<div><dt>Printer time</dt><dd>{money(pr['machine_per_h'], cur)} an hour, plus {pr['setup_min']} minutes of setup.</dd></div>
-<div><dt>Handling</dt><dd>Cleanup and checking at {money(pr['labor_per_h'], cur, cents=False)} an hour, about {pr['post_min_per_part']} minutes a part.</dd></div>
-<div><dt>Design</dt><dd>{money(pr['design_fee'], cur, cents=False)} per request, however many revisions it takes.</dd></div>
-<div><dt>Minimum</dt><dd>{money(pr['min_charge'], cur, cents=False)} per order. Totals include a {pr['margin'] * 100:g}% margin and are rounded to {money(pr.get('round_to', 0.5), cur)}.</dd></div>
+<div><dt>Printer time</dt><dd>{money(pr['machine_per_h'], cur)} an hour on the printer, from setup to the last layer.</dd></div>
+<div><dt>Handling</dt><dd>Setup, cleanup and checking against the measurements at {money(pr['labor_per_h'], cur, cents=False)} an hour: {pr['setup_min']} minutes a job plus about {pr['post_min_per_part']} minutes a part.</dd></div>
+<div><dt>Print price</dt><dd>Those three plus a {pr['margin'] * 100:g}% margin, rounded up to {money(pr.get('round_to', 0.5), cur)}, never less than {money(pr['min_charge'], cur, cents=False)}. Quantity multiplies this line only.</dd></div>
+<div><dt>Design fee</dt><dd>Added once per request, whatever the quantity. Zero for an existing design; see the three cases below.</dd></div>
 </dl>
-<div class="ledger tablewrap"><table><thead><tr><th>One of these, in PLA</th><th class="r">Filament</th><th class="r">Print</th><th class="r">Price</th></tr></thead>
+<div class="ledger tablewrap"><table><thead><tr><th>Print price, one in PLA</th><th class="r">Filament</th><th class="r">Print</th><th class="r">Price</th></tr></thead>
 <tbody>{rows}</tbody></table></div>
 </div>
+<div class="head" style="margin-top:64px"><span class="eyebrow">The design fee</span><h3 style="font-size:28px">Pay for new design work, not for design that already exists.</h3>
+<p>Every design is built from a library of proven parts, so most requests are a matter of fitting, not inventing.</p></div>
+<div class="tiers">{tier_cards}</div>
+<div class="head" style="margin-top:64px"><span class="eyebrow">Worked examples</span><h3 style="font-size:28px">What a quote looks like, on real designs.</h3>
+<p>Each one is priced exactly as a request would be today.</p></div>
+<div class="examples">{''.join(ex_cards)}</div>
 <div class="head" style="margin-top:72px"><span class="eyebrow">Materials</span><h3 style="font-size:28px">Four materials, loaded side by side.</h3>
 <p>The printer runs up to four filaments in one job, so a part can mix colours or put a rubbery TPU foot on a rigid body.</p></div>
 <div class="mats">{mat_cards}</div>
+</div></section>"""
+
+
+def library_section(data: dict) -> str:
+    lib = data["library"]
+    if not lib["count"]:
+        return ""
+    titles = {d["project"]: d["title"] for d in data["designs"]}
+    cats = "".join(f'<div class="cat"><b>{c["count"]}</b><h3>{esc(c["name"])}</h3><p>{esc(c["blurb"])}</p></div>' for c in lib["categories"])
+    top = sorted((c for c in lib["components"] if c["used_in"]), key=lambda c: (-len(c["used_in"]), -len(c["printed_in"]), c["name"]))[:8]
+    rows = []
+    for c in top:
+        where = ", ".join(titles.get(p, title_of(p)) for p in c["used_in"])
+        proven = ", ".join(c["printed_in"]) if c["printed_in"] else "not yet"
+        rows.append(f'<tr><td><b>{esc(c["name"])}</b><br><span class="muted">{esc(c["summary"].split(";")[0].split(" — ")[0])}</span></td>'
+                    f'<td>{esc(where)}</td><td class="num">{esc(proven)}</td></tr>')
+    return f"""<section class="band" id="library"><div class="wrap">
+<div class="head"><span class="eyebrow">The parts library</span><h2>Every design starts from parts that have already printed.</h2>
+<p>A case is not drawn from a blank screen. The insert pockets, the board's hole pattern, the vents, the lid and the snap fit are all parametric components that have been printed and measured before. Only the shape around your object is new.</p></div>
+<div class="cats">{cats}</div>
+<div class="lib-grid">
+<div class="prose">
+<h3>What it means for you</h3>
+<p><b>Fewer surprises.</b> A component that has held a heat-set insert or snapped shut in a finished part does it the same way in yours. When a print report says a part failed, the component it used is marked, and the next design avoids the same mistake.</p>
+<p><b>Faster, cheaper design.</b> Fitting proven parts around your measurements takes a fraction of the time of drawing them, which is why most requests carry the small design fee rather than the full one, and why a revision usually comes back within a day.</p>
+<p><b>Written down.</b> Every design page above lists the components it used and the materials they have been printed in. The library itself is open: <a href="{REPO_URL}/blob/main/PARTS.md">{lib['count']} components on GitHub</a>, with every parameter documented.</p>
+</div>
+<div class="ledger tablewrap"><table><thead><tr><th>Most used</th><th>In</th><th>Printed in</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
+</div>
 </div></section>"""
 
 
@@ -725,7 +885,7 @@ OUT_CURRENT = OUT   # the output directory of the build in progress (work() chec
 
 
 def index_page(data: dict) -> str:
-    body = hero(data) + proof(data) + how(data) + work(data) + quote_anatomy(data) + pricing(data) + faq(data) + cta(data)
+    body = hero(data) + proof(data) + how(data) + work(data) + quote_anatomy(data) + pricing(data) + library_section(data) + faq(data) + cta(data)
     return page(f"{data['brand']} · Custom 3D-printed parts", body, data, depth=0, current="",
                 description=data["cfg"].get("tagline", ""))
 
@@ -782,14 +942,14 @@ def design_page(d: dict, data: dict, out: Path) -> str:
             shutil.copyfile(f, ddir / "files" / f.name)
             label = "whole plate" if f.suffix == ".3mf" else f.suffix[1:].upper()
             files.append(f'<li><a href="files/{esc(f.name)}" download>{esc(f.name)}</a><span class="muted num">{label} · {fmt_size(size)}</span></li>')
-    comps = "".join(f'<tr><td><code>{esc(c["id"])}</code></td><td>{esc(c.get("summary", ""))}</td>'
-                    f'<td>{esc(", ".join(c.get("field_validated") or []) or "—")}</td></tr>' for c in d["components"])
+    comps = "".join(f'<tr><td><b>{esc(lib_name(c["id"]))}</b><br><code>{esc(c["id"])}</code></td><td>{esc(c.get("summary", ""))}</td>'
+                    f'<td class="num">{esc(", ".join(sorted(set(c.get("validated") or []) | set(c.get("field_validated") or []))) or "not yet")}</td></tr>' for c in d["components"])
     tech = f"""<details class="tech"><summary>Technical details</summary><div>
 {f'<div class="prose">{paragraphs(d["details"])}</div>' if d["details"].strip() else ''}
 <div><h3>Parts</h3><div class="tablewrap"><table><thead><tr><th>Part</th><th>Size (mm)</th><th>Volume</th><th>Thinnest wall</th><th>Printability</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div></div>
 {f'<div><h3>Engineering views</h3><div class="gallery">{"".join(views)}</div></div>' if views else ''}
 {f'<div><h3>Downloads</h3><ul class="files">{"".join(files)}</ul></div>' if files else ''}
-{f'<div><h3>Library components</h3><div class="tablewrap"><table><thead><tr><th>Component</th><th>What it does</th><th>Proven in</th></tr></thead><tbody>{comps}</tbody></table></div></div>' if comps else ''}
+{f'<div><h3>Library parts used</h3><p class="muted" style="font-size:14px;margin-bottom:10px">Parametric components shared with the other designs; see <a href="../../index.html#library">the parts library</a>.</p><div class="tablewrap"><table><thead><tr><th>Component</th><th>What it does</th><th>Printed in</th></tr></thead><tbody>{comps}</tbody></table></div></div>' if comps else ''}
 <p class="muted" style="font-size:14px">Source: <a href="{REPO_URL}/tree/main/models/{d['project']}">models/{d['project']}</a> · built <span class="num">{esc(d['built_at'])}</span></p>
 </div></details>"""
 
@@ -806,10 +966,10 @@ def design_page(d: dict, data: dict, out: Path) -> str:
 <h1 style="font-size:clamp(34px,4vw,48px)">{esc(d['title'])}</h1>
 <p class="lede">{esc(d['tagline'])}</p>
 {f'<p class="muted">{esc(d["story"])}</p>' if d['story'] else ''}
-<div class="bigprice"><b>{money(e['total'], cur)}</b><span class="muted">for one in PLA, design included</span></div>
+<div class="bigprice"><b>{money(e['print_price'], cur)}</b><span class="muted">for one in PLA, printed as designed</span></div>
 <dl class="facts">{''.join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in facts)}</dl>
 <div class="actions">{portal_btn}{viewer_btn}</div>
-<p class="muted" style="font-size:14px">Want it in another size, colour or material? Say so in the request and the design is adjusted before it's quoted.</p>
+<p class="muted" style="font-size:14px">Want it in another size, colour or material? Say so in the request: fitting it to your object is a {money(design_fee(data['pricing'], 'adapt'), cur, cents=False)} adjustment, and you see the revised design before it's printed.</p>
 </div>
 </div></div>
 {cta(data).replace('href="request.html"', 'href="../../request.html"')}"""
@@ -878,9 +1038,8 @@ def request_page(data: dict) -> str:
                      for n, h, req in FORM_FIELDS)
     portal_btn = f'<a class="btn primary" href="{esc(portal)}">Open the request portal <span class="arr">→</span></a>' if portal else ""
     help_btn = f'<a class="btn" href="{esc(data["help"])}">Help articles</a>' if data["help"] else ""
-    portal_short = f' (<span class="num">{esc(portal.removeprefix("https://"))}</span>)' if portal else ""
     steps = [
-        ("Raise a request", f"Open the portal{portal_short}, sign in with your e-mail and pick a request type. No Jira licence is needed. Your request gets a key like <b class=num>PRINT-12</b>."),
+        ("Raise a request", "Open the portal, sign in with your e-mail and pick a request type. No Jira licence is needed. Your request gets a key like <b class=num>PRINT-12</b>."),
         ("It's designed", "The request moves to <b>In Progress</b>. If a measurement is missing you get a question first."),
         ("You get a quote", "A comment arrives on the request and by e-mail with a 3D viewer file, renders, a measurement sheet and the price. The request is now <b>Pending</b>, waiting for you."),
         ("Confirm or change", "Reply <span class=kbd>CONFIRM</span> to go ahead. Anything else is read as a change: say what should be different and a revised quote comes back."),
@@ -890,7 +1049,8 @@ def request_page(data: dict) -> str:
     body = f"""<section class="band" style="padding-bottom:48px"><div class="wrap">
 <div class="head"><span class="eyebrow">How to order</span><h1 style="font-size:clamp(34px,4.4vw,52px)">Ordering takes a few minutes. The design takes care of itself.</h1>
 <p>Requests go through a service portal. You describe what you need; you get a design, the measurements and a price back, and nothing is printed until you confirm.</p>
-<div class="actions">{portal_btn}{help_btn}</div></div>
+<div class="actions">{portal_btn}{help_btn}</div>
+{f'<p class="muted" style="font-size:14px">The portal lives at <span class="num">{esc(portal.removeprefix("https://"))}</span>.</p>' if portal else ''}</div>
 <ol class="steps five">{step_items}</ol>
 </div></section>
 <section class="band well"><div class="wrap">

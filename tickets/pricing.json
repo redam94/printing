@@ -1,5 +1,5 @@
 {
-  "_": "Rates behind every quote scripts/tickets.py produces. Edit freely; a quote records the rates it was computed with.",
+  "_": "Rates behind every quote scripts/tickets.py produces. Edit freely; a quote records the rates it was computed with. A price is the PRINT price (filament + printer time + handling, with the margin, never below min_charge) plus a flat DESIGN fee that depends on how much design is new: 'none' for an existing design or a customer's own file, 'adapt' when an existing design or library components are fitted to the customer's object, 'new' when it is drawn from scratch. Quantity multiplies the print price only; the design fee is paid once.",
   "currency": "USD",
   "materials": {
     "PLA":  {"density_g_cm3": 1.24, "cost_per_kg": 22.0},
@@ -14,7 +14,11 @@
   "post_min_per_part": 5,
   "machine_per_h": 2.0,
   "labor_per_h": 20.0,
-  "design_fee": 15.0,
+  "design": {
+    "none":  {"fee": 0.0,  "label": "Existing design, or your own file"},
+    "adapt": {"fee": 5.0,  "label": "An existing design or proven parts, fitted to your object"},
+    "new":   {"fee": 15.0, "label": "Designed from scratch"}
+  },
   "min_charge": 10.0,
   "margin": 0.15,
   "hours_per_day": 8,
