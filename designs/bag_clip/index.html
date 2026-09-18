@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fridge-magnet bag clip · 3D Printing Service</title>
+<meta name="description" content="A chip-bag clip with a living hinge, a sealing rib, a snap catch and two magnets so it lives on the fridge door.">
+<meta name="theme-color" content="#faf8f3">
+<link rel="icon" href="../../brand/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../style.css">
+</head><body>
+<header class="top"><div class="wrap">
+<a class="brand" href="../../index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<nav class="nav" aria-label="Main"><a class="" href="../../index.html#work" aria-current=page>Work</a><a class="opt" href="../../index.html#how">How it works</a><a class="opt" href="../../index.html#pricing">Pricing</a><a class="opt" href="../../index.html#library">Parts library</a><a class="opt" href="../../prints.html">Track record</a><a class="" href="../../request.html">How to order</a><a class="btn primary small" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request a part</a></nav>
+</div></header>
+<main>
+<div class="wrap"><p class="crumbs"><a href="../../index.html#work">Work</a> / Home</p>
+<div class="detail">
+<div style="display:grid;gap:28px"><div class="gallery"><figure><img src="shot.jpg" alt="Fridge-magnet bag clip, all parts" width="1200" height="900"><figcaption><span>All parts, as they come off the printer</span><span class="num">1 part</span></figcaption></figure></div><details class="tech"><summary>Technical details</summary><div>
+<div class="prose"><p>Part: <code>clip</code> — printed open, 180 mm long: the lower jaw (90 x 20 x 3.2) and the upper jaw (84 x 20 x 2.4) end to end with a 0.5 mm <code>mechanisms.living_hinge_web</code> between them. Fold the upper jaw over: a half-round rib along the lower jaw (<code>mechanisms.snap_ridge</code>) presses the bag into a matching channel in the upper jaw (<code>mechanisms.snap_groove</code>, 0.3 mm wider for the film), and the upper jaw&#x27;s tip snaps under a lip on the catch block at the lower jaw&#x27;s end. The upper jaw is the spring: pushing its tip down the lip&#x27;s 45 deg ramp bows it, and it springs into the 0.8 mm undercut. To open, push a thumb into the scoop at the tip toward the hinge and lift. Two 10 x 2 mm disc magnets glued into pockets in the underside hold it on the fridge door.</p><p>Print flat as built, PETG (the living hinge is validated in PETG and TPU; PLA fatigue-cracks within tens of folds). Fold once while the print is still warm. Declared <code>hinged</code>: the 0.5 mm web is the design, not a thin-wall defect. The catch block&#x27;s undercut is a 0.8 mm deep, 2.8 mm tall horizontal slot in a vertical face: it bridges without support.</p><p>Assumptions (user unavailable): sized for a 20 mm jaw and a ~2.4 mm bow-to-snap; magnets 10 x 2 (use MAGNET_H = 3 and JAW_T_LOW = 4.4 for 10 x 3); no text on the jaws.</p></div>
+<div><h3>Parts</h3><div class="tablewrap"><table><thead><tr><th>Part</th><th>Size (mm)</th><th>Volume</th><th>Thinnest wall</th><th>Printability</th></tr></thead><tbody><tr><td><b>clip</b></td><td class="num">176.5 × 20 × 7.8</td><td class="num">9.8 cm³</td><td class="num">0.5 mm</td><td><span class="pill ok">passes</span></td></tr></tbody></table></div></div>
+<div><h3>Engineering views</h3><div class="gallery"><figure style="margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden"><img src="renders/clip.png" alt="clip: isometric, top and front views" loading="lazy"><figcaption style="padding:6px 12px;font-size:13px;color:var(--ink-2)">clip</figcaption></figure></div></div>
+<div><h3>Downloads</h3><ul class="files"><li><a href="files/bag_clip.3mf" download>bag_clip.3mf</a><span class="muted num">whole plate · 37 KB</span></li><li><a href="files/clip.step" download>clip.step</a><span class="muted num">STEP · 150 KB</span></li><li><a href="files/clip.stl" download>clip.stl</a><span class="muted num">STL · 143 KB</span></li></ul></div>
+<div><h3>Library parts used</h3><p class="muted" style="font-size:14px;margin-bottom:10px">Parametric components shared with the other designs; see <a href="../../index.html#library">the parts library</a>.</p><div class="tablewrap"><table><thead><tr><th>Component</th><th>What it does</th><th>Printed in</th></tr></thead><tbody><tr><td><b>Magnet pocket</b><br><code>fasteners.magnet_pocket</code></td><td>Negative (subtract me) blind pocket for a disc magnet, press- or glue-fit; mouth at z=0, pocket extends down.</td><td class="num">not yet</td></tr><tr><td><b>Living hinge</b><br><code>mechanisms.living_hinge_web</code></td><td>Thin flexible web joining two thicker panels (single-strip living hinge), hinge axis along Y, printed flat.</td><td class="num">PETG, TPU</td></tr><tr><td><b>Snap groove</b><br><code>mechanisms.snap_groove</code></td><td>Negative (subtract me) half-round groove matching snap_ridge, cut into a wall face at y=0 going into -Y.</td><td class="num">PETG, PLA</td></tr><tr><td><b>Snap ridge</b><br><code>mechanisms.snap_ridge</code></td><td>Half-round snap ridge (bead) running along X, protruding in +Y from a wall face at y=0; sits on a lid lip.</td><td class="num">PETG, PLA</td></tr><tr><td><b>Finger notch</b><br><code>primitives.finger_notch</code></td><td>Negative (subtract me) rounded finger scoop cut into an edge so a lid or jaw can be lifted; centred on the edge at the origin, cutting through Z.</td><td class="num">not yet</td></tr></tbody></table></div></div>
+<p class="muted" style="font-size:14px">Source: <a href="https://github.com/redam94/printing/tree/main/models/bag_clip">models/bag_clip</a> · built <span class="num">2026-09-18 01:23</span></p>
+</div></details></div>
+<div class="copy">
+<span class="eyebrow">Home</span>
+<h1 style="font-size:clamp(34px,4vw,48px)">Fridge-magnet bag clip</h1>
+<p class="lede">A chip-bag clip with a living hinge, a sealing rib, a snap catch and two magnets so it lives on the fridge door.</p>
+<p class="muted">Printed flat and open; fold it once while warm. The upper jaw is the spring: push its tip down the ramp and it snaps under the lip. A thumb in the scoop releases it. PETG, because the 0.5 mm hinge has to survive years of folding.</p>
+<div class="bigprice"><b>$10.00</b><span class="muted">for one in PLA, printed as designed</span></div>
+<dl class="facts"><dt>Size</dt><dd><span class="num">176 × 20 × 8 mm</span></dd><dt>Print plate</dt><dd><span class="num">176 × 20 × 8 mm</span></dd><dt>Parts</dt><dd><span class="num">1</span></dd><dt>Filament (PLA)</dt><dd><span class="num">about 12 g</span></dd><dt>Print time</dt><dd><span class="num">about 1.0 h</span></dd><dt>Status</dt><dd><span class="pill">Ready to print</span></dd></dl>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request one like this <span class="arr">→</span></a><a class="btn" href="viewer.html">Open in 3D</a></div>
+<p class="muted" style="font-size:14px">Want it in another size, colour or material? Say so in the request: fitting it to your object is a $5 adjustment, and you see the revised design before it's printed.</p>
+</div>
+</div></div>
+<section class="band ink cta"><div class="wrap">
+<div style="display:grid;gap:14px"><span class="eyebrow">Have something in mind?</span><h2>Measure it, describe it, and we'll draw it.</h2>
+<p class="muted">Requests take a few minutes. You'll get the design and a price back before anything is printed.</p></div>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Start a request <span class="arr">→</span></a><a class="btn" href="../../request.html">How ordering works</a></div>
+</div></section>
+</main>
+<footer><div class="wrap">
+<div style="display:grid;gap:8px"><a class="brand" href="../../index.html" style="text-decoration:none"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<span>Custom parts designed in <a href="https://github.com/gumyr/build123d">build123d</a> and printed on a Snapmaker U1.</span></div>
+<div style="display:grid;gap:6px;align-content:start">
+<a href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request portal</a>
+<a href="../../request.html">How to order</a><a href="../../prints.html">Track record</a>
+<a href="https://github.com/redam94/printing">Source on GitHub</a><span class="num" style="font-size:12px">Updated 2026-09-18</span></div>
+</div></footer>
+</body></html>

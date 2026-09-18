@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Folding phone stand · 3D Printing Service</title>
+<meta name="description" content="A phone stand that prints already hinged: lift the rest, drop it into one of three notches, fold it flat to carry.">
+<meta name="theme-color" content="#faf8f3">
+<link rel="icon" href="../../brand/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../style.css">
+</head><body>
+<header class="top"><div class="wrap">
+<a class="brand" href="../../index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<nav class="nav" aria-label="Main"><a class="" href="../../index.html#work" aria-current=page>Work</a><a class="opt" href="../../index.html#how">How it works</a><a class="opt" href="../../index.html#pricing">Pricing</a><a class="opt" href="../../index.html#library">Parts library</a><a class="opt" href="../../prints.html">Track record</a><a class="" href="../../request.html">How to order</a><a class="btn primary small" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request a part</a></nav>
+</div></header>
+<main>
+<div class="wrap"><p class="crumbs"><a href="../../index.html#work">Work</a> / Desk &amp; decor</p>
+<div class="detail">
+<div style="display:grid;gap:28px"><div class="gallery"><figure><img src="shot.jpg" alt="Folding phone stand, all parts" width="1200" height="900"><figcaption><span>All parts, as they come off the printer</span><span class="num">1 part</span></figcaption></figure></div><details class="tech"><summary>Technical details</summary><div>
+<div class="prose"><p>Part: <code>stand</code> — one print, three pieces that come off the bed already hinged together: * the base (90 x 60 x 4) with four rubber-foot recesses underneath and two ears in front that carry an 8 mm lip for the phone&#x27;s bottom edge; * the rest (60 x 50 x 4), hinged along the base&#x27;s front edge, that the phone leans on; * the prop (60 x 71 x 4), hinged along the base&#x27;s rear edge, with three notches across its face. Lift the rest, swing the prop forward over it and drop the rest&#x27;s top edge into a notch: the two plates brace each other as an A-frame, and the notch picks the angle (about 55, 65 or 75 degrees from the desk). Fold both flat to carry it. Both hinges are <code>mechanisms.pip_hinge</code> (7 mm knuckles on a 3 mm pin, 0.35 mm clearance, teardrop bores) and the rack is <code>primitives.notch_rack</code>.</p><p>Printed flat, everything on the bed: the rest lies between the ears, the prop beyond the base. Nothing flexes, so PLA is fine; PETG is also fine. Free both hinges with a firm twist as soon as the print is off the bed. The part reports as three bodies: that is the two hinges.</p><p>Assumptions (user unavailable): phones 65 to 85 mm wide (the bottom corners sit on the ears&#x27; lips); no cable slot; hinge length 60 leaves 14.5 mm ears either side.</p></div>
+<div><h3>Parts</h3><div class="tablewrap"><table><thead><tr><th>Part</th><th>Size (mm)</th><th>Volume</th><th>Thinnest wall</th><th>Printability</th></tr></thead><tbody><tr><td><b>stand</b></td><td class="num">90 × 188.72 × 12</td><td class="num">54.0 cm³</td><td class="num">0.91 mm</td><td><span class="pill ok">passes</span></td></tr></tbody></table></div></div>
+<div><h3>Engineering views</h3><div class="gallery"><figure style="margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden"><img src="renders/stand.png" alt="stand: isometric, top and front views" loading="lazy"><figcaption style="padding:6px 12px;font-size:13px;color:var(--ink-2)">stand</figcaption></figure></div></div>
+<div><h3>Downloads</h3><ul class="files"><li><a href="files/fold_stand.3mf" download>fold_stand.3mf</a><span class="muted num">whole plate · 175 KB</span></li><li><a href="files/stand.step" download>stand.step</a><span class="muted num">STEP · 530 KB</span></li><li><a href="files/stand.stl" download>stand.stl</a><span class="muted num">STL · 747 KB</span></li></ul></div>
+<div><h3>Library parts used</h3><p class="muted" style="font-size:14px;margin-bottom:10px">Parametric components shared with the other designs; see <a href="../../index.html#library">the parts library</a>.</p><div class="tablewrap"><table><thead><tr><th>Component</th><th>What it does</th><th>Printed in</th></tr></thead><tbody><tr><td><b>Notch rack</b><br><code>primitives.notch_rack</code></td><td>Negative (subtract me) row of rectangular notches across a face (running along X, stepped along Y) that a plate edge drops into; face at z=0, notches extend down.</td><td class="num">not yet</td></tr><tr><td><b>Rubber-foot recess</b><br><code>primitives.rubber_foot_recess</code></td><td>Negative (subtract me) shallow recess to locate a stick-on rubber foot; top face at z=0, extends down.</td><td class="num">PLA</td></tr></tbody></table></div></div>
+<p class="muted" style="font-size:14px">Source: <a href="https://github.com/redam94/printing/tree/main/models/fold_stand">models/fold_stand</a> · built <span class="num">2026-09-18 01:25</span></p>
+</div></details></div>
+<div class="copy">
+<span class="eyebrow">Desk &amp; decor</span>
+<h1 style="font-size:clamp(34px,4vw,48px)">Folding phone stand</h1>
+<p class="lede">A phone stand that prints already hinged: lift the rest, drop it into one of three notches, fold it flat to carry.</p>
+<p class="muted">Three plates on two print-in-place pin hinges. The rest and the prop brace each other as an A-frame, and the notch you choose sets the angle at about 55, 65 or 75 degrees. Nothing flexes, so it prints in plain PLA.</p>
+<div class="bigprice"><b>$16.00</b><span class="muted">for one in PLA, printed as designed</span></div>
+<dl class="facts"><dt>Size</dt><dd><span class="num">90 × 189 × 12 mm</span></dd><dt>Print plate</dt><dd><span class="num">90 × 189 × 12 mm</span></dd><dt>Parts</dt><dd><span class="num">1</span></dd><dt>Filament (PLA)</dt><dd><span class="num">about 53 g</span></dd><dt>Print time</dt><dd><span class="num">about 3.7 h</span></dd><dt>Status</dt><dd><span class="pill">Ready to print</span></dd></dl>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request one like this <span class="arr">→</span></a><a class="btn" href="viewer.html">Open in 3D</a></div>
+<p class="muted" style="font-size:14px">Want it in another size, colour or material? Say so in the request: fitting it to your object is a $5 adjustment, and you see the revised design before it's printed.</p>
+</div>
+</div></div>
+<section class="band ink cta"><div class="wrap">
+<div style="display:grid;gap:14px"><span class="eyebrow">Have something in mind?</span><h2>Measure it, describe it, and we'll draw it.</h2>
+<p class="muted">Requests take a few minutes. You'll get the design and a price back before anything is printed.</p></div>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Start a request <span class="arr">→</span></a><a class="btn" href="../../request.html">How ordering works</a></div>
+</div></section>
+</main>
+<footer><div class="wrap">
+<div style="display:grid;gap:8px"><a class="brand" href="../../index.html" style="text-decoration:none"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<span>Custom parts designed in <a href="https://github.com/gumyr/build123d">build123d</a> and printed on a Snapmaker U1.</span></div>
+<div style="display:grid;gap:6px;align-content:start">
+<a href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request portal</a>
+<a href="../../request.html">How to order</a><a href="../../prints.html">Track record</a>
+<a href="https://github.com/redam94/printing">Source on GitHub</a><span class="num" style="font-size:12px">Updated 2026-09-18</span></div>
+</div></footer>
+</body></html>

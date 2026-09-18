@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>40 mm corner bracket · 3D Printing Service</title>
+<meta name="description" content="A stiff 40 mm L-bracket for M3 screws, oriented on the printer so the corner is as strong as it can be.">
+<meta name="theme-color" content="#faf8f3">
+<link rel="icon" href="../../brand/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../style.css">
+</head><body>
+<header class="top"><div class="wrap">
+<a class="brand" href="../../index.html"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<nav class="nav" aria-label="Main"><a class="" href="../../index.html#work" aria-current=page>Work</a><a class="opt" href="../../index.html#how">How it works</a><a class="opt" href="../../index.html#pricing">Pricing</a><a class="opt" href="../../index.html#library">Parts library</a><a class="opt" href="../../prints.html">Track record</a><a class="" href="../../request.html">How to order</a><a class="btn primary small" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request a part</a></nav>
+</div></header>
+<main>
+<div class="wrap"><p class="crumbs"><a href="../../index.html#work">Work</a> / Hardware</p>
+<div class="detail">
+<div style="display:grid;gap:28px"><div class="gallery"><figure><img src="shot.jpg" alt="40 mm corner bracket, all parts" width="1200" height="900"><figcaption><span>All parts, as they come off the printer</span><span class="num">1 part</span></figcaption></figure></div><details class="tech"><summary>Technical details</summary><div>
+<div class="prose"><p>Part: <code>bracket</code> — <code>primitives.l_bracket</code> at the parameters in params.py. Fits M3 socket-head or pan-head screws (3.6 mm printed hole = ISO 273 medium 3.4 + 0.2 oversize).</p><p>Print orientation: on its side, i.e. the L profile lies in the bed plane and the 20 mm width is the print height, so bending load at the corner runs along the layers instead of across them. Consequently every hole is horizontal and is cut as a teardrop (point up) so it bridges cleanly.</p><p>Assumptions (user not available): width 20 mm; holes evenly spread over the free span of each arm (centres 10 / 22 / 34 mm from the outer corner, on the width centreline); sharp outer corner; 1 mm inside fillet; no counterbores.</p></div>
+<div><h3>Parts</h3><div class="tablewrap"><table><thead><tr><th>Part</th><th>Size (mm)</th><th>Volume</th><th>Thinnest wall</th><th>Printability</th></tr></thead><tbody><tr><td><b>bracket</b></td><td class="num">40 × 40 × 20</td><td class="num">5.7 cm³</td><td class="num">2.7 mm</td><td><span class="pill ok">passes</span></td></tr></tbody></table></div></div>
+<div><h3>Engineering views</h3><div class="gallery"><figure style="margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden"><img src="renders/bracket.png" alt="bracket: isometric, top and front views" loading="lazy"><figcaption style="padding:6px 12px;font-size:13px;color:var(--ink-2)">bracket</figcaption></figure></div></div>
+<div><h3>Downloads</h3><ul class="files"><li><a href="files/bracket.step" download>bracket.step</a><span class="muted num">STEP · 146 KB</span></li><li><a href="files/bracket.stl" download>bracket.stl</a><span class="muted num">STL · 171 KB</span></li><li><a href="files/l_bracket_40.3mf" download>l_bracket_40.3mf</a><span class="muted num">whole plate · 41 KB</span></li></ul></div>
+<div><h3>Library parts used</h3><p class="muted" style="font-size:14px;margin-bottom:10px">Parametric components shared with the other designs; see <a href="../../index.html#library">the parts library</a>.</p><div class="tablewrap"><table><thead><tr><th>Component</th><th>What it does</th><th>Printed in</th></tr></thead><tbody><tr><td><b>L bracket</b><br><code>primitives.l_bracket</code></td><td>90-degree L (angle) bracket with a row of screw clearance holes along each arm, standing on its side on z=0 (strongest print orientation).</td><td class="num">not yet</td></tr></tbody></table></div></div>
+<p class="muted" style="font-size:14px">Source: <a href="https://github.com/redam94/printing/tree/main/models/l_bracket_40">models/l_bracket_40</a> · built <span class="num">2026-09-09 13:43</span></p>
+</div></details></div>
+<div class="copy">
+<span class="eyebrow">Hardware</span>
+<h1 style="font-size:clamp(34px,4vw,48px)">40 mm corner bracket</h1>
+<p class="lede">A stiff 40 mm L-bracket for M3 screws, oriented on the printer so the corner is as strong as it can be.</p>
+<p class="muted">Printed on its side so the load runs along the layers, not across them. The simplest thing here, and a good example of how orientation decides strength.</p>
+<div class="bigprice"><b>$10.00</b><span class="muted">for one in PLA, printed as designed</span></div>
+<dl class="facts"><dt>Size</dt><dd><span class="num">40 × 40 × 20 mm</span></dd><dt>Print plate</dt><dd><span class="num">40 × 40 × 20 mm</span></dd><dt>Parts</dt><dd><span class="num">1</span></dd><dt>Filament (PLA)</dt><dd><span class="num">about 6 g</span></dd><dt>Print time</dt><dd><span class="num">about 0.6 h</span></dd><dt>Status</dt><dd><span class="pill">Ready to print</span></dd></dl>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request one like this <span class="arr">→</span></a><a class="btn" href="viewer.html">Open in 3D</a></div>
+<p class="muted" style="font-size:14px">Want it in another size, colour or material? Say so in the request: fitting it to your object is a $5 adjustment, and you see the revised design before it's printed.</p>
+</div>
+</div></div>
+<section class="band ink cta"><div class="wrap">
+<div style="display:grid;gap:14px"><span class="eyebrow">Have something in mind?</span><h2>Measure it, describe it, and we'll draw it.</h2>
+<p class="muted">Requests take a few minutes. You'll get the design and a price back before anything is printed.</p></div>
+<div class="actions"><a class="btn primary" href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Start a request <span class="arr">→</span></a><a class="btn" href="../../request.html">How ordering works</a></div>
+</div></section>
+</main>
+<footer><div class="wrap">
+<div style="display:grid;gap:8px"><a class="brand" href="../../index.html" style="text-decoration:none"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#5a7a3a"/>
+<path d="M11 6h10v5l-3 4h-4l-3-4z" fill="#faf8f3"/><rect x="7" y="19" width="18" height="2.4" rx="1.2" fill="#faf8f3"/>
+<rect x="9" y="23.2" width="14" height="2.4" rx="1.2" fill="#faf8f3" opacity=".8"/><rect x="11" y="27.4" width="10" height="2" rx="1" fill="#faf8f3" opacity=".6"/></svg>3D Printing Service</a>
+<span>Custom parts designed in <a href="https://github.com/gumyr/build123d">build123d</a> and printed on a Snapmaker U1.</span></div>
+<div style="display:grid;gap:6px;align-content:start">
+<a href="https://matt-reda.atlassian.net/servicedesk/customer/portal/1">Request portal</a>
+<a href="../../request.html">How to order</a><a href="../../prints.html">Track record</a>
+<a href="https://github.com/redam94/printing">Source on GitHub</a><span class="num" style="font-size:12px">Updated 2026-09-18</span></div>
+</div></footer>
+</body></html>
