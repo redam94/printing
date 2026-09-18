@@ -1,0 +1,60 @@
+{
+  "project": "cable_comb",
+  "generated": "2026-09-18",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "comb": {
+      "bbox_min": [
+        -29.9,
+        -8.0,
+        0.0
+      ],
+      "bbox_max": [
+        29.9,
+        14.0,
+        12.0
+      ],
+      "bbox_size": [
+        59.8,
+        22.0,
+        12.0
+      ],
+      "volume": 8143.204,
+      "surface_area": 6047.247,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "cfe99e5fc8d14904",
+      "triangles": 4636,
+      "kind": "brep"
+    },
+    "tool_rail": {
+      "bbox_min": [
+        -44.5,
+        -10.0,
+        0.0
+      ],
+      "bbox_max": [
+        44.5,
+        22.0,
+        16.0
+      ],
+      "bbox_size": [
+        89.0,
+        32.0,
+        16.0
+      ],
+      "volume": 21521.679,
+      "surface_area": 10800.593,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "604dde523232e67f",
+      "triangles": 4204,
+      "kind": "brep"
+    }
+  }
+}

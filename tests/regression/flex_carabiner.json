@@ -1,0 +1,35 @@
+{
+  "project": "flex_carabiner",
+  "generated": "2026-09-18",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "carabiner": {
+      "bbox_min": [
+        -30.0,
+        -17.0,
+        -0.0
+      ],
+      "bbox_max": [
+        30.0,
+        17.0,
+        6.0
+      ],
+      "bbox_size": [
+        60.0,
+        34.0,
+        6.0
+      ],
+      "volume": 4075.512,
+      "surface_area": 3281.945,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "7e3e3fc87f066144",
+      "triangles": 1804,
+      "kind": "brep"
+    }
+  }
+}

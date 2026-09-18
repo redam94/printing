@@ -77,7 +77,9 @@ LIB_NAMES = {"heat_set_boss": "Heat-set insert boss", "heat_set_pocket": "Heat-s
              "pi4_mount": "Raspberry Pi 4 mount", "pi_zero_mount": "Raspberry Pi Zero mount", "pi5_port_cutouts": "Pi 5 port windows",
              "pi_board_outline": "Raspberry Pi outline", "esp32_footprint": "ESP32 board footprint", "esp32_header_rows": "ESP32 header pockets",
              "vesa_mount": "VESA mount pattern", "din_rail_ts35_profile": "DIN rail profile", "pcb_slot_cradle": "PCB slot cradle",
-             "sdf_solid": "Sculpted solid", "l_bracket": "L bracket", "rubber_foot_recess": "Rubber-foot recess"}
+             "sdf_solid": "Sculpted solid", "l_bracket": "L bracket", "rubber_foot_recess": "Rubber-foot recess",
+             "pip_hinge": "Print-in-place hinge", "flex_fingers": "Compliant finger comb", "zip_tie_slot": "Cable-tie slots",
+             "living_hinge_web": "Living hinge", "living_hinge_lattice": "Lattice living hinge", "notch_rack": "Notch rack"}
 
 
 def lib_name(cid: str) -> str:

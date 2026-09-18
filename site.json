@@ -2,9 +2,13 @@
   "_": "Copy and settings for the public site (scripts/site.py). Models built for a ticket (tickets/*/ticket.json 'model') are never published, whatever this file says; 'hidden' drops any other model.",
   "brand": "3D Printing Service",
   "tagline": "Custom 3D-printed parts, designed around the thing you already have.",
-  "hero_model": "vape_pen_holder",
+  "hero_model": "fold_stand",
   "hidden": [],
   "order": [
+    "fold_stand",
+    "bag_clip",
+    "flex_carabiner",
+    "cable_comb",
     "vape_pen_holder",
     "cloud_pi_holder",
     "ribbed_vase",
@@ -62,6 +66,30 @@
       "kind": "R&D",
       "tagline": "A test piece for a two-position flexure switch that snaps between states with no spring and no hinge pin.",
       "story": "Mechanisms that bend are tested before they go into a product. The first version failed and taught us the frame must be one closed piece; the redesign snaps reliably in PLA."
+    },
+    "fold_stand": {
+      "title": "Folding phone stand",
+      "kind": "Desk & decor",
+      "tagline": "A phone stand that prints already hinged: lift the rest, drop it into one of three notches, fold it flat to carry.",
+      "story": "Three plates on two print-in-place pin hinges. The rest and the prop brace each other as an A-frame, and the notch you choose sets the angle at about 55, 65 or 75 degrees. Nothing flexes, so it prints in plain PLA."
+    },
+    "bag_clip": {
+      "title": "Fridge-magnet bag clip",
+      "kind": "Home",
+      "tagline": "A chip-bag clip with a living hinge, a sealing rib, a snap catch and two magnets so it lives on the fridge door.",
+      "story": "Printed flat and open; fold it once while warm. The upper jaw is the spring: push its tip down the ramp and it snaps under the lip. A thumb in the scoop releases it. PETG, because the 0.5 mm hinge has to survive years of folding."
+    },
+    "flex_carabiner": {
+      "title": "Compliant key carabiner",
+      "kind": "Hardware",
+      "tagline": "A key clip whose gate is a printed leaf spring: press it in to open, let go and it springs shut.",
+      "story": "One solid, no pin, no metal spring. The gate's tip rests under a lip, so pulling on the keys presses it closed rather than open. For keys, lanyards and water bottles, not for anything that holds a person."
+    },
+    "cable_comb": {
+      "title": "Cable comb and tool rail",
+      "kind": "Desk & decor",
+      "tagline": "Rows of compliant fingers that grip whatever you push into them: desk leads in one, screwdrivers and markers in the other.",
+      "story": "The same library component at two sizes. Each finger spreads to take the object and closes round it, so a 3 mm audio lead and an 8 mm power lead sit in the same comb. Keyholes on the back for screws, and slots for a cable tie round a table leg."
     }
   },
   "faq": [

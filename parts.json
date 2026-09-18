@@ -328,6 +328,71 @@
       "used_by": [],
       "import": "from lib.fasteners.heat_set_boss import heat_set_pocket"
     },
+    "fasteners.magnet_pocket": {
+      "id": "fasteners.magnet_pocket",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) blind pocket for a disc magnet, press- or glue-fit; mouth at z=0, pocket extends down.",
+      "params": [
+        {
+          "name": "d",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "magnet diameter (10 x 3 and 6 x 3 discs are the common ones)"
+        },
+        {
+          "name": "h",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "magnet height"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.2,
+          "description": "added to the diameter; 0.2 press-fits in PLA/PETG, 0.4 leaves room for glue"
+        },
+        {
+          "name": "floor",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "extra depth so the magnet sits this far below the mouth (0 = flush)"
+        }
+      ],
+      "tags": [
+        "closure",
+        "disc",
+        "fridge",
+        "lid",
+        "magnet",
+        "negative",
+        "neodymium",
+        "pocket"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "mouth up (flat floor) or mouth on the bed (the magnet is inserted after printing; the pocket is then a recess in the first layers)",
+        "notes": "UNVALIDATED: no test print yet. Magnets pressed in warm PETG hold without glue; in PLA use a drop of CA.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "fasteners",
+      "module": "lib.fasteners.magnet_pocket",
+      "qualname": "magnet_pocket",
+      "file": "lib/fasteners/magnet_pocket.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Example:\njaw = jaw - Pos(x, y, 0) * magnet_pocket(10, 3)            # from the bed face up\nlid = lid - Pos(x, y, lid_t) * magnet_pocket(6, 3, floor=0.4)   # from the top face down",
+      "example": "jaw = jaw - Pos(x, y, 0) * magnet_pocket(10, 3)            # from the bed face up\nlid = lid - Pos(x, y, lid_t) * magnet_pocket(6, 3, floor=0.4)   # from the top face down",
+      "used_by": [
+        "models/bag_clip/model.py"
+      ],
+      "import": "from lib.fasteners.magnet_pocket import magnet_pocket"
+    },
     "fasteners.screw_boss": {
       "id": "fasteners.screw_boss",
       "version": "1.0.0",
@@ -2062,6 +2127,102 @@
       ],
       "import": "from lib.mechanisms.cantilever_latch import cantilever_latch"
     },
+    "mechanisms.flex_fingers": {
+      "id": "mechanisms.flex_fingers",
+      "version": "1.0.0",
+      "summary": "Comb of bulb-tipped compliant fingers along X forming self-adjusting slots that grip cables or tool shanks pushed in from +Y; standing on z=0.",
+      "params": [
+        {
+          "name": "slots",
+          "type": "int",
+          "units": "count",
+          "default": 6,
+          "description": "number of slots (fingers = slots + 1)"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 9.0,
+          "description": "X pitch between fingers; slot width at the bottom = pitch - finger_t"
+        },
+        {
+          "name": "finger_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "finger thickness along X (the flexing dimension); 1.2 = 3 lines"
+        },
+        {
+          "name": "finger_len",
+          "type": "float",
+          "units": "mm",
+          "default": 14.0,
+          "description": "finger length from the spine face (y=0) to the tip in +Y"
+        },
+        {
+          "name": "entry_w",
+          "type": "float",
+          "units": "mm",
+          "default": 3.2,
+          "description": "opening between the tip bulbs of neighbouring fingers = smallest diameter that is held; bigger things spread the fingers"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 10.0,
+          "description": "part depth = print height (Z)"
+        },
+        {
+          "name": "spine_w",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "spine bar width in -Y behind the fingers (mount screws / keyholes go here)"
+        },
+        {
+          "name": "end_t",
+          "type": "float",
+          "units": "mm",
+          "default": 2.4,
+          "description": "thickness of the two outermost fingers (stiffer, they only flex one way)"
+        }
+      ],
+      "tags": [
+        "cable",
+        "cable comb",
+        "clip",
+        "comb",
+        "compliant",
+        "fingers",
+        "grip",
+        "holder",
+        "organizer",
+        "snap",
+        "tool rail"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed, fingers in the bed plane; the bulbs and slot bottoms are then vertical walls with no overhang",
+        "notes": "UNVALIDATED: no test print yet. Each finger deflects (object_d - entry_w) / 2 at the tip; root strain ~ 1.5 * finger_t * deflection / finger_len^2 \u2014 keep under ~1.5% (PETG) by lengthening the fingers rather than thinning them below 3 lines.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.flex_fingers",
+      "qualname": "flex_fingers",
+      "file": "lib/mechanisms/flex_fingers.py",
+      "line": 9,
+      "returns": "Part",
+      "docstring": "Spine bar occupies y in [-spine_w, 0] over the full length; fingers rise from y=0 to y=finger_len,\nthe row centred on x=0.  Slot bottoms are rounded (radius = half the slot width), and each finger\ntip carries a round bulb sized so the gap between neighbouring bulbs equals entry_w.\n\nExample:\n    comb = flex_fingers(slots=6, pitch=9, finger_t=1.2, finger_len=14, entry_w=3.2, depth=10)\n    comb = comb - [Pos(x, -spine_w, depth / 2) * Rot(90, 0, 0) * keyhole_hanger() for x in (-25, 25)]",
+      "example": "comb = flex_fingers(slots=6, pitch=9, finger_t=1.2, finger_len=14, entry_w=3.2, depth=10)\ncomb = comb - [Pos(x, -spine_w, depth / 2) * Rot(90, 0, 0) * keyhole_hanger() for x in (-25, 25)]",
+      "used_by": [
+        "models/cable_comb/model.py"
+      ],
+      "import": "from lib.mechanisms.flex_fingers import flex_fingers"
+    },
     "mechanisms.latch_window": {
       "id": "mechanisms.latch_window",
       "version": "1.0.0",
@@ -2133,6 +2294,80 @@
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.mechanisms.cantilever_latch import latch_window"
+    },
+    "mechanisms.leaf_spring": {
+      "id": "mechanisms.leaf_spring",
+      "version": "1.0.0",
+      "summary": "Bowed leaf spring (circular-arc beam) between two points on the X axis, bulging toward +Y; standing on z=0.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "chord: X distance between the two ends (the ends sit on y=0 at +/- length/2)"
+        },
+        {
+          "name": "thickness",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "beam thickness measured radially (the flexing dimension, in the bed plane)"
+        },
+        {
+          "name": "bow",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "sagitta: how far the beam's outer face bulges in +Y at the middle; 0 gives a straight beam"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "part depth = print height (Z)"
+        },
+        {
+          "name": "end_overlap",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "extra straight length past each end along the arc tangent, so the ends bury into their blocks"
+        }
+      ],
+      "tags": [
+        "arc",
+        "bow",
+        "cantilever",
+        "carabiner",
+        "clip",
+        "compliant",
+        "gate",
+        "leaf",
+        "leaf spring",
+        "spring"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed, the spring flexing in the bed plane (bending stress runs along the extrusion lines, never across layers)",
+        "notes": "UNVALIDATED: no test print yet. PETG for anything cycled; PLA holds a small preload but creeps and fatigues. Keep the beam >= 3 lines (1.2 mm) at a 0.4 nozzle unless the part is declared hinged.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.springs",
+      "qualname": "leaf_spring",
+      "file": "lib/mechanisms/springs.py",
+      "line": 18,
+      "returns": "Part",
+      "docstring": "The beam's mid-surface runs through (-length/2, 0) and (length/2, 0) with its middle at (0, bow).\nUnion the ends into whatever holds them (a ring end, a jaw); as a cantilever, anchor one end\nand leave the other free.  Strain at the root of a cantilever of chord L deflected d at the tip\nis about 1.5 * thickness * d / L^2 (0.7% for the defaults deflected 3 mm at 28 mm).\n\nExample:\n    gate = Pos(x_gap_centre, y_edge, 0) * leaf_spring(length=28, thickness=1.2, bow=2.5, depth=6)\n    body = ring + gate          # one end overlaps the ring; the other stops short of the nose",
+      "example": "gate = Pos(x_gap_centre, y_edge, 0) * leaf_spring(length=28, thickness=1.2, bow=2.5, depth=6)\nbody = ring + gate          # one end overlaps the ring; the other stops short of the nose",
+      "used_by": [
+        "models/flex_carabiner/model.py"
+      ],
+      "import": "from lib.mechanisms.springs import leaf_spring"
     },
     "mechanisms.living_hinge_lattice": {
       "id": "mechanisms.living_hinge_lattice",
@@ -2289,7 +2524,9 @@
       "returns": "Part",
       "docstring": "Web sits at the bottom (z=0 to web_thickness), centred at x=0; panels extend to +/-X.\n\nExample:\n    hinge = living_hinge_web(width=40, web_thickness=0.5)\n    part = left_panel + hinge + right_panel",
       "example": "hinge = living_hinge_web(width=40, web_thickness=0.5)\npart = left_panel + hinge + right_panel",
-      "used_by": [],
+      "used_by": [
+        "models/bag_clip/model.py"
+      ],
       "import": "from lib.mechanisms.living_hinge import living_hinge_web"
     },
     "mechanisms.parallel_flexure": {
@@ -2370,6 +2607,169 @@
       "used_by": [],
       "import": "from lib.mechanisms.flexure import parallel_flexure"
     },
+    "mechanisms.pip_hinge": {
+      "id": "mechanisms.pip_hinge",
+      "version": "1.0.0",
+      "summary": "Print-in-place pin hinge: leaf A (-Y) and leaf B (+Y) joined by alternating knuckles on a captive pin along X, printed flat and assembled.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 60.0,
+          "description": "hinge length along X (the knuckles fill it)"
+        },
+        {
+          "name": "knuckles",
+          "type": "int",
+          "units": "count",
+          "default": 5,
+          "description": "number of knuckle segments, alternating A, B, A...; odd gives leaf A both ends"
+        },
+        {
+          "name": "pin_d",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "pin diameter (part of leaf A; B's knuckles turn on it)"
+        },
+        {
+          "name": "hub_d",
+          "type": "float",
+          "units": "mm",
+          "default": 7.0,
+          "description": "knuckle outer diameter; the axis sits at z = hub_d / 2 so the hub rests on the bed"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.35,
+          "description": "gap between the pin and B's bore (radial) and between neighbouring knuckles (axial); 0.3-0.4 at a 0.4 nozzle"
+        },
+        {
+          "name": "leaf_len",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "Y length of each stub leaf beyond the hub; union your real plates onto them"
+        },
+        {
+          "name": "leaf_t",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "leaf thickness (Z), from the bed up; must not exceed hub_d"
+        }
+      ],
+      "tags": [
+        "articulated",
+        "fold",
+        "hinge",
+        "knuckle",
+        "lid",
+        "pin",
+        "pip",
+        "print-in-place",
+        "stand"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed with the axis in the bed plane; B's bore is a teardrop (point up) so it bridges over the pin without support",
+        "notes": "UNVALIDATED: no test print yet. Leaves sit on the bed, so the axis is above them: the hinge opens toward +Z to about 160 deg before B's plate meets A's knuckle blocks; it cannot fold flat face-to-face. Break it free with a firm twist after printing. Fine in PLA (nothing flexes); with 0.35 mm clearance the fit is snug rather than loose.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.pip_hinge",
+      "qualname": "pip_hinge",
+      "file": "lib/mechanisms/pip_hinge.py",
+      "line": 10,
+      "returns": "Part",
+      "docstring": "Returns one Part holding two separate solids (A and B) that do not touch; ``pip_hinge_halves``\ngives them separately for fit checks.  Axis: X, at (y=0, z=hub_d/2).  Leaf A spans y in\n[-(leaf_len + hub_d/2), -(hub_d/2 + clearance)] and leaf B the mirror, both z in [0, leaf_t].\n\nExample:\n    h = pip_hinge(length=70, knuckles=7, leaf_t=4)\n    base = Pos(0, -(35 + 3.5), 0) * Box(70, 70, 4, align=(Align.CENTER, Align.CENTER, Align.MIN))   # overlaps leaf A\n    stand = h + base + backrest",
+      "example": "h = pip_hinge(length=70, knuckles=7, leaf_t=4)\nbase = Pos(0, -(35 + 3.5), 0) * Box(70, 70, 4, align=(Align.CENTER, Align.CENTER, Align.MIN))   # overlaps leaf A\nstand = h + base + backrest",
+      "used_by": [],
+      "import": "from lib.mechanisms.pip_hinge import pip_hinge"
+    },
+    "mechanisms.serpentine_spring": {
+      "id": "mechanisms.serpentine_spring",
+      "version": "1.0.0",
+      "summary": "In-plane serpentine (meander) spring along X between two end blocks, compliant along X; standing on z=0, centred on the origin.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "X span of the meander between the inner faces of the end blocks"
+        },
+        {
+          "name": "amplitude",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "Y extent of the meander (leg length, centre to centre of the links)"
+        },
+        {
+          "name": "legs",
+          "type": "int",
+          "units": "count",
+          "default": 4,
+          "description": "number of transverse legs (more legs = softer, longer travel)"
+        },
+        {
+          "name": "beam_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.0,
+          "description": "beam thickness everywhere (the flexing dimension)"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "part depth = print height (Z)"
+        },
+        {
+          "name": "end_block",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "X width of the two end blocks the spring pushes with; their Y size is amplitude + 2 * beam_t"
+        }
+      ],
+      "tags": [
+        "button",
+        "compliant",
+        "compression",
+        "holder",
+        "meander",
+        "self-centring",
+        "serpentine",
+        "spring",
+        "zigzag"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "flat on the bed, the spring flexing in the bed plane (bending stress runs along the extrusion lines, never across layers)",
+        "notes": "UNVALIDATED: no test print yet. PETG for anything cycled; PLA holds a small preload but creeps and fatigues. Keep the beam >= 3 lines (1.2 mm) at a 0.4 nozzle unless the part is declared hinged.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "mechanisms",
+      "module": "lib.mechanisms.springs",
+      "qualname": "serpentine_spring",
+      "file": "lib/mechanisms/springs.py",
+      "line": 62,
+      "returns": "Part",
+      "docstring": "Fixed block at -X, pushing block at +X (or the other way round: it is symmetric).  Compressing\nalong X bends every leg; stiffness scales with beam_t^3 / amplitude^3 and falls with more legs.\nLegs are joined by links alternating between +Y and -Y; the first and last legs join their\nblocks by a link on the X axis.\n\nExample:\n    spring = serpentine_spring(length=24, amplitude=10, legs=5, beam_t=1.0, depth=8)\n    pad = Pos(24 / 2 + 3 + pad_w / 2, 0, 0) * Box(pad_w, pad_h, 8, align=(Align.CENTER, Align.CENTER, Align.MIN))",
+      "example": "spring = serpentine_spring(length=24, amplitude=10, legs=5, beam_t=1.0, depth=8)\npad = Pos(24 / 2 + 3 + pad_w / 2, 0, 0) * Box(pad_w, pad_h, 8, align=(Align.CENTER, Align.CENTER, Align.MIN))",
+      "used_by": [],
+      "import": "from lib.mechanisms.springs import serpentine_spring"
+    },
     "mechanisms.snap_groove": {
       "id": "mechanisms.snap_groove",
       "version": "1.0.0",
@@ -2425,6 +2825,7 @@
       "docstring": "Example:\nbody = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
       "example": "body = body - Pos(0, inner_wall_y, z) * snap_groove(length=lip_len, r=0.6)",
       "used_by": [
+        "models/bag_clip/model.py",
         "models/drain_system/model.py"
       ],
       "import": "from lib.mechanisms.snap_fit import snap_groove"
@@ -2485,6 +2886,7 @@
       "docstring": "Example:\nlip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
       "example": "lip = lip + Pos(0, lip_face_y, z) * snap_ridge(length=lip_len - 4, r=0.6)",
       "used_by": [
+        "models/bag_clip/model.py",
         "models/drain_system/model.py"
       ],
       "import": "from lib.mechanisms.snap_fit import snap_ridge"
@@ -3457,6 +3859,64 @@
       ],
       "import": "from lib.primitives.edge_clip import edge_clip"
     },
+    "primitives.finger_notch": {
+      "id": "primitives.finger_notch",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) rounded finger scoop cut into an edge so a lid or jaw can be lifted; centred on the edge at the origin, cutting through Z.",
+      "params": [
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "scoop width along the edge (X)"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "how far the scoop reaches into the part from the edge (-Y)"
+        },
+        {
+          "name": "through",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "cut length along Z, both ways from z=0"
+        }
+      ],
+      "tags": [
+        "edge",
+        "finger",
+        "grip",
+        "lid",
+        "lift",
+        "negative",
+        "notch",
+        "scoop"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any",
+        "notes": "UNVALIDATED: no test print yet.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.notches",
+      "qualname": "finger_notch",
+      "file": "lib/primitives/notches.py",
+      "line": 9,
+      "returns": "Part",
+      "docstring": "An ellipse of the given width centred on the edge (y=0) whose inner end reaches ``depth`` into -Y;\nthe half outside the part cuts nothing.\n\nExample:\n    jaw = jaw - Pos(0, jaw_end_y, jaw_t / 2) * finger_notch(width=18, depth=5)",
+      "example": "jaw = jaw - Pos(0, jaw_end_y, jaw_t / 2) * finger_notch(width=18, depth=5)",
+      "used_by": [
+        "models/bag_clip/model.py"
+      ],
+      "import": "from lib.primitives.notches import finger_notch"
+    },
     "primitives.foot": {
       "id": "primitives.foot",
       "version": "1.0.0",
@@ -3606,6 +4066,78 @@
       ],
       "import": "from lib.primitives.groove_field import groove_field"
     },
+    "primitives.keyhole_hanger": {
+      "id": "primitives.keyhole_hanger",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) keyhole pocket for hanging on a screw head: round head pocket narrowing to a slot in +Y; mouth at z=0, pocket extends down.",
+      "params": [
+        {
+          "name": "head_d",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "screw head diameter (8 fits a #8 / M4 pan head)"
+        },
+        {
+          "name": "shank_d",
+          "type": "float",
+          "units": "mm",
+          "default": 4.5,
+          "description": "screw shank diameter the slot rides on"
+        },
+        {
+          "name": "slot_len",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "slot length from the head-pocket centre in +Y (up, when hung)"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "pocket depth below the mouth (head height + 1)"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "added to head_d and shank_d"
+        }
+      ],
+      "tags": [
+        "hang",
+        "hanger",
+        "keyhole",
+        "mount",
+        "negative",
+        "pocket",
+        "screw",
+        "wall mount"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "pocket cut into the face that meets the wall; on a vertical face the round pocket roof is a short bridge (<= 10 mm) and prints clean",
+        "notes": "UNVALIDATED: no test print yet. Slot must point up in use; screw the head out ~depth from the wall.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.hangers",
+      "qualname": "keyhole_hanger",
+      "file": "lib/primitives/hangers.py",
+      "line": 11,
+      "returns": "Part",
+      "docstring": "Drawn in XY with the slot in +Y; rotate it so +Y is up on the mounting face.\n\nExample:\n    # keyholes on a vertical back face at y = -spine_w, slot pointing +Z\n    comb = comb - [Pos(x, -spine_w, z) * Rot(90, 0, 0) * keyhole_hanger() for x in (-25, 25)]",
+      "example": "# keyholes on a vertical back face at y = -spine_w, slot pointing +Z\ncomb = comb - [Pos(x, -spine_w, z) * Rot(90, 0, 0) * keyhole_hanger() for x in (-25, 25)]",
+      "used_by": [
+        "models/cable_comb/model.py"
+      ],
+      "import": "from lib.primitives.hangers import keyhole_hanger"
+    },
     "primitives.l_bracket": {
       "id": "primitives.l_bracket",
       "version": "1.0.0",
@@ -3734,6 +4266,86 @@
         "models/l_bracket_40/model.py"
       ],
       "import": "from lib.primitives.l_bracket import l_bracket"
+    },
+    "primitives.notch_rack": {
+      "id": "primitives.notch_rack",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) row of rectangular notches across a face (running along X, stepped along Y) that a plate edge drops into; face at z=0, notches extend down.",
+      "params": [
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 3,
+          "description": "number of notches"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "Y distance between notch centres"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 4.6,
+          "description": "notch width (Y) = plate thickness + clearance"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "notch depth below the face"
+        },
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "notch length along X (through the face if longer than the part)"
+        },
+        {
+          "name": "lead_in",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "45 deg chamfer on the notch mouth so the edge finds it (0 = sharp)"
+        }
+      ],
+      "tags": [
+        "adjustable",
+        "angle",
+        "detent",
+        "groove",
+        "kickstand",
+        "negative",
+        "notch",
+        "rack",
+        "stand"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "face up (notch floors are flat) or on the bed (notch mouths bridge across width)",
+        "notes": "UNVALIDATED: no test print yet.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.notches",
+      "qualname": "notch_rack",
+      "file": "lib/primitives/notches.py",
+      "line": 29,
+      "returns": "Part",
+      "docstring": "Notches centred on y = 0, +/-pitch, ... (the row is centred on the origin).\n\nExample:\n    prop = prop - Pos(0, y_first + pitch, prop_t) * notch_rack(count=3, pitch=8, width=4.6, depth=2, length=80)",
+      "example": "prop = prop - Pos(0, y_first + pitch, prop_t) * notch_rack(count=3, pitch=8, width=4.6, depth=2, length=80)",
+      "used_by": [
+        "models/fold_stand/model.py"
+      ],
+      "import": "from lib.primitives.notches import notch_rack"
     },
     "primitives.pcb_slot_cradle": {
       "id": "primitives.pcb_slot_cradle",
@@ -4087,6 +4699,7 @@
       "used_by": [
         "models/cloud_pi_holder/model.py",
         "models/couch_remote_caddy/model.py",
+        "models/fold_stand/model.py",
         "models/pi5_fan_case/model.py",
         "models/vape_pen_holder/model.py"
       ],
@@ -4446,13 +5059,104 @@
         "models/pi5_fan_case/model.py"
       ],
       "import": "from lib.primitives.vented_panel import vent_slots"
+    },
+    "primitives.zip_tie_slot": {
+      "id": "primitives.zip_tie_slot",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me) pair of parallel slots through a wall for a cable tie loop; slots along Y, spaced along X, cutting through Z.",
+      "params": [
+        {
+          "name": "tie_w",
+          "type": "float",
+          "units": "mm",
+          "default": 4.8,
+          "description": "cable tie width (4.8 = common 4.8 mm tie)"
+        },
+        {
+          "name": "tie_t",
+          "type": "float",
+          "units": "mm",
+          "default": 1.6,
+          "description": "cable tie thickness"
+        },
+        {
+          "name": "spacing",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "X distance between the two slot centres (the loop wraps whatever lies between)"
+        },
+        {
+          "name": "through",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "cut length along Z, both ways from z=0 (exceed the wall thickness)"
+        },
+        {
+          "name": "clearance",
+          "type": "float",
+          "units": "mm",
+          "default": 0.6,
+          "description": "added to width and thickness"
+        }
+      ],
+      "tags": [
+        "cable tie",
+        "mount",
+        "negative",
+        "slot",
+        "strain relief",
+        "strap",
+        "zip tie"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any; slots are rectangular",
+        "notes": "UNVALIDATED: no test print yet.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "primitives",
+      "module": "lib.primitives.hangers",
+      "qualname": "zip_tie_slot",
+      "file": "lib/primitives/hangers.py",
+      "line": 39,
+      "returns": "Part",
+      "docstring": "Example:\nspine = spine - Pos(x, y, 0) * zip_tie_slot(spacing=10, through=spine_w * 2)",
+      "example": "spine = spine - Pos(x, y, 0) * zip_tie_slot(spacing=10, through=spine_w * 2)",
+      "used_by": [
+        "models/cable_comb/model.py"
+      ],
+      "import": "from lib.primitives.hangers import zip_tie_slot"
     }
   },
   "models": {
+    "bag_clip": {
+      "path": "models/bag_clip",
+      "components": [
+        "fasteners.magnet_pocket",
+        "mechanisms.living_hinge_web",
+        "mechanisms.snap_groove",
+        "mechanisms.snap_ridge",
+        "primitives.finger_notch"
+      ],
+      "golden": true
+    },
     "bistable_coupon": {
       "path": "models/bistable_coupon",
       "components": [
         "mechanisms.bistable_beam_pair"
+      ],
+      "golden": true
+    },
+    "cable_comb": {
+      "path": "models/cable_comb",
+      "components": [
+        "mechanisms.flex_fingers",
+        "primitives.keyhole_hanger",
+        "primitives.zip_tie_slot"
       ],
       "golden": true
     },
@@ -4501,6 +5205,21 @@
         "primitives.pcb_slot_cradle",
         "primitives.rounded_box",
         "primitives.vent_slots"
+      ],
+      "golden": true
+    },
+    "flex_carabiner": {
+      "path": "models/flex_carabiner",
+      "components": [
+        "mechanisms.leaf_spring"
+      ],
+      "golden": true
+    },
+    "fold_stand": {
+      "path": "models/fold_stand",
+      "components": [
+        "primitives.notch_rack",
+        "primitives.rubber_foot_recess"
       ],
       "golden": true
     },
