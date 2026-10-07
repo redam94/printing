@@ -79,5 +79,17 @@ fillet(sketch.vertices(), r)                            # 2D fillet; fails on ta
 - **Unioning a boss that already has its pocket cut into a wall re-fills the pocket** wherever the
   wall material overlaps it. Build solids first (shell + solid pillars), then cut pockets and holes
   last (`heat_set_pocket`, `clearance_hole`), or place bosses fully inside the cavity.
+- **`is_valid` can be True while the exported mesh is not watertight.** Two causes seen in
+  `diptyque_discovery_stand`, both found by listing the STL's edges whose face count is not 2
+  (`trimesh.grouping.group_rows(mesh.edges_sorted, require_count=1)` for open edges, a `Counter`
+  for count > 2) and printing where they sit:
+  - a cut that only TOUCHES another boundary at a point (a ripple ring tangent to the circle it was
+    clipped by) leaves a non-manifold edge shared by four triangles. Move one of them so they cross
+    or clear by a few tenths;
+  - one sketch extruded into two cutters (the same fig leaf on both end faces) left the second
+    recess floor open once the part had other features. Building a fresh sketch per placement
+    fixed it.
+- Morphological opening blunts hairline tips in a sketch: `offset(offset(sk, -w/2), w/2)` rounds
+  every horn or point narrower than `w` (used for crescent horns and petal tips, `lib/form/motifs.py`).
 - **Section views are cheap verification:** `part & Box(...)` or `section(part, Plane.XY.offset(z))`
   then render; use them when a cutout's position matters more than the overall shape.

@@ -1,0 +1,303 @@
+{
+  "id": "PRINT-1",
+  "title": "[TEST] Remote control holder for the side of the couch",
+  "status": "done",
+  "created": "2026-09-17T00:43:19",
+  "updated": "2026-09-17T11:28:47",
+  "requester": {
+    "name": "Matthew Reda",
+    "email": "m.reda94@gmail.com"
+  },
+  "request": {
+    "fields": {
+      "title": "[TEST] Remote control holder for the side of the couch",
+      "purpose": "Holds three TV/streaming remotes next to the couch so they stop disappearing between the cushions. Sits on the armrest or hangs over it.",
+      "dimensions": "Remotes ~45 x 20 x 180, 40 x 18 x 150, 38 x 15 x 140; couch arm 150 wide, 25 thick fabric-covered",
+      "quantity": "1",
+      "material": "PLA, Black",
+      "deadline": "2026-10-01",
+      "notes": "Test request submitted through the API to check the Jira form -> tickets pipeline. No screws or adhesive; must not scratch the fabric.",
+      "name": "Matthew Reda",
+      "email": "m.reda94@gmail.com"
+    },
+    "text": "Your name: Matthew Reda\nYour e-mail: m.reda94@gmail.com\nWhat do you need: [TEST] Remote control holder for the side of the couch\nWhat is it for: Holds three TV/streaming remotes next to the couch so they stop disappearing between the cushions. Sits on the armrest or hangs over it.\nSizes it must fit (mm): Remotes ~45 x 20 x 180, 40 x 18 x 150, 38 x 15 x 140; couch arm 150 wide, 25 thick fabric-covered\nHow many: 1\nMaterial and colour: PLA, Black\nWhen do you need it: 2026-10-01\nAnything else: Test request submitted through the API to check the Jira form -> tickets pipeline. No screws or adhesive; must not scratch the fabric.",
+    "source": "jira"
+  },
+  "model": "couch_remote_caddy",
+  "quotes": [
+    {
+      "rev": 1,
+      "created": "2026-09-17T11:27:08",
+      "sent": "2026-09-17T11:27:18",
+      "model": "couch_remote_caddy",
+      "build_id": "20260917-112707",
+      "material": "PLA",
+      "qty": 1,
+      "estimate": {
+        "material": "PLA",
+        "qty": 1,
+        "currency": "USD",
+        "parts": [
+          {
+            "name": "caddy",
+            "bbox_mm": [
+              184.8,
+              140.2,
+              92.4
+            ],
+            "volume_cm3": 241.09,
+            "mass_g": 204.5,
+            "print_h": 13.63,
+            "wall_min_mm": 1.61,
+            "print_mode": "normal"
+          }
+        ],
+        "mass_g": 204.5,
+        "print_h": 13.8,
+        "post_h": 0.1,
+        "lead_days": 4,
+        "material_cost": 4.5,
+        "machine_cost": 27.59,
+        "labor_cost": 5.0,
+        "design_fee": 15.0,
+        "subtotal": 52.09,
+        "margin": 0.15,
+        "total": 60.0,
+        "per_unit": 60.0,
+        "rates": {
+          "shell_mm": 1.2,
+          "infill": 0.2,
+          "flow_g_per_h": 15.0,
+          "setup_min": 10,
+          "post_min_per_part": 5,
+          "machine_per_h": 2.0,
+          "labor_per_h": 20.0,
+          "design_fee": 15.0,
+          "min_charge": 10.0,
+          "margin": 0.15,
+          "queue_days": 2,
+          "material": {
+            "density_g_cm3": 1.24,
+            "cost_per_kg": 22.0
+          }
+        }
+      },
+      "note": "This is one piece that sits over the couch arm: a flat saddle across the top, a short leg down the seat side, and a block of three pockets hanging down the outside. No screws or glue; the remotes' weight holds it against the arm. Every edge that touches the fabric is rounded, and the underside has four shallow seats for stick-on felt dots (12 mm) so nothing rubs the upholstery. Each pocket is 2 mm bigger than the remote and half its length deep, so the top half of each remote stays in reach. Two things I assumed and would like you to check: (1) I read 'couch arm 150 wide, 25 thick' as a 150 mm wide, roughly flat arm top, with the 25 mm being the padding; if the arm is rounded or narrower, tell me its width at the top and I will adjust the saddle. (2) The caddy runs 140 mm along the arm; say if you want it shorter.",
+      "attachments": [
+        "PRINT-1-r1-3d-viewer.html",
+        "caddy.png",
+        "measurements.md"
+      ],
+      "subject": "[PRINT-1] Quote r1: [TEST] Remote control holder for the side of the couch",
+      "message_id": "jira-comment-10000"
+    },
+    {
+      "rev": 2,
+      "created": "2026-09-17T11:28:10",
+      "sent": "2026-09-17T11:28:14",
+      "model": "couch_remote_caddy",
+      "build_id": "20260917-112801",
+      "material": "PLA",
+      "qty": 1,
+      "estimate": {
+        "material": "PLA",
+        "qty": 1,
+        "currency": "USD",
+        "parts": [
+          {
+            "name": "caddy",
+            "bbox_mm": [
+              174.8,
+              140.2,
+              74.4
+            ],
+            "volume_cm3": 207.32,
+            "mass_g": 178.7,
+            "print_h": 11.91,
+            "wall_min_mm": 1.61,
+            "print_mode": "normal"
+          }
+        ],
+        "mass_g": 178.7,
+        "print_h": 12.1,
+        "post_h": 0.1,
+        "lead_days": 4,
+        "material_cost": 3.93,
+        "machine_cost": 24.15,
+        "labor_cost": 5.0,
+        "design_fee": 15.0,
+        "subtotal": 48.08,
+        "margin": 0.15,
+        "total": 55.5,
+        "per_unit": 55.5,
+        "rates": {
+          "shell_mm": 1.2,
+          "infill": 0.2,
+          "flow_g_per_h": 15.0,
+          "setup_min": 10,
+          "post_min_per_part": 5,
+          "machine_per_h": 2.0,
+          "labor_per_h": 20.0,
+          "design_fee": 15.0,
+          "min_charge": 10.0,
+          "margin": 0.15,
+          "queue_days": 2,
+          "material": {
+            "density_g_cm3": 1.24,
+            "cost_per_kg": 22.0
+          }
+        }
+      },
+      "note": "Revision 2, with the two changes you asked for: the saddle now fits a 140 mm wide arm (144 mm inside, the same 4 mm of play as before), and each pocket is 40% of its remote's length deep instead of half (72, 60 and 56 mm), so more of each remote sticks out to grab. Nothing else changed. The caddy is now 175 x 140 x 74 mm and a little lighter, so the price came down.",
+      "attachments": [
+        "PRINT-1-r2-3d-viewer.html",
+        "caddy.png",
+        "measurements.md"
+      ],
+      "subject": "[PRINT-1] Quote r2: [TEST] Remote control holder for the side of the couch",
+      "message_id": "jira-comment-10002"
+    }
+  ],
+  "messages": [
+    {
+      "id": "jira-PRINT-1",
+      "when": "2026-09-17T00:43:19",
+      "from": "requester",
+      "kind": "request",
+      "subject": "[print request] [TEST] Remote control holder for the side of the couch",
+      "text": "Your name: Matthew Reda\nYour e-mail: m.reda94@gmail.com\nWhat do you need: [TEST] Remote control holder for the side of the couch\nWhat is it for: Holds three TV/streaming remotes next to the couch so they stop disappearing between the cushions. Sits on the armrest or hangs over it.\nSizes it must fit (mm): Remotes ~45 x 20 x 180, 40 x 18 x 150, 38 x 15 x 140; couch arm 150 wide, 25 thick fabric-covered\nHow many: 1\nMaterial and colour: PLA, Black\nWhen do you need it: 2026-10-01\nAnything else: Test request submitted through the API to check the Jira form -> tickets pipeline. No screws or adhesive; must not scratch the fabric."
+    },
+    {
+      "id": "jira-comment-10000",
+      "when": "2026-09-17T11:27:18",
+      "from": "me",
+      "kind": "quote",
+      "subject": "[PRINT-1] Quote r1: [TEST] Remote control holder for the side of the couch",
+      "text": "quote r1 sent: couch_remote_caddy in PLA x1, $60.00, ~4 day(s)",
+      "mail_message_id": "jira-comment-10000",
+      "jira": "Jira: In review -> Pending"
+    },
+    {
+      "id": "jira-comment-10001",
+      "when": "2026-09-17T11:27:42",
+      "from": "requester",
+      "kind": "reply",
+      "subject": "comment on PRINT-1",
+      "text": "[TEST reply] Looks good, but I measured the arm again: it is 140 mm wide at the top, not 150. Could you also make the pockets a bit shallower, about 40% of each remote's length?",
+      "verdict": "changes"
+    },
+    {
+      "id": "jira-comment-10002",
+      "when": "2026-09-17T11:28:14",
+      "from": "me",
+      "kind": "quote",
+      "subject": "[PRINT-1] Quote r2: [TEST] Remote control holder for the side of the couch",
+      "text": "quote r2 sent: couch_remote_caddy in PLA x1, $55.50, ~4 day(s)",
+      "mail_message_id": "jira-comment-10002",
+      "jira": "Jira: no transition for 'quoted' on PRINT-1 (wanted one of Respond to customer, Waiting for customer, Pending; set tickets/jira.json transitions)"
+    },
+    {
+      "id": "jira-comment-10003",
+      "when": "2026-09-17T11:28:27",
+      "from": "requester",
+      "kind": "reply",
+      "subject": "comment on PRINT-1",
+      "text": "CONFIRM",
+      "verdict": "approved"
+    },
+    {
+      "id": "jira-comment-10004",
+      "when": "2026-09-17T11:28:40",
+      "from": "me",
+      "kind": "comment",
+      "subject": "comment on PRINT-1",
+      "text": "[TEST] workflow test complete; no part was printed"
+    }
+  ],
+  "history": [
+    {
+      "when": "2026-09-17T00:43:19",
+      "from": "",
+      "to": "new",
+      "by": "jira",
+      "note": ""
+    },
+    {
+      "when": "2026-09-17T11:26:35",
+      "from": "new",
+      "to": "designing",
+      "by": "me",
+      "note": "model couch_remote_caddy built"
+    },
+    {
+      "when": "2026-09-17T11:26:37",
+      "from": "designing",
+      "to": "designing",
+      "by": "me",
+      "note": "quote r1 packaged from couch_remote_caddy"
+    },
+    {
+      "when": "2026-09-17T11:27:08",
+      "from": "designing",
+      "to": "designing",
+      "by": "me",
+      "note": "quote r1 packaged from couch_remote_caddy"
+    },
+    {
+      "when": "2026-09-17T11:27:18",
+      "from": "designing",
+      "to": "quoted",
+      "by": "me",
+      "note": "quote r1"
+    },
+    {
+      "when": "2026-09-17T11:27:43",
+      "from": "quoted",
+      "to": "changes",
+      "by": "requester",
+      "note": "Jira comment read as changes"
+    },
+    {
+      "when": "2026-09-17T11:28:10",
+      "from": "changes",
+      "to": "changes",
+      "by": "me",
+      "note": "quote r2 packaged from couch_remote_caddy"
+    },
+    {
+      "when": "2026-09-17T11:28:14",
+      "from": "changes",
+      "to": "quoted",
+      "by": "me",
+      "note": "quote r2"
+    },
+    {
+      "when": "2026-09-17T11:28:29",
+      "from": "quoted",
+      "to": "approved",
+      "by": "requester",
+      "note": "Jira comment read as approved"
+    },
+    {
+      "when": "2026-09-17T11:28:38",
+      "from": "approved",
+      "to": "printing",
+      "by": "me",
+      "note": "[TEST] workflow test: nothing is on the bed"
+    },
+    {
+      "when": "2026-09-17T11:28:39",
+      "from": "printing",
+      "to": "done",
+      "by": "me",
+      "note": "[TEST] workflow test complete; no part was printed"
+    }
+  ],
+  "jira": {
+    "key": "PRINT-1",
+    "url": "https://matt-reda.atlassian.net/browse/PRINT-1",
+    "status": "Done",
+    "jsm": true,
+    "synced": "2026-09-17T11:28:47"
+  }
+}

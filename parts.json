@@ -480,6 +480,185 @@
       "used_by": [],
       "import": "from lib.fasteners.screw_boss import screw_boss"
     },
+    "form.arc_band": {
+      "id": "form.arc_band",
+      "version": "1.0.0",
+      "summary": "Annular-sector sketch symmetric about +Y (terrace, amphitheatre step, curved shelf), optional wavy inner/outer edge and rounded corners.",
+      "params": [
+        {
+          "name": "r_in",
+          "type": "float",
+          "units": "mm",
+          "default": 40.0,
+          "description": "inner radius"
+        },
+        {
+          "name": "r_out",
+          "type": "float",
+          "units": "mm",
+          "default": 60.0,
+          "description": "outer radius"
+        },
+        {
+          "name": "angle",
+          "type": "float",
+          "units": "deg",
+          "default": 90.0,
+          "description": "total sector angle, centred on +Y"
+        },
+        {
+          "name": "wave_in",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "sinusoidal amplitude of the inner edge (0 = plain arc)"
+        },
+        {
+          "name": "waves_in",
+          "type": "int",
+          "units": "count",
+          "default": 0,
+          "description": "full waves along the inner edge (the edge is symmetric about +Y)"
+        },
+        {
+          "name": "wave_out",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "sinusoidal amplitude of the outer edge (0 = plain arc)"
+        },
+        {
+          "name": "waves_out",
+          "type": "int",
+          "units": "count",
+          "default": 0,
+          "description": "full waves along the outer edge"
+        },
+        {
+          "name": "corner_r",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "fillet on the four corners (0 = sharp); corners too tight for it get a smaller radius"
+        },
+        {
+          "name": "samples_per_wave",
+          "type": "int",
+          "units": "count",
+          "default": 8,
+          "description": "spline points per wave (>= 6 keeps the curve faithful)"
+        }
+      ],
+      "tags": [
+        "amphitheatre",
+        "annulus",
+        "arc",
+        "band",
+        "curved",
+        "form",
+        "sector",
+        "shelf",
+        "sketch",
+        "step",
+        "terrace",
+        "wave"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "arc_band",
+      "file": "lib/form/motifs.py",
+      "line": 54,
+      "returns": "Sketch",
+      "docstring": "Centre of curvature at the origin; the band spans ``angle`` degrees centred on +Y.\n\nExample:\n    terrace = extrude(arc_band(90, 120, 100, wave_in=1.5, waves_in=7, corner_r=4), amount=5)",
+      "example": "terrace = extrude(arc_band(90, 120, 100, wave_in=1.5, waves_in=7, corner_r=4), amount=5)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import arc_band"
+    },
+    "form.arc_flutes": {
+      "id": "form.arc_flutes",
+      "version": "1.0.0",
+      "summary": "Negative (subtract me): vertical half-round flutes with their axes on an arc about Z, for a curved wall face (concave or convex); z=0 up.",
+      "params": [
+        {
+          "name": "radius",
+          "type": "float",
+          "units": "mm",
+          "default": 60.0,
+          "description": "radius of the face being fluted (the flute axes sit on it, so the depth is flute_r)"
+        },
+        {
+          "name": "angle",
+          "type": "float",
+          "units": "deg",
+          "default": 60.0,
+          "description": "sector the flutes fill, centred on +Y; the row is centred in it"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 4.0,
+          "description": "spacing between flute axes, measured along the arc"
+        },
+        {
+          "name": "flute_r",
+          "type": "float",
+          "units": "mm",
+          "default": 1.2,
+          "description": "flute radius = depth into the face; width is twice this"
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "units": "mm",
+          "default": 20.0,
+          "description": "flute length from z=0 up (overshoot the face's top by ~1 mm to open the flute out)"
+        }
+      ],
+      "tags": [
+        "arc",
+        "curved",
+        "flutes",
+        "fluting",
+        "form",
+        "grooves",
+        "negative",
+        "reeding",
+        "riser",
+        "texture",
+        "wood"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "axis vertical (flutes run up the wall); a horizontal flute is a 90 deg overhang",
+        "notes": "UNVALIDATED. Keep pitch - 2 * flute_r >= 0.8 so the lands between flutes survive.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "arc_flutes",
+      "file": "lib/form/motifs.py",
+      "line": 247,
+      "returns": "Part",
+      "docstring": "Example:\nbody = body - Pos(0, 0, tread_z) * arc_flutes(riser_r, sector, pitch=4, flute_r=1.2, height=riser_h + 1)",
+      "example": "body = body - Pos(0, 0, tread_z) * arc_flutes(riser_r, sector, pitch=4, flute_r=1.2, height=riser_h + 1)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import arc_flutes"
+    },
     "form.ball_chain": {
       "id": "form.ball_chain",
       "version": "1.0.0",
@@ -742,6 +921,78 @@
         "models/cloud_pi_holder/model.py"
       ],
       "import": "from lib.form.outline import cloud_outline"
+    },
+    "form.crescent": {
+      "id": "form.crescent",
+      "version": "1.0.0",
+      "summary": "Crescent-moon sketch: a disc with an offset disc bitten out of it, horns pointing +X before rotation.",
+      "params": [
+        {
+          "name": "r",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "moon radius"
+        },
+        {
+          "name": "bite_r",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.82,
+          "description": "radius of the disc removed, as a fraction of r"
+        },
+        {
+          "name": "bite_offset",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.42,
+          "description": "how far the removed disc sits off centre (toward +X), as a fraction of r; bite_r + bite_offset must exceed 1"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotates the crescent"
+        },
+        {
+          "name": "min_width",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "the horns are rounded off so nothing is narrower than this (0 = cusps)"
+        }
+      ],
+      "tags": [
+        "celestial",
+        "crescent",
+        "form",
+        "lunar",
+        "moon",
+        "night",
+        "relief",
+        "sketch"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "crescent",
+      "file": "lib/form/motifs.py",
+      "line": 204,
+      "returns": "Sketch",
+      "docstring": "Example:\nsky = sky - extrude(Plane.XY.offset(top) * crescent(7, rotation=30), amount=-0.6)",
+      "example": "sky = sky - extrude(Plane.XY.offset(top) * crescent(7, rotation=30), amount=-0.6)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import crescent"
     },
     "form.dome_chain": {
       "id": "form.dome_chain",
@@ -1124,6 +1375,279 @@
       ],
       "import": "from lib.form.surface import flutes"
     },
+    "form.lily_pad": {
+      "id": "form.lily_pad",
+      "version": "1.0.0",
+      "summary": "Lily-pad sketch: a disc with a V slit running to the centre, optional radial vein lines left uncut.",
+      "params": [
+        {
+          "name": "r",
+          "type": "float",
+          "units": "mm",
+          "default": 8.0,
+          "description": "pad radius"
+        },
+        {
+          "name": "notch",
+          "type": "float",
+          "units": "deg",
+          "default": 36.0,
+          "description": "opening angle of the V slit"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "direction the slit opens toward, from +Y"
+        },
+        {
+          "name": "veins",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "width of the radial vein lines removed from the sketch (0 = none)"
+        },
+        {
+          "name": "vein_count",
+          "type": "int",
+          "units": "count",
+          "default": 7,
+          "description": "number of veins, spaced evenly with the slit's edges; each starts where the land beside it is 0.8 mm wide (small pads may get none)"
+        }
+      ],
+      "tags": [
+        "botanical",
+        "form",
+        "leaf",
+        "lily",
+        "pad",
+        "pond",
+        "relief",
+        "sketch",
+        "water"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "lily_pad",
+      "file": "lib/form/motifs.py",
+      "line": 143,
+      "returns": "Sketch",
+      "docstring": "Example:\npond = pond + extrude(Plane.XY.offset(pond_top) * lily_pad(9, rotation=40), amount=1.2)",
+      "example": "pond = pond + extrude(Plane.XY.offset(pond_top) * lily_pad(9, rotation=40), amount=1.2)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import lily_pad"
+    },
+    "form.palmate_leaf": {
+      "id": "form.palmate_leaf",
+      "version": "1.0.0",
+      "summary": "Palmate leaf sketch (fig, vine, maple): lobes radiating from the stem junction at the origin, central lobe along +Y, optional vein lines left uncut.",
+      "params": [
+        {
+          "name": "length",
+          "type": "float",
+          "units": "mm",
+          "default": 30.0,
+          "description": "stem junction to the tip of the central lobe"
+        },
+        {
+          "name": "lobes",
+          "type": "int",
+          "units": "count",
+          "default": 5,
+          "description": "number of lobes (odd keeps a central lobe; the defaults draw a 5-lobed fig leaf)"
+        },
+        {
+          "name": "spread",
+          "type": "float",
+          "units": "deg",
+          "default": 220.0,
+          "description": "angle between the outermost lobe axes"
+        },
+        {
+          "name": "lobe_width",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.55,
+          "description": "lobe width as a fraction of its own length"
+        },
+        {
+          "name": "taper",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.75,
+          "description": "each lobe out from the centre is this fraction of the length of the one inside it"
+        },
+        {
+          "name": "palm",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.3,
+          "description": "radius of the solid centre that joins the lobes, as a fraction of length"
+        },
+        {
+          "name": "stem_len",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.35,
+          "description": "stem length below the origin, as a fraction of length (0 = no stem)"
+        },
+        {
+          "name": "stem_w",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.12,
+          "description": "stem width, as a fraction of length"
+        },
+        {
+          "name": "tip",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.22,
+          "description": "radius of a disc rounding off each lobe's end, as a fraction of that lobe's length: 0 = plain elliptical lobes (pointed, maple-like); ~0.22 = spoon-shaped lobes, broad and blunt at the end (fig); 0.3 and up turns into a club suit"
+        },
+        {
+          "name": "veins",
+          "type": "float",
+          "units": "mm",
+          "default": 0.0,
+          "description": "width of the vein lines removed from the sketch (0 = none); debossed, the veins stay standing"
+        },
+        {
+          "name": "smooth_r",
+          "type": "float",
+          "units": "mm",
+          "default": 2.0,
+          "description": "fillet in the sinuses between lobes"
+        }
+      ],
+      "tags": [
+        "botanical",
+        "deboss",
+        "fig",
+        "form",
+        "leaf",
+        "lobes",
+        "maple",
+        "palmate",
+        "relief",
+        "sketch",
+        "veins",
+        "vine"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "palmate_leaf",
+      "file": "lib/form/motifs.py",
+      "line": 89,
+      "returns": "Sketch",
+      "docstring": "Each lobe is an ellipse from the origin out to its tip, optionally club-ended (``tip``); the\nunion is smoothed in the sinuses. The defaults draw a fig leaf; tip=0 with lobe_width ~0.4 reads\nas maple, lobes=3 as a vine leaf.\nWith ``veins`` > 0 a midrib runs up every lobe from the stem junction, removed from the sketch, so\nsubtracting the extruded sketch from a wall leaves a recessed leaf with raised veins.\n\nExample:\n    wall = wall - extrude(Plane.YZ * palmate_leaf(28, veins=1.0), amount=-0.8)",
+      "example": "wall = wall - extrude(Plane.YZ * palmate_leaf(28, veins=1.0), amount=-0.8)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import palmate_leaf"
+    },
+    "form.petal_rosette": {
+      "id": "form.petal_rosette",
+      "version": "1.0.0",
+      "summary": "Flower rosette sketch: pointed (lens-shaped) petals radiating from a centre disc; stack two, rotated, for a layered bloom.",
+      "params": [
+        {
+          "name": "r",
+          "type": "float",
+          "units": "mm",
+          "default": 6.0,
+          "description": "centre to petal tip"
+        },
+        {
+          "name": "petals",
+          "type": "int",
+          "units": "count",
+          "default": 8,
+          "description": "number of petals"
+        },
+        {
+          "name": "petal_w",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.42,
+          "description": "petal width as a fraction of r"
+        },
+        {
+          "name": "centre",
+          "type": "float",
+          "units": "ratio",
+          "default": 0.25,
+          "description": "centre disc radius as a fraction of r"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "units": "deg",
+          "default": 0.0,
+          "description": "rotates the rosette"
+        },
+        {
+          "name": "min_width",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "petal tips are rounded so nothing is narrower than this (0 = needle-sharp tips)"
+        }
+      ],
+      "tags": [
+        "botanical",
+        "daisy",
+        "flower",
+        "form",
+        "lily",
+        "lotus",
+        "petal",
+        "relief",
+        "rosette",
+        "sketch",
+        "star"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "petal_rosette",
+      "file": "lib/form/motifs.py",
+      "line": 176,
+      "returns": "Sketch",
+      "docstring": "Each petal is a vesica (the overlap of two circles) from the centre to the tip.\n\nExample:\n    bloom = extrude(petal_rosette(6), amount=1.2) + extrude(Plane.XY.offset(1.2) * petal_rosette(3.5, rotation=22.5), amount=1.2)",
+      "example": "bloom = extrude(petal_rosette(6), amount=1.2) + extrude(Plane.XY.offset(1.2) * petal_rosette(3.5, rotation=22.5), amount=1.2)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import petal_rosette"
+    },
     "form.revolved_body": {
       "id": "form.revolved_body",
       "version": "1.0.0",
@@ -1224,6 +1748,72 @@
         "models/vape_pen_holder/model.py"
       ],
       "import": "from lib.form.revolved import revolved_body"
+    },
+    "form.ripple_rings": {
+      "id": "form.ripple_rings",
+      "version": "1.0.0",
+      "summary": "Concentric ring sketch (water ripples, target, rings in a pond) to deboss or raise; centred on the origin.",
+      "params": [
+        {
+          "name": "r0",
+          "type": "float",
+          "units": "mm",
+          "default": 5.0,
+          "description": "centre-line radius of the innermost ring"
+        },
+        {
+          "name": "pitch",
+          "type": "float",
+          "units": "mm",
+          "default": 3.0,
+          "description": "radial spacing between rings"
+        },
+        {
+          "name": "count",
+          "type": "int",
+          "units": "count",
+          "default": 3,
+          "description": "number of rings"
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "units": "mm",
+          "default": 0.8,
+          "description": "ring width"
+        }
+      ],
+      "tags": [
+        "concentric",
+        "form",
+        "groove",
+        "pond",
+        "relief",
+        "rings",
+        "ripple",
+        "sketch",
+        "water"
+      ],
+      "material_notes": {
+        "validated": [],
+        "orientation": "any (2D motif): raised or debossed on a top face it needs no support; on a wall keep the relief <= 1 mm",
+        "notes": "UNVALIDATED. Keep raised/debossed features >= 0.8 mm wide (two lines at a 0.4 nozzle): crescent horns and rosette petal tips are rounded to min_width for that reason; leaf veins and ripple rings take their width as given.",
+        "evidence": [],
+        "field_validated": [],
+        "field_failed": []
+      },
+      "category": "form",
+      "module": "lib.form.motifs",
+      "qualname": "ripple_rings",
+      "file": "lib/form/motifs.py",
+      "line": 227,
+      "returns": "Sketch",
+      "docstring": "Clip the result to the surface it sits on (``rings & surface_sketch``) before cutting.\n\nExample:\n    pond = pond - extrude(Plane.XY.offset(top) * (ripple_rings(10, 3, 4) & pond_outline), amount=-0.6)",
+      "example": "pond = pond - extrude(Plane.XY.offset(top) * (ripple_rings(10, 3, 4) & pond_outline), amount=-0.6)",
+      "used_by": [
+        "models/diptyque_discovery_stand/model.py"
+      ],
+      "import": "from lib.form.motifs import ripple_rings"
     },
     "form.sdf_solid": {
       "id": "form.sdf_solid",
@@ -4530,7 +5120,8 @@
       "docstring": "Pockets in a row along X, the whole row centred on x=0, rims in the z=0 plane.\n\n``row_length(sizes, web, clearance)`` gives the X extent, for sizing the body around it::\n\n    block = block - Pos(0, 0, top_z) * pocket_array(((45, 20, 90), (40, 18, 75)), web=2.4)\n\nExample:\n    caddy = box - Pos(0, 0, box_h) * pocket_array(((45, 20, 90), (40, 18, 75), (38, 15, 70)))",
       "example": "caddy = box - Pos(0, 0, box_h) * pocket_array(((45, 20, 90), (40, 18, 75), (38, 15, 70)))",
       "used_by": [
-        "models/couch_remote_caddy/model.py"
+        "models/couch_remote_caddy/model.py",
+        "models/diptyque_discovery_stand/model.py"
       ],
       "import": "from lib.primitives.pocket_array import pocket_array"
     },
@@ -4699,6 +5290,7 @@
       "used_by": [
         "models/cloud_pi_holder/model.py",
         "models/couch_remote_caddy/model.py",
+        "models/diptyque_discovery_stand/model.py",
         "models/fold_stand/model.py",
         "models/pi5_fan_case/model.py",
         "models/vape_pen_holder/model.py"
@@ -4910,6 +5502,7 @@
       "docstring": "Sockets on a ``count`` x ``rows`` grid centred on the origin, rims in the z=0 plane.\n\nSubtract from a body whose top face is at ``top_z``::\n\n    block = block - Pos(x, y, top_z) * socket_array(...)\n\nThe wall left between two sockets is ``pitch - bore_d - clearance``; keep it at 2 mm or more\n(5 perimeters at a 0.4 nozzle) for anything that gets pushed sideways.\n\nExample:\n    holder = block - Pos(0, 0, block_h) * socket_array(11.0, depth=22, count=2, pitch=26)",
       "example": "holder = block - Pos(0, 0, block_h) * socket_array(11.0, depth=22, count=2, pitch=26)",
       "used_by": [
+        "models/diptyque_discovery_stand/model.py",
         "models/vape_pen_holder/model.py"
       ],
       "import": "from lib.primitives.socket_array import socket_array"
@@ -5180,6 +5773,22 @@
       "components": [
         "primitives.pocket_array",
         "primitives.rubber_foot_recess"
+      ],
+      "golden": true
+    },
+    "diptyque_discovery_stand": {
+      "path": "models/diptyque_discovery_stand",
+      "components": [
+        "form.arc_band",
+        "form.arc_flutes",
+        "form.crescent",
+        "form.lily_pad",
+        "form.palmate_leaf",
+        "form.petal_rosette",
+        "form.ripple_rings",
+        "primitives.pocket_array",
+        "primitives.rubber_foot_recess",
+        "primitives.socket_array"
       ],
       "golden": true
     },

@@ -1,0 +1,206 @@
+{
+  "rev": 2,
+  "created": "2026-09-17T11:28:10",
+  "sent": "",
+  "model": "couch_remote_caddy",
+  "build_id": "20260917-112801",
+  "material": "PLA",
+  "qty": 1,
+  "estimate": {
+    "material": "PLA",
+    "qty": 1,
+    "currency": "USD",
+    "parts": [
+      {
+        "name": "caddy",
+        "bbox_mm": [
+          174.8,
+          140.2,
+          74.4
+        ],
+        "volume_cm3": 207.32,
+        "mass_g": 178.7,
+        "print_h": 11.91,
+        "wall_min_mm": 1.61,
+        "print_mode": "normal"
+      }
+    ],
+    "mass_g": 178.7,
+    "print_h": 12.1,
+    "post_h": 0.1,
+    "lead_days": 4,
+    "material_cost": 3.93,
+    "machine_cost": 24.15,
+    "labor_cost": 5.0,
+    "design_fee": 15.0,
+    "subtotal": 48.08,
+    "margin": 0.15,
+    "total": 55.5,
+    "per_unit": 55.5,
+    "rates": {
+      "shell_mm": 1.2,
+      "infill": 0.2,
+      "flow_g_per_h": 15.0,
+      "setup_min": 10,
+      "post_min_per_part": 5,
+      "machine_per_h": 2.0,
+      "labor_per_h": 20.0,
+      "design_fee": 15.0,
+      "min_charge": 10.0,
+      "margin": 0.15,
+      "queue_days": 2,
+      "material": {
+        "density_g_cm3": 1.24,
+        "cost_per_kg": 22.0
+      }
+    }
+  },
+  "note": "Revision 2, with the two changes you asked for: the saddle now fits a 140 mm wide arm (144 mm inside, the same 4 mm of play as before), and each pocket is 40% of its remote's length deep instead of half (72, 60 and 56 mm), so more of each remote sticks out to grab. Nothing else changed. The caddy is now 175 x 140 x 74 mm and a little lighter, so the price came down.",
+  "attachments": [
+    "PRINT-1-r2-3d-viewer.html",
+    "caddy.png",
+    "measurements.md"
+  ],
+  "subject": "[PRINT-1] Quote r2: [TEST] Remote control holder for the side of the couch",
+  "message_id": "",
+  "report_params": [
+    {
+      "name": "ARM_W",
+      "value": 140.0,
+      "comment": "mm, arm width across the top (PRINT-1 r2: requester re-measured, was 150)",
+      "derived": false
+    },
+    {
+      "name": "ARM_CLEARANCE",
+      "value": 4.0,
+      "comment": "mm, added to ARM_W so the saddle slides over padded fabric without dragging",
+      "derived": false
+    },
+    {
+      "name": "ARM_SPAN",
+      "value": 144.0,
+      "comment": "mm, inside width of the saddle",
+      "derived": true
+    },
+    {
+      "name": "ARM_ENVELOPE_H",
+      "value": 200.0,
+      "comment": "mm, how far down the arm is modelled for the fit check (the sides of any couch arm)",
+      "derived": false
+    },
+    {
+      "name": "REMOTES",
+      "value": "((45.0, 20.0, 180.0), (40.0, 18.0, 150.0), (38.0, 15.0, 140.0))",
+      "comment": "",
+      "derived": true
+    },
+    {
+      "name": "POCKET_DEPTH_FRAC",
+      "value": 0.4,
+      "comment": "pocket depth as a fraction of each remote's length (PRINT-1 r2: was 0.5)",
+      "derived": false
+    },
+    {
+      "name": "POCKET_CLEARANCE",
+      "value": 2.0,
+      "comment": "mm, added to each remote's width and thickness (1 mm per side, drops in one-handed)",
+      "derived": false
+    },
+    {
+      "name": "POCKET_CORNER_R",
+      "value": 3.0,
+      "comment": "mm, vertical corner radius inside each pocket",
+      "derived": false
+    },
+    {
+      "name": "POCKET_LEAD_IN",
+      "value": 1.2,
+      "comment": "mm, 45 deg chamfer at each pocket rim",
+      "derived": false
+    },
+    {
+      "name": "POCKET_WEB",
+      "value": 2.4,
+      "comment": "mm, wall between pockets (6 perimeters)",
+      "derived": false
+    },
+    {
+      "name": "POCKETS",
+      "value": "((45.0, 20.0, 72.0), (40.0, 18.0, 60.0), (38.0, 15.0, 56.0))",
+      "comment": "(x, y, depth) for pocket_array",
+      "derived": true
+    },
+    {
+      "name": "PLATE_T",
+      "value": 3.2,
+      "comment": "mm, saddle plate lying on the arm (8 perimeters' worth of stiffness across the span)",
+      "derived": false
+    },
+    {
+      "name": "INNER_LEG_T",
+      "value": 3.2,
+      "comment": "mm, leg down the seat side",
+      "derived": false
+    },
+    {
+      "name": "INNER_LEG_H",
+      "value": 35.0,
+      "comment": "mm, leg length below the arm top (stops the caddy sliding off outboard)",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_ARM_WALL",
+      "value": 3.2,
+      "comment": "mm, block wall against the outboard side of the arm (it is the outer leg)",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_OUTER_WALL",
+      "value": 2.4,
+      "comment": "mm, block wall facing the room",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_END_WALL",
+      "value": 3.2,
+      "comment": "mm, block walls at both ends of the pocket row",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_FLOOR_T",
+      "value": 2.4,
+      "comment": "mm, pocket floors (bridges in print orientation)",
+      "derived": false
+    },
+    {
+      "name": "EDGE_R",
+      "value": 1.5,
+      "comment": "mm, radius on every edge running along the arm except the saddle top: nothing sharp touches the fabric",
+      "derived": false
+    },
+    {
+      "name": "BED_CHAMFER",
+      "value": 0.4,
+      "comment": "mm, elephant-foot chamfer round the saddle top (the bed face)",
+      "derived": false
+    },
+    {
+      "name": "PAD_D",
+      "value": 12.0,
+      "comment": "mm, stick-on felt / rubber dot diameter",
+      "derived": false
+    },
+    {
+      "name": "PAD_DEPTH",
+      "value": 0.8,
+      "comment": "mm, locating recess depth",
+      "derived": false
+    },
+    {
+      "name": "PAD_INSET",
+      "value": 15.0,
+      "comment": "mm, pad centre distance from the saddle's inner edges and ends",
+      "derived": false
+    }
+  ]
+}

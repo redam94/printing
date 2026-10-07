@@ -1,0 +1,35 @@
+{
+  "project": "diptyque_discovery_stand",
+  "generated": "2026-10-06",
+  "tessellation": {
+    "tolerance": 0.01,
+    "angular_tolerance": 0.1
+  },
+  "parts": {
+    "stand": {
+      "bbox_min": [
+        -131.861,
+        20.46,
+        0.0
+      ],
+      "bbox_max": [
+        131.861,
+        163.588,
+        46.2
+      ],
+      "bbox_size": [
+        263.721,
+        143.128,
+        46.2
+      ],
+      "volume": 265825.31,
+      "surface_area": 110992.791,
+      "solids": 1,
+      "valid": true,
+      "watertight": true,
+      "mesh_hash": "538d16332f3c73be",
+      "triangles": 153720,
+      "kind": "brep"
+    }
+  }
+}

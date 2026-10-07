@@ -1,0 +1,54 @@
+Hi Matthew,
+
+Here is the design for your request "[TEST] Remote control holder for the side of the couch" (PRINT-1), revision 2.
+The attached 3D viewer opens in any browser: orbit it, section it, and check every measurement against the spot it goes in.
+
+Revision 2, with the two changes you asked for: the saddle now fits a 140 mm wide arm (144 mm inside, the same 4 mm of play as before), and each pocket is 40% of its remote's length deep instead of half (72, 60 and 56 mm), so more of each remote sticks out to grab. Nothing else changed. The caddy is now 175 x 140 x 74 mm and a little lighter, so the price came down.
+
+MEASUREMENTS
+
+  caddy: 174.8 x 140.2 x 74.4 mm, 207.32 cm3, about 178.7 g
+
+  Key dimensions and choices (all in mm unless said otherwise):
+  - ARM_W = 140.0  (mm, arm width across the top (PRINT-1 r2: requester re-measured, was 150))
+  - ARM_CLEARANCE = 4.0  (mm, added to ARM_W so the saddle slides over padded fabric without dragging)
+  - ARM_ENVELOPE_H = 200.0  (mm, how far down the arm is modelled for the fit check (the sides of any couch arm))
+  - POCKET_DEPTH_FRAC = 0.4  (pocket depth as a fraction of each remote's length (PRINT-1 r2: was 0.5))
+  - POCKET_CLEARANCE = 2.0  (mm, added to each remote's width and thickness (1 mm per side, drops in one-handed))
+  - POCKET_CORNER_R = 3.0  (mm, vertical corner radius inside each pocket)
+  - POCKET_LEAD_IN = 1.2  (mm, 45 deg chamfer at each pocket rim)
+  - POCKET_WEB = 2.4  (mm, wall between pockets (6 perimeters))
+  - PLATE_T = 3.2  (mm, saddle plate lying on the arm (8 perimeters' worth of stiffness across the span))
+  - INNER_LEG_T = 3.2  (mm, leg down the seat side)
+  - INNER_LEG_H = 35.0  (mm, leg length below the arm top (stops the caddy sliding off outboard))
+  - BLOCK_ARM_WALL = 3.2  (mm, block wall against the outboard side of the arm (it is the outer leg))
+  - BLOCK_OUTER_WALL = 2.4  (mm, block wall facing the room)
+  - BLOCK_END_WALL = 3.2  (mm, block walls at both ends of the pocket row)
+  - BLOCK_FLOOR_T = 2.4  (mm, pocket floors (bridges in print orientation))
+  - EDGE_R = 1.5  (mm, radius on every edge running along the arm except the saddle top: nothing sharp touches the fabric)
+  - BED_CHAMFER = 0.4  (mm, elephant-foot chamfer round the saddle top (the bed face))
+  - PAD_D = 12.0  (mm, stick-on felt / rubber dot diameter)
+  - PAD_DEPTH = 0.8  (mm, locating recess depth)
+  - PAD_INSET = 15.0  (mm, pad centre distance from the saddle's inner edges and ends)
+
+  The full list is in measurements.md, attached.
+
+ESTIMATE
+
+  Material      PLA, about 178.7 g
+  Print time    about 12 h 06 min (+ 0.1 h finishing)
+  Quantity      1
+  Price         $55.50 total
+  Ready in      about 4 day(s) from your confirmation
+
+  Time and price are estimates from the model's geometry; the sliced print may differ a little either way.
+
+WHAT NEXT
+
+  Reply on the request in the portal (or to Jira's e-mail about it) with:
+    CONFIRM                 - to have it printed as shown, or
+    your notes              - anything to change: a size, a feature, the material, the count.
+  A revised design and estimate come back the same way, until you are happy.
+
+Thanks,
+Matthew Reda

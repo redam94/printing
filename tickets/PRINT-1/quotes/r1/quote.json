@@ -1,0 +1,206 @@
+{
+  "rev": 1,
+  "created": "2026-09-17T11:27:08",
+  "sent": "",
+  "model": "couch_remote_caddy",
+  "build_id": "20260917-112707",
+  "material": "PLA",
+  "qty": 1,
+  "estimate": {
+    "material": "PLA",
+    "qty": 1,
+    "currency": "USD",
+    "parts": [
+      {
+        "name": "caddy",
+        "bbox_mm": [
+          184.8,
+          140.2,
+          92.4
+        ],
+        "volume_cm3": 241.09,
+        "mass_g": 204.5,
+        "print_h": 13.63,
+        "wall_min_mm": 1.61,
+        "print_mode": "normal"
+      }
+    ],
+    "mass_g": 204.5,
+    "print_h": 13.8,
+    "post_h": 0.1,
+    "lead_days": 4,
+    "material_cost": 4.5,
+    "machine_cost": 27.59,
+    "labor_cost": 5.0,
+    "design_fee": 15.0,
+    "subtotal": 52.09,
+    "margin": 0.15,
+    "total": 60.0,
+    "per_unit": 60.0,
+    "rates": {
+      "shell_mm": 1.2,
+      "infill": 0.2,
+      "flow_g_per_h": 15.0,
+      "setup_min": 10,
+      "post_min_per_part": 5,
+      "machine_per_h": 2.0,
+      "labor_per_h": 20.0,
+      "design_fee": 15.0,
+      "min_charge": 10.0,
+      "margin": 0.15,
+      "queue_days": 2,
+      "material": {
+        "density_g_cm3": 1.24,
+        "cost_per_kg": 22.0
+      }
+    }
+  },
+  "note": "This is one piece that sits over the couch arm: a flat saddle across the top, a short leg down the seat side, and a block of three pockets hanging down the outside. No screws or glue; the remotes' weight holds it against the arm. Every edge that touches the fabric is rounded, and the underside has four shallow seats for stick-on felt dots (12 mm) so nothing rubs the upholstery. Each pocket is 2 mm bigger than the remote and half its length deep, so the top half of each remote stays in reach. Two things I assumed and would like you to check: (1) I read 'couch arm 150 wide, 25 thick' as a 150 mm wide, roughly flat arm top, with the 25 mm being the padding; if the arm is rounded or narrower, tell me its width at the top and I will adjust the saddle. (2) The caddy runs 140 mm along the arm; say if you want it shorter.",
+  "attachments": [
+    "PRINT-1-r1-3d-viewer.html",
+    "caddy.png",
+    "measurements.md"
+  ],
+  "subject": "[PRINT-1] Quote r1: [TEST] Remote control holder for the side of the couch",
+  "message_id": "",
+  "report_params": [
+    {
+      "name": "ARM_W",
+      "value": 150.0,
+      "comment": "mm, arm width across the top",
+      "derived": false
+    },
+    {
+      "name": "ARM_CLEARANCE",
+      "value": 4.0,
+      "comment": "mm, added to ARM_W so the saddle slides over padded fabric without dragging",
+      "derived": false
+    },
+    {
+      "name": "ARM_SPAN",
+      "value": 154.0,
+      "comment": "mm, inside width of the saddle",
+      "derived": true
+    },
+    {
+      "name": "ARM_ENVELOPE_H",
+      "value": 200.0,
+      "comment": "mm, how far down the arm is modelled for the fit check (the sides of any couch arm)",
+      "derived": false
+    },
+    {
+      "name": "REMOTES",
+      "value": "((45.0, 20.0, 180.0), (40.0, 18.0, 150.0), (38.0, 15.0, 140.0))",
+      "comment": "",
+      "derived": true
+    },
+    {
+      "name": "POCKET_DEPTH_FRAC",
+      "value": 0.5,
+      "comment": "pocket depth as a fraction of each remote's length; the top half stays in reach",
+      "derived": false
+    },
+    {
+      "name": "POCKET_CLEARANCE",
+      "value": 2.0,
+      "comment": "mm, added to each remote's width and thickness (1 mm per side, drops in one-handed)",
+      "derived": false
+    },
+    {
+      "name": "POCKET_CORNER_R",
+      "value": 3.0,
+      "comment": "mm, vertical corner radius inside each pocket",
+      "derived": false
+    },
+    {
+      "name": "POCKET_LEAD_IN",
+      "value": 1.2,
+      "comment": "mm, 45 deg chamfer at each pocket rim",
+      "derived": false
+    },
+    {
+      "name": "POCKET_WEB",
+      "value": 2.4,
+      "comment": "mm, wall between pockets (6 perimeters)",
+      "derived": false
+    },
+    {
+      "name": "POCKETS",
+      "value": "((45.0, 20.0, 90.0), (40.0, 18.0, 75.0), (38.0, 15.0, 70.0))",
+      "comment": "(x, y, depth) for pocket_array",
+      "derived": true
+    },
+    {
+      "name": "PLATE_T",
+      "value": 3.2,
+      "comment": "mm, saddle plate lying on the arm (8 perimeters' worth of stiffness across the span)",
+      "derived": false
+    },
+    {
+      "name": "INNER_LEG_T",
+      "value": 3.2,
+      "comment": "mm, leg down the seat side",
+      "derived": false
+    },
+    {
+      "name": "INNER_LEG_H",
+      "value": 35.0,
+      "comment": "mm, leg length below the arm top (stops the caddy sliding off outboard)",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_ARM_WALL",
+      "value": 3.2,
+      "comment": "mm, block wall against the outboard side of the arm (it is the outer leg)",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_OUTER_WALL",
+      "value": 2.4,
+      "comment": "mm, block wall facing the room",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_END_WALL",
+      "value": 3.2,
+      "comment": "mm, block walls at both ends of the pocket row",
+      "derived": false
+    },
+    {
+      "name": "BLOCK_FLOOR_T",
+      "value": 2.4,
+      "comment": "mm, pocket floors (bridges in print orientation)",
+      "derived": false
+    },
+    {
+      "name": "EDGE_R",
+      "value": 1.5,
+      "comment": "mm, radius on every edge running along the arm except the saddle top: nothing sharp touches the fabric",
+      "derived": false
+    },
+    {
+      "name": "BED_CHAMFER",
+      "value": 0.4,
+      "comment": "mm, elephant-foot chamfer round the saddle top (the bed face)",
+      "derived": false
+    },
+    {
+      "name": "PAD_D",
+      "value": 12.0,
+      "comment": "mm, stick-on felt / rubber dot diameter",
+      "derived": false
+    },
+    {
+      "name": "PAD_DEPTH",
+      "value": 0.8,
+      "comment": "mm, locating recess depth",
+      "derived": false
+    },
+    {
+      "name": "PAD_INSET",
+      "value": 15.0,
+      "comment": "mm, pad centre distance from the saddle's inner edges and ends",
+      "derived": false
+    }
+  ]
+}
